@@ -1,0 +1,50 @@
+function plotSpectrum(dataTable, groupingTable)
+
+groupLengths = uint32(groupingTable.Fun_nSpectra);
+nGroups = height(groupingTable);
+
+f = figure;
+ax = axes('Parent', f);
+
+% Get MATLAB colour palette
+co = get(gca,'ColorOrder');
+
+hold on
+
+j = 1;
+for i = 1:nGroups
+    l = groupLengths(i);
+    
+    % Cycle through colour palette
+    colorIndex = mod(i-1, length(co)) + 1;
+    co_i = co(colorIndex, :);
+    
+    try
+        xData = [dataTable.xData{j : l+j-1}];
+        yData = [dataTable.yData{j : l+j-1}];
+    catch
+        warning('Could not concatenate data from group %i',i);
+        xData = [0 0];
+        yData = [0 0];
+    end
+    
+    plot(xData, yData, 'Color', co_i);
+    
+    j = j + l;
+end
+
+% Set Axes
+xlabelText = 'Raman Shift [cm^-^1]';
+ylabelText = 'Intensity [a.u.]';
+xlabel(xlabelText,'FontWeight','bold');
+ylabel(ylabelText,'FontWeight','bold');
+set(ax,'FontSize',14);
+ax.XAxisLocation = 'bottom';
+ax.YAxisLocation = 'left';
+
+% Set Legend
+groupNames = groupingTable.GroupName;
+legend(ax,groupNames);
+
+end
+

@@ -1,6 +1,7 @@
 classdef Dummy
     %DUMMY Summary of this class goes here
     %   Detailed explanation goes here
+    %   Testing things
     
     properties
         Property1;

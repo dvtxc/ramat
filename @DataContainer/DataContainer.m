@@ -113,61 +113,9 @@ classdef DataContainer < handle
             t = listItems(self.Data);
         end
         
-        function trimData(self, startx, endx, overwrite)
-        %TRIMDATA Trim spectral data
-        %   Checks whether the container has spectral data
-        %   Trims data to [start wavenumber] till [end wavenumber]
+        trimData(self, startx, endx, overwrite);
         
-            for i = 1:numel(self)
-                if (self(i).dataType == "SpecData")
-                    % Select last data item
-                    didx = numel(self(i).Data);
-                    
-                    try
-                        trimmedDataObj = trimSpectrum(self(i).Data(didx), startx, endx);
-                        
-                        if (overwrite == true)
-                            self(i).Data(didx) = trimmedDataObj;
-                        else
-                            newDescription = sprintf("Trim [%i - %i]", startx, endx);
-                            self(i).addSpecData(newDescription, trimmedDataObj.XData, trimmedDataObj.YData);
-                        end
-                        
-                    catch
-                        warning('Could not trim spectral data.');
-                    end
-                end
-            end
-            
-        end
-        
-        function normalizeData(self, overwrite)
-        %NORMALIZEDATA Normalize spectral data
-        %   Checks whether the container has spectral data
-        %   Normalizes data, so sum = 1
-        
-            for i = 1:numel(self)
-                if (self(i).dataType == "SpecData")
-                    %Select last data item
-                    didx = numel(self(i).Data);
-                    
-                    try
-                        normalizedDataObj = normalizeSpectrum(self(i).Data(didx));
-                        
-                        if (overwrite == true)
-                            self(i).Data(didx) = normalizedDataObj;
-                        else
-                            newDescription = "Normalize";
-                            self(i).addSpecData(newDescription, normalizedDataObj.XData, normalizedDataObj.YData);
-                        end
-                        
-                    catch
-                        warning('Could not normalize spectral data.');
-                    end
-                    
-                end
-            end
-        end
+        normalizeData(self, overwrite);
         
         function idx = currentlySelectedDataItem(self)
             idx = numel(self.Data);

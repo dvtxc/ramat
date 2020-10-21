@@ -5,6 +5,26 @@ classdef SpecData < DataItem
     properties
         XData;
         YData;
+        
+        % Spectral Data
+        Data;
+        DataUnits;
+        
+        % Spectral Base
+        Graph;
+        GraphSize;
+        GraphUnit;
+        
+        % Spatial Grid Data
+        X;
+        Y;
+        Z;
+        XLength;
+        YLength;
+        ZLength;
+        XSize; % Make dependent?
+        YSize;
+        ZSize;
     end
     
     properties (SetAccess = private)

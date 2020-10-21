@@ -5,7 +5,6 @@ function data = importRaman(varargin)
 %   FILE TYPE MODES:
 %       0 = WIP
 %       1 = MATLAB
-%       2 = ASCII
 %
 %   Input Arguments:
 %  (ARG 1:) PATH TYPE. (*0 = FILES, 1 = FOLDER)
@@ -150,15 +149,10 @@ if numberOfFiles >= 1
             drawnow;
         end
         
-        switch filetype
-            case 0
-                data(f) = importSingleWIP(fullFileName);
-            case 1
-                if (consoleOutput == true)
-                    data(f) = importSingleRamanGraph(fullFileName);
-                else
-                    data(f) = importSingleRamanGraph(fullFileName,app);
-                end
+        if (consoleOutput == true)
+            data(f) = importSingleRamanGraph(fullFileName);
+        else
+            data(f) = importSingleRamanGraph(fullFileName,app);
         end
         		
 		% === END OF IMPORT ===

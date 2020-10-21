@@ -1,0 +1,9 @@
+- Importing only one data item crashes updateTable(), because of struct2table()
+- Rewrite table(DataSet) in updateTable() to only output names and other essential stuff
+- Disable automatic preview generation when sample has >100 spectra
+- Deleting a group always creates a new one. Even when no data is assigned to the deleted group.
+- If a samples is assigned a group number, which does not exist, updateTables() crashes when joining t and g tables.
+- Remove NaNs from LA Scans
+    - And make sure Nspectra is correctly updated, otherwise plotpca() will break down
+- Numbering of groups is not correct when a new group is added, though restored after renaming.
+- Opening .ramat causes RAMAT to crash, as it is suddenly treated as an ASCII file.

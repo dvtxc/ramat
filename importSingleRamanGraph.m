@@ -89,10 +89,10 @@ end
 yDataRaw = double(data.data');
 
 % OMIT FIRST PART?
-% xData = xData(100:end,:);
-% yDataRaw = yDataRaw(100:end,:);
-% wavResolution = wavResolution - 99;
-%
+xData = xData(107:942,:);
+yDataRaw = yDataRaw(107:942,:);
+wavResolution = 836;
+
 % --- let trim function handle this
 
 yData = yDataRaw - repmat(min(yDataRaw),wavResolution,1);

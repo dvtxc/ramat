@@ -76,6 +76,7 @@ else
                 '*.txt;*.asc', 'ASCII Format (*.txt,*.asc)'}, ...
                 'Select one or more files', ...
                 'MultiSelect', 'on');
+            
         case 1
             % Ask for folder, which contains files
             baseDir = uigetdir(start_path);
@@ -119,15 +120,24 @@ if (pathtype == 1)
     fileNames = transpose({fileList.name});
     
 else
+    if (size(strlength(fileNames),2) == 1)
+        % We got a single file name as char array:
+        % Put fileName into a cell, so we know that the length of
+        % fileNames = 1.
+        fileNames = {fileNames};
+    end
+        
     filetype = determineFileTypeMode(fileNames);
     
     fileNames = transpose(fileNames);
 end
 
 
-numberOfFiles = length(fileList);
+numberOfFiles = length(fileNames);
 
 if numberOfFiles >= 1
+    data = [];
+    
 	% Go through all those files.
 	for f = 1 : numberOfFiles
 		fullFileName = fullfile(baseDir, fileNames{f});
@@ -152,7 +162,7 @@ if numberOfFiles >= 1
         
         switch filetype
             case 0
-                data(f) = importSingleWIP(fullFileName);
+                data = [data importSingleWIP(fullFileName)];
             case 1
                 if (consoleOutput == true)
                     data(f) = importSingleRamanGraph(fullFileName);

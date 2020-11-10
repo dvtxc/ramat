@@ -6,22 +6,30 @@ classdef Dummy
     properties
         Property1;
         Name;
+        prop3;
     end
-    
-    properties (Dependent)
-        YData
-    end
-    
+
     properties (Access = private)
         Data;
     end
     
     methods
-        function obj = Dummy(inputArg1,inputArg2)
+        function obj = Dummy(inputArg1,inputArg2,arg3)
             %DUMMY Construct an instance of this class
             %   Detailed explanation goes here
+            
             obj.Property1 = inputArg1 + inputArg2;
-            obj.Data = SpecData('f',[34 4],[2 4]);
+            %obj.Data = SpecData('f',[34 4],[2 4]);
+            
+            if isempty(arg3)
+                obj.Name = 'gf';
+            end
+            
+            if nargin == 2
+                obj.prop3 = 'nothing passed to me';
+            elseif nargin == 3
+                obj.prop3 = arg3;
+            end
         end
         
         function outputArg = method1(obj,inputArg)
@@ -58,10 +66,6 @@ classdef Dummy
                 end 
             end
             
-        end
-        
-        function ydat = get.YData(self)
-            ydat = self.Data(1).YData;
         end
         
         

@@ -11,7 +11,7 @@ end
 % Determine extensions for all input files
 ext = cell(1, len);
 
-for i = 1:fileNames
+for i = 1:length(fileNames)
     [~, ~, ext{i}] = fileparts(fileNames{i});
 end
 

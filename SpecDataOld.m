@@ -1,10 +1,10 @@
-classdef SpecData < DataItem
+classdef SpecDataOld < DataItem
     %SPECDATA Summary of this class goes here
     %   Detailed explanation goes here
     
     properties
-        XData;
-        YData;
+        XData; % Deprecated
+        YData; % Deprecated
         
         % Spectral Data
         Data;
@@ -32,9 +32,17 @@ classdef SpecData < DataItem
     end
     
     methods
-        function obj = SpecData(desc,xdat,ydat)
+        function obj = SpecData(desc, xdat, ydat)
             %SPECDATA Construct an instance of this class
             %   Stores x-data and y-data
+            
+            if (nargin == 0)
+                % Create empty spectral data object
+                obj.Description = "empty";
+                obj.Data = [];
+            elseif (nargin == 3 && min(size(xdat)) == 1)
+                % This mode is deprecated:
+                % xdat
             
             if (nargin > 0)
                 obj.Description = desc;

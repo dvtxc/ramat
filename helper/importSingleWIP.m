@@ -20,15 +20,14 @@ end
 enableWITIOhelper();
 
 %% Import .wip file
-[O_wid, O_wip, ~] = wip.read('X:\121250_PolyKARD\5-Data\02_Raman\WIP Files\20200710_RC02 and RC03.wip','-all');
+[O_wid, O_wip, ~] = wip.read(fullFileName, '-all');
 
 % Output to out=[]
-out = [];
 f = 1;
 
-% Default: import everything
-for i = 1:len(O_wid)
-    out(f) = importSingleWIData(O_wid(f, 1));
+% Default: import everything, including text data objects
+for i = 1:size(O_wid,1)
+    out(i, 1) = importSingleWIData(O_wid(i, 1));
 end
 
 end

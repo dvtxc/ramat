@@ -3,7 +3,10 @@ function pcaresult = calculatePCA(self)
     
     
     try
-        inputdata = transpose(horzcat(self.FlatDataArray));
+        flatdata = horzcat(self.FlatDataArray);
+        flatdata( :, all(isnan(flatdata))) = [];
+        
+        inputdata = transpose(flatdata);
     catch
         error('Could not prepare data for PCA');
     end

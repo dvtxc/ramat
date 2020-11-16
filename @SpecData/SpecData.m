@@ -129,6 +129,7 @@ classdef SpecData < DataItem
             flatdata = reshape(flatdata, graphsize, [], 1);
         end
         
+        
         %% Setter
         function self = set.Data(self, data)
             % Force a three-dimensional matrix

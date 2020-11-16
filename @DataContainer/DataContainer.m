@@ -129,9 +129,33 @@ classdef DataContainer < handle
         function appendSpecData(self, specdataobj)
             %APPENDSPECDATA
             %   Appends specdata object to list of data items
+            %   It can also append multiple SpecData objects to multiple
+            %   DataContainer objects if the number of instances is equal.
             
-            lastInstance = numel(self.DataItems);
-            self.DataItems( lastInstance + 1 ) = specdataobj; 
+            numSpecDataObj = numel(specdataobj);
+            numSelf = numel(self);
+            
+            if ~(numSpecDataObj == 1 || numSpecDataObj == numSelf)
+                % The number of SpecData objects cannot be unambigeously
+                % appended to the corresponding DataContainer instances.
+                
+                return
+            end
+            
+            if numSpecDataObj == 1
+                newSpecData = specdataobj;
+            end
+            
+            for i = 1 : numSelf
+                % For every instance of DataContainer
+                
+                if (numSpecDataObj > 1)
+                    newSpecData = specdataobj(i);
+                end
+                
+                lastInstance = numel(self(i).DataItems);
+                self(i).DataItems( lastInstance + 1 ) = newSpecData;
+            end
         end
         
         function pcaresult = grouped_pca(self)

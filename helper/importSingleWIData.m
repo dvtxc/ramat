@@ -70,8 +70,8 @@ switch widO.Type
 %         specdat = specdat.removeConstantOffset();
         
         % Remove Background
-        %fprintf('-- Removing Baseline ...\n');
-        %specdat = specdat.removeBaseline();
+        fprintf('-- Removing Baseline ...\n');
+        specdat = specdat.removeBaseline();
         
         % Normalize Data
 %         fprintf('-- Normalising Spectrum ...\n');

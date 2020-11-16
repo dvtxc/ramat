@@ -21,6 +21,9 @@ classdef DataContainer < handle
         xData;
         yData;
         dataType;
+        
+        XSize;
+        YSize;
     end
     
     properties (Access = public)
@@ -55,10 +58,10 @@ classdef DataContainer < handle
                 %obj.DataItems = SpecData; % empty SpecData instance
             end
             
-            global CurrentProject
+            global prj
             
-            if ~isempty(CurrentProject)
-                obj.ProjectParent = CurrentProject;
+            if ~isempty(prj)
+                obj.ProjectParent = prj;
             end
             
         end
@@ -131,6 +134,48 @@ classdef DataContainer < handle
             self.DataItems( lastInstance + 1 ) = specdataobj; 
         end
         
+        function pcaresult = grouped_pca(self)
+            %GROUPED_PCA
+            %   Groups Data Containes, Sorts by group, calculates PCA
+            
+            % Filter for SpecDat
+            set = findobj(self, 'dataType', "SpecData");
+            
+            % Find unique groups and sort by group
+            group_arr = vertcat(set.Group);
+            group_name = transpose({group_arr.Name});
+            [~, ~, group_num] = unique(group_arr);
+            num_spectra = transpose([set.XSize] .* [set.YSize]);
+            data = vertcat(set.Data);
+                        
+            T = table(group_num, group_name, num_spectra, data);
+            T = sortrows(T, 'group_num');
+            
+            % Create summary table
+            num_spectra = accumarray(T.group_num, T.num_spectra);
+            group_name = unique(T.group_name);
+            G = table( group_name, num_spectra );
+            
+            % Perform PCA
+            pcaresult = data.calculatePCA();
+            
+            % Append Groups
+            pcaresult.Groups = G;
+            
+        end
+        
+        function h = getDataHandles(self, data_type)
+            %% Get handles of spectral data objects
+            
+            try
+                set = findobj(self, 'dataType', data_type);
+                h = vertcat(set.Data);
+            catch
+                warning('Could not find suitable data.');
+                h = [];
+            end
+            
+        end
    
                 
         %% Getters and setters of Dependent Properties
@@ -160,14 +205,30 @@ classdef DataContainer < handle
             end
         end
         
-        function self = set.yData(self, ydata)
+        function set.yData(self, ydata)
             lastInstance = numel(self.DataItems);
             self.DataItems(lastInstance).YData = ydata;
         end
         
-        function self = set.xData(self, xdata)
+        function set.xData(self, xdata)
             lastInstance = numel(self.DataItems);
             self.DataItems(lastInstance).XData = xdata;
+        end
+        
+        function xsize = get.XSize(self)
+            if numel(self.DataItems)
+                xsize = self.Data.XSize;
+            else
+                xsize = [];
+            end
+        end
+        
+        function ysize = get.YSize(self)
+            if numel(self.DataItems)
+                ysize = self.Data.YSize;
+            else
+                ysize = [];
+            end
         end
         
         %% Other methods

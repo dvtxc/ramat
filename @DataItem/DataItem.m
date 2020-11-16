@@ -19,11 +19,10 @@ classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
             T = T(:, {'Name', 'Description'});
         end
 
-        function T = table(self)
+        function T = totable(self)
             %TABLE Output data formatted as table
             %   This method overrides table() and replaces the need for
             %   struct2table()
-            
             T = struct2table(struct(self));
             
         end

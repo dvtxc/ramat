@@ -19,20 +19,20 @@ classdef Group < handle
         function self = Group(name)
             %GROUP Construct an instance of this class
             %   Detailed explanation goes here
-            global CurrentProject
+            global prj
             
-            if ~isempty(CurrentProject)
-                self.ProjectParent = CurrentProject;
+            if ~isempty(prj)
+                self.ProjectParent = prj;
             end
             
             self.Name = name;
         end
         
         function children = get.Children(self)
-            global CurrentProject
+            %global prj
             
-            if ~isempty(CurrentProject)
-                children = CurrentProject.DataSet.findgroup( self );
+            if ~isempty(self.ProjectParent)
+                children = self.ProjectParent.DataSet.findgroup( self );
             end
         end
         

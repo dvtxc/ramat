@@ -5,6 +5,7 @@ classdef PCAResult
         Coefs;
         Score;
         Variance;
+        Groups;
     end
     
     methods
@@ -15,6 +16,9 @@ classdef PCAResult
             self.Score = score;
             self.Variance = variance;
         end
+        
+        
+        scoresscatter(self, pcax);
         
     end
 end

@@ -2,5 +2,5 @@
 addpath('helper');
 
 % Initialise Project
-global CurrentProject;
-CurrentProject = Project();
+global prj;
+prj = Project();

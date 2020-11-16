@@ -72,7 +72,7 @@ classdef SpecData < DataItem
 
         end
         
-        
+        clipByMask(self, mask);
         
         function obj = normalizeSpectrum(obj)
             % Normalizes spectrum, so sum(Data) = 1

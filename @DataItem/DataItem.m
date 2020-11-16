@@ -1,4 +1,4 @@
-classdef DataItem < handle & matlab.mixin.Heterogeneous
+classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
     %DATAITEM Summary of this class goes here
     %   Detailed explanation goes here
     

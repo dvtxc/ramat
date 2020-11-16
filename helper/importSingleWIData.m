@@ -66,16 +66,16 @@ switch widO.Type
         % specdat_obj.trimData(trimStart, trimEnd)
         
         % Remove Offset
-        fprintf('-- Removing Offset ...\n');
-        specdat = specdat.removeConstantOffset();
+%         fprintf('-- Removing Offset ...\n');
+%         specdat = specdat.removeConstantOffset();
         
         % Remove Background
         %fprintf('-- Removing Baseline ...\n');
         %specdat = specdat.removeBaseline();
         
         % Normalize Data
-        fprintf('-- Normalising Spectrum ...\n');
-        specdat = specdat.normalizeSpectrum();
+%         fprintf('-- Normalising Spectrum ...\n');
+%         specdat = specdat.normalizeSpectrum();
         
         dataObject.appendSpecData(specdat)
         

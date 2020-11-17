@@ -82,8 +82,8 @@ classdef SpecData < DataItem
                 % Convert to double
                 dat = double(obj(i).Data);
                 
-                % Divide by sum of m-by-n-by-o array
-                obj(i).Data = dat ./ sum(sum(sum(dat)));
+                % Divide by sums of the individual spectra
+                obj(i).Data = dat ./ sum( dat, 3 );
             end
         end
         

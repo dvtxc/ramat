@@ -40,26 +40,35 @@ classdef Group < handle
             id = vertcat(self.ID);
         end
         
-        function sizes = countGroupFlatDataSizes(self)
+        function sizes = countGroupFlatDataSizes(self, omitnan)
             %COUNTGROUPFLATDATASIZES
             %   Since groups are stored in DataContainer, we need to
             %   calculate the flat data sizes of the contained data items
             %   here.
-            sizes = [];
-            groups = [];
+            
+            sizes = zeros( numel(self), 1 );
+            
             for i = 1:numel(self)
-                for j = 1:numel(self(i).Children)
-                    if (self(i).Children(j).dataType == "SpecData")
-                        % Analyse datacontainer
-                        dc = self(i).Children(j);
-                        sizes(end + 1) = self.Data.XSize * self.Data.YSize;
-                        groups(end + 1) = i;
-                    end
+                % For every instance of Group.
+                
+                % Get handles of all instances of DataContainer() within
+                % the current instance Group() that contain spectral data.
+                h = self(i).Children.getDataHandles('SpecData');
+                      
+                if (nargin > 1 && strcmp(omitnan, 'omitnan'))
+                    % Calculate number of spectra, whilst omitting
+                    % NaN-spectra.
+                    sizes(i) = sum( ~any( isnan( horzcat(h.FlatDataArray) ) ) );
+                else
+                    % Calculate number of spectra, including NaN-spectra.
+                    sizes(i) = size( horzcat( h.Data.FlatDataArray ), 2);
                 end
+
             end
-            
-            
+ 
         end
+        
+        pcaresult = groupedPCA(self);
         
         function t = table(self)
             %TABLE Output data formatted as table

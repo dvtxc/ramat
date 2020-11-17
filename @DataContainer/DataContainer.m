@@ -165,12 +165,20 @@ classdef DataContainer < handle
             % Filter for SpecDat
             set = findobj(self, 'dataType', "SpecData");
             
+            
             % Find unique groups and sort by group
             group_arr = vertcat(set.Group);
             group_name = transpose({group_arr.Name});
             [~, ~, group_num] = unique(group_arr);
-            num_spectra = transpose([set.XSize] .* [set.YSize]);
+%             num_spectra = transpose([set.XSize] .* [set.YSize]);
             data = vertcat(set.Data);
+            
+            % NaNs are not included in PCA and should, therefore, be left
+            % out of the calculation of the number of spectra
+            num_spectra = zeros( numel(set), 1 );
+            for i = 1 : numel(set)
+                num_spectra(i) = sum( ~any( isnan( set(i).Data.FlatDataArray) ) );
+            end
                         
             T = table(group_num, group_name, num_spectra, data);
             T = sortrows(T, 'group_num');

@@ -49,8 +49,9 @@ switch widO.Type
         end
         
         
-        % Convert to double
+        % Convert to double and store in correct order
         data = double(widO.Data);
+        data = permute(data, [2 1 3]);
         
         specdat = SpecData( ...
             item_name, ...

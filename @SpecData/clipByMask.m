@@ -9,11 +9,11 @@ function clipByMask(self, binaryMask)
         return
     end
     
-    if isnumeric(binaryMask)
+    if (isnumeric(binaryMask) || islogical(binaryMask))
         mask = double( binaryMask );
         mask( mask == 0 ) = NaN;
-    elseif (islogical(binaryMask) || iscell(binaryMask))
-        mask = binaryMask;
+    elseif iscell(binaryMask)
+        % Do nothing yet
     else
         return
     end
@@ -21,9 +21,9 @@ function clipByMask(self, binaryMask)
     for i = 1 : numel(self)
         % For every instance of SpecData
         
-        if iscell(mask)
+        if iscell(binaryMask)
             % Multiple masks stored within a cell array.
-            mask = double( mask{i} );
+            mask = double( binaryMask{i} );
             mask( mask == 0 ) = NaN;
         end
         

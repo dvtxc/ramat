@@ -10,8 +10,8 @@ function obj = trimSpectrum(obj, startG, endG)
         for i = 1:numel(obj)
             % Repeat operation for each spectral data object
 
-            gdat = obj(i).XData;
-            dat = obj(i).YData;
+            gdat = obj(i).Graph;
+            dat = obj(i).Data;
 
             % Find indices of trim region
             startIdx = find(gdat > startG, 1, 'first');

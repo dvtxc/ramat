@@ -1,4 +1,4 @@
-function pcaresult = groupedPCA(self)
+function pcaresult = groupedPCA(self, range)
     %GROUPEDPCA Summary of this function goes here
     %   Detailed explanation goes here
        
@@ -8,7 +8,11 @@ function pcaresult = groupedPCA(self)
     % Get handles of instances of SpecData()
     data = dch.getDataHandles('SpecData');
     
-    pcaresult = data.calculatePCA();
+    if nargin > 1
+        pcaresult = data.calculatePCA(range);
+    else
+        pcaresult = data.calculatePCA();
+    end
     
     % Calculate number of spectra for every group. Since NaN-spectra are
     % omitted by PCA, we need to exclude these.

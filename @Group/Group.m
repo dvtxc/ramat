@@ -56,11 +56,11 @@ classdef Group < handle
                 h = self(i).Children.getDataHandles('SpecData');
                       
                 if (nargin > 1 && strcmp(omitnan, 'omitnan'))
-                    % Calculate number of spectra, whilst omitting
+                    % Calculate number of spectra, whilst OMITTING
                     % NaN-spectra.
                     sizes(i) = sum( ~any( isnan( horzcat(h.FlatDataArray) ) ) );
                 else
-                    % Calculate number of spectra, including NaN-spectra.
+                    % Calculate number of spectra, INCLUDING NaN-spectra.
                     sizes(i) = size( horzcat( h.Data.FlatDataArray ), 2);
                 end
 
@@ -68,7 +68,38 @@ classdef Group < handle
  
         end
         
-        pcaresult = groupedPCA(self);
+        function specplot(self)
+            % SPECPLOT
+            
+            fig = figure;
+            hold on
+            
+            for i = 1:numel(self)
+                % For every instance of Group()
+                
+                % Get handles of all instances of DataContainer() within
+                % the current instance Group() that contain spectral data.
+                h = self(i).Children.getDataHandles('SpecData');
+                
+                xdata = [];
+                ydata = [];
+                
+                if ~isempty(h)
+                    % TO-DO: implement a check for uniform GRAPHDATA
+                    xdata = h(1).Graph;
+                    ydata = mean( horzcat( h.FlatDataArray ), 2, 'omitnan');
+                    
+                end
+                
+                plot(xdata, ydata);
+                                
+            end
+            
+            legend({self.Name}');
+            
+        end
+        
+        pcaresult = groupedPCA(self, range);
         
         function t = table(self)
             %TABLE Output data formatted as table

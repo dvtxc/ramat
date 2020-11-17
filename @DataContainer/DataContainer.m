@@ -95,7 +95,11 @@ classdef DataContainer < handle
             s = struct();
             for i = 1:numel(self)
                 for j = 1:numel(publicProperties)
-                    s(i).(publicProperties{j}) = self(i).(publicProperties{j}); 
+                    if strcmp(publicProperties{j}, 'Group')
+                        s(i).(publicProperties{j}) = self(i).(publicProperties{j}).Name;
+                    else
+                        s(i).(publicProperties{j}) = self(i).(publicProperties{j}); 
+                    end
                 end 
             end
             
@@ -158,6 +162,21 @@ classdef DataContainer < handle
             end
         end
         
+        function duplicateData(self, datatype)
+            
+            if nargin > 1
+                h = self.getDataHandles(datatype);
+            else
+                h = self.getDataHandles();
+            end
+                
+            duplicates = copy(h);
+            
+            self.appendSpecData( duplicates );
+            
+            
+        end
+        
         function pcaresult = grouped_pca(self)
             %GROUPED_PCA
             %   Groups Data Containes, Sorts by group, calculates PCA
@@ -199,12 +218,18 @@ classdef DataContainer < handle
         function h = getDataHandles(self, data_type)
             %% Get handles of spectral data objects
             
-            try
-                set = findobj(self, 'dataType', data_type);
-                h = vertcat(set.Data);
-            catch
-                warning('Could not find suitable data.');
-                h = [];
+            if nargin > 1
+                try
+                    set = findobj(self, 'dataType', data_type);
+                    h = vertcat(set.Data);
+                catch
+                    warning('Could not find suitable data.');
+                    h = [];
+                end
+            else
+                % Get all handles of DataItem() child classes within the
+                % DataContainer() instances.
+                h = vertcat(self.Data);
             end
             
         end

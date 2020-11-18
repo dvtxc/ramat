@@ -68,7 +68,7 @@ classdef Group < handle
  
         end
         
-        function specplot(self)
+        function specplot(self, stacked)
             % SPECPLOT
             
             fig = figure;
@@ -88,6 +88,12 @@ classdef Group < handle
                     % TO-DO: implement a check for uniform GRAPHDATA
                     xdata = h(1).Graph;
                     ydata = mean( horzcat( h.FlatDataArray ), 2, 'omitnan');
+                    
+                    if nargin>1
+                        if stacked == 1
+                            ydata = ydata - 0.005 .* (i - 1);
+                        end
+                    end
                     
                 end
                 

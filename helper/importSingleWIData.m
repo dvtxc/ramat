@@ -32,7 +32,7 @@ switch widO.Type
         end
         
         % Append raw (=as-is) spectral data to DataContainer
-        dataObject.appendSpecData(specdat);
+%         dataObject.appendSpecData(specdat);
         
         %% PROCESSED DATA
         % Process data
@@ -71,8 +71,8 @@ switch widO.Type
 %         specdat = specdat.removeConstantOffset();
         
         % Remove Background
-        fprintf('-- Removing Baseline ...\n');
-        specdat = specdat.removeBaseline();
+%         fprintf('-- Removing Baseline ...\n');
+%         specdat = specdat.removeBaseline();
         
         % Normalize Data
 %         fprintf('-- Normalising Spectrum ...\n');

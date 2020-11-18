@@ -1,6 +1,7 @@
 function pcaresult = calculatePCA(self, range)
     %CALCULATEPCA
-        
+       
+    % Prepare data
     try
         if nargin > 1
             % Calculate PCA of a specific range
@@ -9,6 +10,7 @@ function pcaresult = calculatePCA(self, range)
             
             % Create a trimmed SpecData() as a copy.
             tmpdat = trimSpectrum(copy(self), startG, endG);
+            graphBase = tmpdat.Graph;            
             
             flatdata = horzcat(tmpdat.FlatDataArray);
             
@@ -20,6 +22,8 @@ function pcaresult = calculatePCA(self, range)
             % Use the full range
             
             flatdata = horzcat(self.FlatDataArray);
+            graphBase = self.Graph;
+            
         end
         
         % Remove NaN-Spectra
@@ -35,5 +39,7 @@ function pcaresult = calculatePCA(self, range)
     
     % Return results as an PCAResult Object
     pcaresult = PCAResult(coefs, score, variance);
+    
+    pcaresult.CoefsBase = graphBase;
 end
 

@@ -2,10 +2,11 @@ classdef PCAResult
     %PCARESULT Contains results of PCA
         
     properties
-        Coefs;
-        Score;
+        Coefs;      % Coefficients
+        Score;      % Scores
         Variance;
         Groups;
+        CoefsBase;  % Spectral Base for loadings plot of the coefficients
     end
     
     methods

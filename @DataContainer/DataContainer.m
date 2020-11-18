@@ -95,7 +95,7 @@ classdef DataContainer < handle
             s = struct();
             for i = 1:numel(self)
                 for j = 1:numel(publicProperties)
-                    if strcmp(publicProperties{j}, 'Group')
+                    if strcmp(publicProperties{j}, 'Group') && ~isempty(self(i).Group)
                         s(i).(publicProperties{j}) = self(i).(publicProperties{j}).Name;
                     else
                         s(i).(publicProperties{j}) = self(i).(publicProperties{j}); 

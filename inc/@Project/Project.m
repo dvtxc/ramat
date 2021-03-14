@@ -5,6 +5,7 @@ classdef Project < handle
     properties
         DataSet = DataContainer.empty;
         GroupSet = Group.empty;
+        Name = "";
     end
     
     methods
@@ -20,6 +21,7 @@ classdef Project < handle
             
             self.GroupSet(end + 1) = Group( groupname );
         end
+        
     end
 end
 

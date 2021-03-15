@@ -100,7 +100,7 @@ classdef Group < handle
                     
                     if nargin>1
                         if stacked == 1
-                            ydata = ydata - 0.005 .* (i - 1);
+                            ydata = ydata - 0.01 .* (mod(i,2) - 1);
                         end
                     end
                     

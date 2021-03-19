@@ -14,12 +14,18 @@ classdef Project < handle
             %   Appends a dataset to the project object
 
             self.DataSet = [self.DataSet; dataset];
+            
+            % Create a new group for the newly appended data
+            newGroup = self.add_group("New Import");
+            dataset.setgroup( newGroup );
         end
         
-        function add_group(self, groupname)
+        function newGroup = add_group(self, groupname)
             %ADD_GROUP
             
-            self.GroupSet(end + 1) = Group( groupname );
+            newGroup = Group( groupname );
+            self.GroupSet(end + 1) = newGroup;
+            
         end
         
     end

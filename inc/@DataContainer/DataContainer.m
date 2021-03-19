@@ -121,6 +121,23 @@ classdef DataContainer < handle
             
         end
         
+        function setgroup(self, group)
+            %SETGROUP
+            %   Set group for the DataContainers
+            %   self:   nx1 DataContainer
+            %   group:  1x1 Group
+            
+            % Only one group can be assigned
+            if numel(group) > 1
+                group = group(1);
+            end
+            
+            % Assign group to each instance of DataContainer
+            for i = 1:numel(self)
+                self(i).Group = group;
+            end
+        end
+        
         function addSpecData(self, name, gdata, data, graph_unit, data_unit)
             %ADDSPECDATA
             %   Create new SpecData instance containing spectral data

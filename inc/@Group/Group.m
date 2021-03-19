@@ -55,13 +55,22 @@ classdef Group < handle
                 % the current instance Group() that contain spectral data.
                 h = self(i).Children.getDataHandles('SpecData');
                       
-                if (nargin > 1 && strcmp(omitnan, 'omitnan'))
-                    % Calculate number of spectra, whilst OMITTING
-                    % NaN-spectra.
-                    sizes(i) = sum( ~any( isnan( horzcat(h.FlatDataArray) ) ) );
+                if ~isempty(h)
+                    % Current instance of Group() has instances of
+                    % DataContainer()
+                
+                    if (nargin > 1 && strcmp(omitnan, 'omitnan'))
+                        % Calculate number of spectra, whilst OMITTING
+                        % NaN-spectra.
+                        sizes(i) = sum( ~any( isnan( horzcat(h.FlatDataArray) ) ) );
+                    else
+                        % Calculate number of spectra, INCLUDING NaN-spectra.
+                        sizes(i) = size( horzcat( h.Data.FlatDataArray ), 2);
+                    end
                 else
-                    % Calculate number of spectra, INCLUDING NaN-spectra.
-                    sizes(i) = size( horzcat( h.Data.FlatDataArray ), 2);
+                    % Current instance of Group() is empty or has
+                    % non-spectral data.
+                    sizes(i) = 0;
                 end
 
             end

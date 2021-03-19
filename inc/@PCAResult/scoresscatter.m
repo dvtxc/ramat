@@ -29,6 +29,10 @@ function scoresscatter(pcaresult, pcax)
     j = 1; % Score Index
     for i = 1:nGroups
         l = groupLengths(i);
+        
+        % Color for current item
+        coidx = mod(i - 1, 6 ) + 1;
+        color = co(coidx, :);
 
         % Plot scatter for every group
         % Invert Y-axis for compatibility with PCA function of ORIGIN.
@@ -36,14 +40,14 @@ function scoresscatter(pcaresult, pcax)
             pcaresult.Score(j:l+j-1, pcax(1)), ... % x-axis
             -pcaresult.Score(j:l+j-1, pcax(2)), ...% inv. y-axis
             45, ...                                 % size
-            co(i,:), ...                            % color
+            color, ...                              % color
             'filled');                              % marker type
         
         % Plot confidence ellipses
         error_ellipse( ...
             pcaresult.Score(j:l+j-1, pcax(1)), ...
             -pcaresult.Score(j:l+j-1, pcax(2)), ...
-            co(i,:));
+            color);
         
         % Fast-forward in scores array by group length.
         j = j + l;

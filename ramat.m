@@ -7,6 +7,7 @@ rootdir = GetExecutableFolder();
 % Add subfolders
 addpath('inc');
 addpath(fullfile('inc','gui'));
+addpath(fullfile('inc','gui','images'));
 addpath('helper');
 
 % Check if WITIO redist is enabled

@@ -5,6 +5,7 @@ classdef Project < handle
     properties
         DataSet = DataContainer.empty;
         GroupSet = Group.empty;
+        AnalysisSet = Analysis.empty;
         Name = "";
     end
     

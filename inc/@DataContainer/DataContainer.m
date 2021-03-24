@@ -305,6 +305,18 @@ classdef DataContainer < handle
             end
         end
         
+        %% Destructor
+        
+        function delete(self)
+            %DESTRUCTOR Delete all references to object
+            
+%             for i = 1:numel(self)
+%                 % For every instance
+%                 ds = self.ProjectParent.DataSet;
+%                 
+%             end
+        end
+        
         %% Other methods
         function t = listDataItems(self)
             t = listItems(self.DataItems);

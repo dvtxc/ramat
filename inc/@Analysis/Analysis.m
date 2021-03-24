@@ -2,11 +2,15 @@ classdef Analysis < handle
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties
+    properties (Access = public)
         DataSet = DataContainer.empty;
         Parent = Project.empty;
         Selection = [];
         Name = "";
+    end
+    
+    properties (Access = public, Dependent)
+        DisplayName;
     end
     
     methods
@@ -23,6 +27,16 @@ classdef Analysis < handle
         function set_name(self, name)
             self.Name = name;
         end
+        
+        function displayname = get.DisplayName(self)
+            % Get formatted DisplayName
+            if (self.Name == "")
+                displayname = "Empty Subset";
+            else
+                displayname = self.Name;
+            end
+        end
+
     end
 end
 

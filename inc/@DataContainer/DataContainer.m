@@ -314,6 +314,10 @@ classdef DataContainer < handle
         
         normalizeData(self, overwrite);
         
+        subsetHandle = addToNewSubset(self);
+        
+        addToSubset(self, subsetHandle);
+        
         function idx = currentlySelectedDataItem(self)
             idx = numel(self.DataItems);
         end

@@ -21,12 +21,21 @@ classdef Project < handle
             dataset.setgroup( newGroup );
         end
         
-        function newGroup = add_group(self, groupname)
+        function newGroupHandle = add_group(self, groupname)
             %ADD_GROUP
             
-            newGroup = Group( groupname );
-            self.GroupSet(end + 1) = newGroup;
+            newGroupHandle = Group( groupname );
+            self.GroupSet(end + 1) = newGroupHandle;
             
+        end
+        
+        function newAnalysisHandle = add_analysis(self, dataset)
+            %ADD_ANALYSIS
+            %   Add a new data subset for analysis
+            %   Returns:    handle to new analysis subset
+            
+            newAnalysisHandle = Analysis(self, dataset);
+            self.AnalysisSet = [self.AnalysisSet; newAnalysisHandle];
         end
         
     end

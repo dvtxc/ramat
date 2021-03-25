@@ -1,9 +1,10 @@
 classdef Analysis < handle
-    %UNTITLED Summary of this class goes here
+    %ANALYSIS Analysis subset used for PCA Analysis
     %   Detailed explanation goes here
     
     properties (Access = public)
         DataSet = DataContainer.empty;
+        GroupSet = AnalysisGroup.empty;
         Parent = Project.empty;
         Selection = [];
         Name = "";
@@ -35,6 +36,29 @@ classdef Analysis < handle
             else
                 displayname = self.Name;
             end
+        end
+        
+        function add_group(varargin)
+            %ADD_GROUP Add analysis group to current analysis subset
+            
+            self = varargin{1};
+            
+            if (nargin == 1)
+                % Construct new analysis group without name
+                
+                newgroup = AnalysisGroup(self);
+                
+            elseif (nargin == 2)
+                % Construct new analysis group with name
+                
+                name = varargin{2};
+                newgroup = AnalysisGroup(self, name);
+                
+            end
+            
+            % Add new group to group set.
+            self.GroupSet = [self.GroupSet; newgroup];
+            
         end
 
     end

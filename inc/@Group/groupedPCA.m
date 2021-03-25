@@ -1,5 +1,5 @@
 function pcaresult = groupedPCA(self, range)
-    %GROUPEDPCA Summary of this function goes here
+    %GROUPEDPCA Compute PCA of spectral data in groups
     %   Detailed explanation goes here
        
     % Get handles of instances of DataContainer() within these groups.

@@ -24,7 +24,7 @@ classdef Analysis < handle
         function append_data(self, dataset)
             self.DataSet = [self.DataSet; dataset];
         end
-        
+                
         function set_name(self, name)
             self.Name = name;
         end
@@ -38,7 +38,7 @@ classdef Analysis < handle
             end
         end
         
-        function add_group(varargin)
+        function newgroup = add_group(varargin)
             %ADD_GROUP Add analysis group to current analysis subset
             
             self = varargin{1};
@@ -58,6 +58,39 @@ classdef Analysis < handle
             
             % Add new group to group set.
             self.GroupSet = [self.GroupSet; newgroup];
+            
+        end
+        
+        function move_data_to_group(self, dataset, newgroup)
+            %MOVE_DATA_TO_GROUP Moves data to an analysis group by
+            %DataContainer handle
+            %   This function will move ALL instances of the DataContainer
+            %   to a single group.
+            
+            for i = 1:numel(dataset)
+                % For every datacontainer that has to be moved
+                
+                datacon = dataset(i);
+                
+                % Step 1: Remove data from old group(s)
+                                
+                % Remove occurences of the datacontainer in unassigned
+                % dataset.
+                self.DataSet(self.DataSet == datacon) = [];
+                
+                % Check all the groups
+                for g = 1:numel(self.GroupSet)
+                    % Find occurences of the datacontainer in this group's
+                    % children and remove the occurences
+                    
+                    group = self.GroupSet(g);
+                    group.Children(datacon == group.Children) = [];
+                    
+                end
+                
+                % Step 2: Assign data to new group
+                newgroup.append_data(datacon);
+            end
             
         end
 

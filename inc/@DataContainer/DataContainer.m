@@ -24,6 +24,8 @@ classdef DataContainer < handle
         
         XSize;
         YSize;
+        
+        AnalysisGroupParent = AnalysisGroup.empty;
     end
     
     properties (Access = public)
@@ -303,6 +305,10 @@ classdef DataContainer < handle
             else
                 ysize = [];
             end
+        end
+        
+        function analysisGroupParent = get.AnalysisGroupParent(self)
+            % TO DO: return the parent group
         end
         
         %% Destructor

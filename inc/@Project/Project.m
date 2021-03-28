@@ -6,6 +6,7 @@ classdef Project < handle
         DataSet = DataContainer.empty;
         GroupSet = Group.empty;
         AnalysisSet = Analysis.empty;
+        ActiveAnalysis = Analysis.empty;
         Name = "";
     end
     

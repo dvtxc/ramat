@@ -35,8 +35,8 @@ classdef AnalysisGroup < handle
                 
             elseif (nargin == 2)
                 % Construct empty AnalysisGroup with name
-                name = varargin{1};
-                parent = varargin{2};
+                parent = varargin{1};
+                name = varargin{2};
                 
                 self.Name = name;
                 self.AnalysisParent = parent;

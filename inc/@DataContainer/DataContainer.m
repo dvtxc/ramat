@@ -5,7 +5,7 @@ classdef DataContainer < handle
     %   Instances)
     
     properties (Access = public)
-        name;
+        Name;
 %         xUnits;
 %         xDataRaw;
 %         yDataRaw;
@@ -26,6 +26,8 @@ classdef DataContainer < handle
         YSize;
         
         AnalysisGroupParent = AnalysisGroup.empty;
+        
+        DisplayName;
     end
     
     properties (Access = public)
@@ -43,7 +45,7 @@ classdef DataContainer < handle
             %DATACONTAINER Construct an instance of this class
             
             if (nargin > 1)
-                obj.name = name;
+                obj.Name = name;
 %                 obj.xUnits = xUnits;
 %                 obj.xDataRaw = xDataRaw;
 %                 obj.yDataRaw = yDataRaw;
@@ -53,10 +55,10 @@ classdef DataContainer < handle
                 
                 obj.DataItems = SpecData('Spectrum', xData, yData);
             elseif (nargin == 1)
-                obj.name = name;
+                obj.Name = name;
                 obj.DataItems = SpecData;
             else
-                obj.name = 'empty';
+                obj.Name = "";
                 %obj.DataItems = SpecData; % empty SpecData instance
             end
             
@@ -252,9 +254,23 @@ classdef DataContainer < handle
             end
             
         end
+        
+        function set.Name(self, newname)
+            self.Name = newname;
+        end
    
                 
         %% Getters and setters of Dependent Properties
+        function displayname = get.DisplayName(self)
+            %DISPLAYNAME Format name nicely
+            
+            if (self.Name == "")
+                displayname = "No Name";
+            else
+                displayname = self.Name;
+            end
+        end
+        
         function ydat = get.yData(self)
             
             if (self.dataType == "SpecData")

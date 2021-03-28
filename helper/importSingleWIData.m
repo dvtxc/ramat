@@ -4,9 +4,9 @@ function dataObject = importSingleWIData(widO)
 % Create a DataContainer object
 dataObject = DataContainer();
 item_name = widO.Name;
-dataObject.name = item_name;
+dataObject.Name = item_name;
 
-fprintf('\n%s\n', dataObject.name);
+fprintf('\n%s\n', dataObject.DisplayName);
 
 switch widO.Type
     case 'TDGraph'

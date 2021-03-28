@@ -39,6 +39,17 @@ classdef Project < handle
             self.AnalysisSet = [self.AnalysisSet; newAnalysisHandle];
         end
         
+        function pca(self)
+            % Create new PCA analysis
+            
+            if ~isempty(self.AnalysisSet)
+                if ~isempty(self.ActiveAnalysis)
+                    subset = self.ActiveAnalysis;
+                    subset.calculate_pca();
+                end
+            end
+        end
+        
     end
 end
 

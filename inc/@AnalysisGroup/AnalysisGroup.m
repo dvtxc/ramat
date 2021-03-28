@@ -64,6 +64,10 @@ classdef AnalysisGroup < handle
             % TO-DO: checks
         end
         
+        function set.Name(self, newname)
+            self.Name = newname;
+        end
+        
         function displayname = get.DisplayName(self)
             %DISPLAYNAME Format name nicely
             

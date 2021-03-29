@@ -8,6 +8,7 @@ classdef Project < handle
         AnalysisSet = Analysis.empty;
         ActiveAnalysis = Analysis.empty;
         Name = "";
+        AnalysisResults;
     end
     
     methods
@@ -39,15 +40,28 @@ classdef Project < handle
             self.AnalysisSet = [self.AnalysisSet; newAnalysisHandle];
         end
         
-        function pca(self)
+        function pcaresult = create_pca(self, options)
             % Create new PCA analysis
+            
+            arguments
+                self Analysis
+                options.Range (2,1) double = [];
+                options.Selection (:,:) DataContainer = DataContainer.empty;
+            end
             
             if ~isempty(self.AnalysisSet)
                 if ~isempty(self.ActiveAnalysis)
                     subset = self.ActiveAnalysis;
-                    subset.calculate_pca();
+                    
+                    pcaresult = subset.calculate_pca(options.Range, options.Selection);
                 end
             end
+        end
+        
+        function add_analysis_result(self, newresult)
+            %ADD_ANALYSIS_RESULT
+            
+            self.AnalysisResults = [self.AnalysisResult; newresult];
         end
         
     end

@@ -3,7 +3,7 @@ classdef Analysis < handle
     %   Detailed explanation goes here
     
     properties (Access = public)
-        DataSet = DataContainer.empty;
+%         DataSet = DataContainer.empty;
         GroupSet = AnalysisGroup.empty;
         Parent = Project.empty;
         Selection = [];
@@ -12,17 +12,22 @@ classdef Analysis < handle
     
     properties (Access = public, Dependent)
         DisplayName;
+        DataSet; % Set of all DataContainers
     end
     
     methods
         function self = Analysis(parentProject, dataset)
             %CONSTRUCTOR
             self.Parent = parentProject;
-            self.DataSet = dataset;
+            
+            self.append_data(dataset);
         end
         
         function append_data(self, dataset)
-            self.DataSet = [self.DataSet; dataset];
+            
+            newgroup = self.add_group();
+            newgroup.append_data(dataset);
+            
         end
                 
         function set_name(self, name)
@@ -76,7 +81,7 @@ classdef Analysis < handle
                                 
                 % Remove occurences of the datacontainer in unassigned
                 % dataset.
-                self.DataSet(self.DataSet == datacon) = [];
+%                 self.DataSet(self.DataSet == datacon) = [];
                 
                 % Check all the groups
                 for g = 1:numel(self.GroupSet)
@@ -92,6 +97,68 @@ classdef Analysis < handle
                 newgroup.append_data(datacon);
             end
             
+        end
+        
+        function dataset = get.DataSet(self)
+            %DATASET Ungrouped data set of this analysis subset.
+            
+            dataset = DataContainer.empty;
+            
+            for i = 1:numel(self.GroupSet)
+                % Look for data in each group
+                
+                group = self.GroupSet(i);
+                
+                for j = 1:numel(group.Children)
+                    dc = group.Children(j);
+                    
+                    dataset = [dataset; dc];
+                    
+                end
+            end
+            
+        end
+        
+        function pcaresult = compute_pca(self, options)
+            %COMPUTE_PCA Compute a principle component analysis (PCA) of
+            %current analysis subset.
+            %Input:
+            %   self
+            %   options.Range:      range [2x1 array] in cm^-1
+            %   options.Selection   selection of DataContainers
+            %
+            %Output:
+            %   pcaresult:  PCAResult object
+            
+            arguments
+                self Analysis
+                options.Range (2,1) double = [];
+                options.Selection (:,:) DataContainer = DataContainer.empty;
+            end
+                        
+            % Get handles of selected data containers
+            if isempty(options.Selection)
+                % No selection has been provided, take all data containers
+                % in the current analysis
+                data = self.DataSet;
+                
+            else
+                % Selection has been provided
+                
+                % Make sure the selection corresponds to data that is
+                % within this analysis subset
+                % TO-DO
+                
+                data = options.Selection;
+                
+            end
+                
+            
+            if isempty(options.Range)
+                pcaresult = data.calculatePCA();
+            else
+                pcaresult = data.calculatePCA(options.Range);
+            end
         end
 
     end

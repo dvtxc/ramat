@@ -44,16 +44,17 @@ classdef Project < handle
             % Create new PCA analysis
             
             arguments
-                self Analysis
-                options.Range (2,1) double = [];
+                self Project
+                options.Range = [];
                 options.Selection (:,:) DataContainer = DataContainer.empty;
             end
             
             if ~isempty(self.AnalysisSet)
                 if ~isempty(self.ActiveAnalysis)
+                    % Found analysis subset to operate on
                     subset = self.ActiveAnalysis;
                     
-                    pcaresult = subset.calculate_pca(options.Range, options.Selection);
+                    pcaresult = subset.compute_pca(Range=options.Range, Selection=options.Selection);
                 end
             end
         end

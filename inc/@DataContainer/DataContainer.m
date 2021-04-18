@@ -325,6 +325,16 @@ classdef DataContainer < handle
         
         function analysisGroupParent = get.AnalysisGroupParent(self)
             % TO DO: return the parent group
+            
+            analysisGroupParent = AnalysisGroup.empty;
+            
+            for i = 1 : numel(prj.AnalysisSet)
+                subset = prj.AnalysisSet(i);
+                
+                for j = 1:numel(subset.GroupSet)
+                    subsetgroup = subset.GroupSet(j);
+                end
+            end
         end
         
         %% Destructor

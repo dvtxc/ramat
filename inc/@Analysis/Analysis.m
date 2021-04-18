@@ -132,7 +132,7 @@ classdef Analysis < handle
             
             arguments
                 self Analysis
-                options.Range (2,1) double = [];
+                options.Range
                 options.Selection (:,:) DataContainer = DataContainer.empty;
             end
                         
@@ -152,15 +152,75 @@ classdef Analysis < handle
                 data = options.Selection;
                 
             end
-                
             
-            if isempty(options.Range)
-                pcaresult = data.calculatePCA();
+            if ~isempty(data)
+                
+                % Get list of groups
+                grouplist = self.getParentGroups(data, ExclusiveDataType="SpecData");
+                
+                % Get spectral data handles from selected containers
+                specdata = data.getDataHandles('SpecData');
+
+                if ~isempty(specdata)
+                    % Selection contains actual spectral data
+
+                    if isempty(options.Range)
+                        % No range has been provided, take entire range
+
+                        pcaresult = specdata.calculatePCA();
+                    else
+                        % Take only provided range
+
+                        pcaresult = specdata.calculatePCA(options.Range);
+                        
+                    end
+                else
+                    % No spectral data
+                    warning("No spectral data has been selected");
+                    
+                end
             else
-                pcaresult = data.calculatePCA(options.Range);
+                % No data
+                warning("No data has been selected");
+                
+            end
+            
+        end
+        
+        function groupList = getParentGroups(self, dataContainer, options)
+            % Get parent groups belonging to data containers
+            
+            arguments
+                self
+                dataContainer
+                options.ExclusiveDataType = [];
+            end
+            
+            groupList = AnalysisGroup.empty();
+            
+            for i = 1 : numel(dataContainer)
+                datacon = dataContainer(i);
+                
+                if ~isempty(options.ExclusiveDataType)
+                    if (datacon.dataType ~= options.ExclusiveDataType)
+                        % Different data type: skip data container
+                        
+                        continue;
+                    end
+                end
+                
+                for j = 1 : numel(self.GroupSet)
+                    % Look in each group
+                    group = self.GroupSet(j);
+                    
+                    if any(group.Children == datacon)
+                        % Found datacon in current group
+                        
+                        groupList(end + 1) = group;
+                    end
+                end
             end
         end
-
     end
 end
 

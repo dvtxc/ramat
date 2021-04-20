@@ -135,6 +135,8 @@ classdef Analysis < handle
                 options.Range
                 options.Selection (:,:) DataContainer = DataContainer.empty;
             end
+            
+            pcaresult = PCAResult.empty;
                         
             % Get handles of selected data containers
             if isempty(options.Selection)
@@ -152,7 +154,7 @@ classdef Analysis < handle
                 data = options.Selection;
                 
             end
-            
+                        
             if ~isempty(data)
                 
                 % Get list of groups
@@ -160,6 +162,24 @@ classdef Analysis < handle
                 
                 % Get spectral data handles from selected containers
                 specdata = data.getDataHandles('SpecData');
+                
+                % Check whether we have group information for all data
+                if (numel(grouplist) ~= numel(specdata))
+                    warning("Data selection for PCA failed.");
+                    return
+                end
+                                
+                % Sort data by group
+                [groups, ~, groupIdx] = unique(grouplist);
+                [sortedGroupIdx, sortingIdx] = sort(groupIdx);
+                
+                specdata = specdata(sortingIdx);
+                
+                groupNames = vertcat( groups.DisplayName );
+                
+                % Get data sizes
+                dataSizes = vertcat( specdata.DataSize );
+                groupSizes = accumarray( sortedGroupIdx, dataSizes);
 
                 if ~isempty(specdata)
                     % Selection contains actual spectral data
@@ -179,6 +199,16 @@ classdef Analysis < handle
                     warning("No spectral data has been selected");
                     
                 end
+                
+                % Add source data information to PCA result
+                sourcedata = struct( ...
+                    'GroupName', num2cell(groupNames), ...
+                    'GroupSize', num2cell(groupSizes) ...
+                    );
+                
+                pcaresult.SrcData = sourcedata;
+                pcaresult.DataSizes = dataSizes;
+                
             else
                 % No data
                 warning("No data has been selected");

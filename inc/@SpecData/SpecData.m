@@ -29,6 +29,7 @@ classdef SpecData < DataItem
         XSize;
         YSize;
         ZSize;
+        DataSize;
         
         XData; % Deprecated
         YData; % Deprecated
@@ -119,6 +120,10 @@ classdef SpecData < DataItem
         function zres = get.ZSize(self)
             % TO BE IMPLEMENTED
             zres = 0;
+        end
+        
+        function datares = get.DataSize(self)
+            datares = self.XSize * self.YSize;
         end
         
         function flatdata = get.FlatDataArray(self)

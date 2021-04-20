@@ -74,7 +74,7 @@ classdef AnalysisGroup < handle
             if (self.Name == "")
                 displayname = "Empty Group";
             else
-                displayname = self.Name;
+                displayname = string( self.Name );
             end
         end
         

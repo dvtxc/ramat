@@ -5,16 +5,17 @@ function scoresscatter(pcaresult, pcax)
 %   pcaresult:  PCAResult() object
 %   pcax:       2x1 integer array with the principal component axis numbers
 
-    if isempty(pcaresult.Groups)
+    if isempty(pcaresult.SrcData)
         % We need a grouping table to create a legend.
+        
         num_spectra = size(pcaresult.Score, 1);
-        pcaresult.Groups = table( ...
-            {'Ungrouped'}, num_spectra, ...
-            'VariableNames', {'group_name', 'num_spectra'});
+        pcaresult.SrcData.GroupName = "Ungrouped";
+        pcaresult.SrcData.GroupSize = num_spectra;
+
     end
         
-    groupLengths = uint32(pcaresult.Groups.num_spectra);
-    nGroups = height(pcaresult.Groups);
+    groupLengths = vertcat(pcaresult.SrcData.GroupSize);
+    nGroups = numel(pcaresult.SrcData);
     
     f = figure;
     ax = axes('Parent',f);
@@ -63,17 +64,9 @@ function scoresscatter(pcaresult, pcax)
     ax.YAxisLocation = 'left';
 
     % Set Legend
-    groupNames = pcaresult.Groups.group_name;
+    groupNames = vertcat(pcaresult.SrcData.GroupName);
     legend(s,groupNames);
 
 
 end
-%%
-
-%n = 1; l=82; error_ellipse(score(n:l+n-1,pcax(1)),-score(n:l+n-1,pcax(2)));
-%n = l+n; l=156; error_ellipse(score(n:l+n-1,pcax(1)),-score(n:l+n-1,pcax(2)));
-% n = l+n; l=7; error_ellipse(score(n:l+n-1,pcax(1)),-score(n:l+n-1,pcax(2)));
-% n = l+n; l=4; error_ellipse(score(n:l+n-1,pcax(1)),-score(n:l+n-1,pcax(2)));
-
-% n = l+n; l=4; error_ellipse(score([6:17],pcax(1)),-score([6:17],pcax(2)));
 

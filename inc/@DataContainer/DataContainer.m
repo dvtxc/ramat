@@ -24,6 +24,7 @@ classdef DataContainer < handle
         
         XSize;
         YSize;
+        DataSize;
         
         AnalysisGroupParent = AnalysisGroup.empty;
         
@@ -320,6 +321,14 @@ classdef DataContainer < handle
                 ysize = self.Data.YSize;
             else
                 ysize = [];
+            end
+        end
+        
+        function datasize = get.DataSize(self)
+            if numel(self.DataItems)
+                datasize = self.Data.DataSize;
+            else
+                datasize = [];
             end
         end
         

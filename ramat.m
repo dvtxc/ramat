@@ -8,6 +8,8 @@ rootdir = GetExecutableFolder();
 addpath('inc');
 addpath(fullfile('inc','gui'));
 addpath(fullfile('inc','gui','images'));
+addpath(fullfile('inc','gui','wit_icons'));
+addpath(fullfile('inc','gui','guihelper'));
 addpath('helper');
 
 % Check if WITIO redist is enabled

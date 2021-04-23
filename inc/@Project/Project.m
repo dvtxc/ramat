@@ -7,6 +7,7 @@ classdef Project < handle
         GroupSet = Group.empty;
         AnalysisSet = Analysis.empty;
         ActiveAnalysis = Analysis.empty;
+        ActiveAnalysisResult = AnalysisResult.empty;
         Name = "";
         AnalysisResults;
     end
@@ -62,7 +63,7 @@ classdef Project < handle
         function add_analysis_result(self, newresult)
             %ADD_ANALYSIS_RESULT
             
-            self.AnalysisResults = [self.AnalysisResult; newresult];
+            self.AnalysisResults = [self.AnalysisResults; newresult];
         end
         
     end

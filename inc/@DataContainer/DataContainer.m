@@ -18,9 +18,12 @@ classdef DataContainer < handle
     
     properties (Access = public, Dependent)
         Data % This will always be the handle to the last/active data item in DataItems
-        xData;
-        yData;
+        %xData;
+        %yData;
         dataType;
+        
+        Graph;
+        DataPreview;
         
         XSize;
         YSize;
@@ -272,24 +275,24 @@ classdef DataContainer < handle
             end
         end
         
-        function ydat = get.yData(self)
-            
-            if (self.dataType == "SpecData")
-                ydat = self.Data.YData;
-            else
-                ydat = [];
-            end
-        end
-
-        function xdat = get.xData(self)
-            
-            if (self.dataType == "SpecData")
-                xdat = self.Data.XData;
-            else
-                xdat = [];
-            end
-        end
-        
+%         function ydat = get.yData(self)
+%             
+%             if (self.dataType == "SpecData")
+%                 ydat = self.Data.YData;
+%             else
+%                 ydat = [];
+%             end
+%         end
+%
+%         function xdat = get.xData(self)
+%             
+%             if (self.dataType == "SpecData")
+%                 xdat = self.Data.XData;
+%             else
+%                 xdat = [];
+%             end
+%         end
+%         
         function dataType = get.dataType(self)
             if numel(self.DataItems)
                 dataType = self.Data.Type;
@@ -297,15 +300,37 @@ classdef DataContainer < handle
                 dataType = "empty";
             end
         end
-        
-        function set.yData(self, ydata)
-            lastInstance = numel(self.DataItems);
-            self.DataItems(lastInstance).YData = ydata;
+%         
+%         function set.yData(self, ydata)
+%             lastInstance = numel(self.DataItems);
+%             self.DataItems(lastInstance).YData = ydata;
+%         end
+%         
+%         function set.xData(self, xdata)
+%             lastInstance = numel(self.DataItems);
+%             self.DataItems(lastInstance).XData = xdata;
+%         end
+
+        function graph = get.Graph(self)
+            % Get a graph preview
+            
+            if (self.dataType == "SpecData")
+                graph = self.Data.Graph;
+            else
+                graph = [];
+            end
+            
         end
         
-        function set.xData(self, xdata)
-            lastInstance = numel(self.DataItems);
-            self.DataItems(lastInstance).XData = xdata;
+        function graph = get.DataPreview(self)
+            % Get a data preview
+            
+            if (self.dataType == "SpecData")
+                graph = self.Data.FlatDataArray;
+            else
+                graph = [];
+            end
+            
         end
         
         function xsize = get.XSize(self)

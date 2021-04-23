@@ -1,8 +1,28 @@
-function error_ellipse(y1,y2,color)
+function error_ellipse(y1,y2,color, options)
 % data [y1 y2]
 %
 %
 %%%%%%
+
+    arguments
+        y1
+        y2
+        color
+        options.Axes = [];
+    end
+    
+    if isempty(options.Axes)
+        f = figure;
+        ax = axes('Parent',f);
+    else
+        if ( class(options.Axes) == "matlab.graphics.axis.Axes" || class(options.Axes) == "matlab.ui.control.UIAxes")
+            ax = options.Axes;
+        else
+            warning("Invalid Axes Handle");
+            return;
+        end
+    end
+
     data = [y1 y2];
     % Calculate the eigenvectors and eigenvalues
     covariance = cov(data);
@@ -56,7 +76,7 @@ function error_ellipse(y1,y2,color)
     r_ellipse = [ellipse_x_r;ellipse_y_r]' * R;
 
     % Draw the error ellipse
-    plot(r_ellipse(:,1) + X0,r_ellipse(:,2) + Y0,'-','Color',color);
+    plot(ax, r_ellipse(:,1) + X0,r_ellipse(:,2) + Y0,'-','Color',color);
     % e.HandleVisibility = 'off';
 
 

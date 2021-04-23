@@ -1,9 +1,16 @@
-function scoresscatter(pcaresult, pcax)
+function scoresscatter(pcaresult, pcax, options)
 %SCORESSCATTER
 %   Draw a scatter plot of the scores of the PCA Data along 2 principal
 %   components (2D PCA)
 %   pcaresult:  PCAResult() object
 %   pcax:       2x1 integer array with the principal component axis numbers
+
+    arguments
+        pcaresult
+        pcax
+        options.Axes = []; % Handle to Axes, if empty a new figure will be created
+        options.ErrorEllipse logical = false;
+    end
 
     if isempty(pcaresult.SrcData)
         % We need a grouping table to create a legend.
@@ -17,12 +24,24 @@ function scoresscatter(pcaresult, pcax)
     groupLengths = vertcat(pcaresult.SrcData.GroupSize);
     nGroups = numel(pcaresult.SrcData);
     
-    f = figure;
-    ax = axes('Parent',f);
+    if isempty(options.Axes)
+        f = figure;
+        ax = axes('Parent',f);
+    else
+        if ( class(options.Axes) == "matlab.graphics.axis.Axes" || class(options.Axes) == "matlab.ui.control.UIAxes")
+            ax = options.Axes;
+            
+            % Clear axes
+            cla(ax);
+        else
+            warning("Invalid Axes Handle");
+            return;
+        end
+    end
     
     % Get standard MATLAB plot colors
-    co = get(gca,'ColorOrder');
-    hold on
+    co = get(ax,'ColorOrder');
+    hold(ax, 'on');
     
     % Scatter Handles
     s = [];
@@ -37,7 +56,7 @@ function scoresscatter(pcaresult, pcax)
 
         % Plot scatter for every group
         % Invert Y-axis for compatibility with PCA function of ORIGIN.
-        s(i) = scatter( ...
+        s(i) = scatter(ax, ...
             pcaresult.Score(j:l+j-1, pcax(1)), ... % x-axis
             -pcaresult.Score(j:l+j-1, pcax(2)), ...% inv. y-axis
             45, ...                                 % size
@@ -45,10 +64,13 @@ function scoresscatter(pcaresult, pcax)
             'filled');                              % marker type
         
         % Plot confidence ellipses
-        error_ellipse( ...
-            pcaresult.Score(j:l+j-1, pcax(1)), ...
-            -pcaresult.Score(j:l+j-1, pcax(2)), ...
-            color);
+        if (options.ErrorEllipse)
+            error_ellipse( ...
+                pcaresult.Score(j:l+j-1, pcax(1)), ...
+                -pcaresult.Score(j:l+j-1, pcax(2)), ...
+                color, ...
+                Axes=ax);
+        end
         
         % Fast-forward in scores array by group length.
         j = j + l;
@@ -57,15 +79,22 @@ function scoresscatter(pcaresult, pcax)
     % Set Axes
     xlabelText = sprintf('PC%u: %.2g%%', pcax(1), pcaresult.Variance(pcax(1)));
     ylabelText = sprintf('PC%u: %.2g%%', pcax(2), pcaresult.Variance(pcax(2)));
-    xlabel(xlabelText,'FontWeight','bold');
-    ylabel(ylabelText,'FontWeight','bold');
+    xlabel(ax, xlabelText,'FontWeight','bold');
+    ylabel(ax, ylabelText,'FontWeight','bold');
     set(ax,'FontSize',14);
     ax.XAxisLocation = 'bottom';
     ax.YAxisLocation = 'left';
+    
+    % Make plot box square
+    if (class(options.Axes) == "matlab.ui.control.UIAxes")
+        ax.PlotBoxAspectRatio = [1 1 1];
+    else
+        ax.pbaspect = [1 1 1];
+    end
 
     % Set Legend
     groupNames = vertcat(pcaresult.SrcData.GroupName);
-    legend(s,groupNames);
+    legend(ax, s,groupNames);
 
 
 end

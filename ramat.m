@@ -11,6 +11,7 @@ addpath(fullfile('inc','gui','images'));
 addpath(fullfile('inc','gui','wit_icons'));
 addpath(fullfile('inc','gui','guihelper'));
 addpath('helper');
+addpath(fullfile('helper', 'io'));
 
 % Check if WITIO redist is enabled
 [witio_status, ~] = witio_isenabled();

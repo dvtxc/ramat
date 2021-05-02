@@ -10,6 +10,7 @@ addpath(fullfile('inc','gui'));
 addpath(fullfile('inc','gui','images'));
 addpath(fullfile('inc','gui','wit_icons'));
 addpath(fullfile('inc','gui','guihelper'));
+addpath(fullfile('inc','algo'));
 addpath('helper');
 addpath(fullfile('helper', 'io'));
 

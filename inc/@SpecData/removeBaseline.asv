@@ -39,13 +39,10 @@ function self = removeBaseline(self, method, options)
                 xbase = repmat(self(i).Graph, 1, nSpectra);
                 
                 if isempty(options)
-                    adjusted_data = bgs_builtinBackAdj(xbase, flatdat);
+                    adjusted_data = bgs_builtinBackAdj(xbase, flatdat)
                 else
-                    celloptions = namedargs2cell(options);
-                    
-                    adjusted_data = bgs_builtinBackAdj(xbase, flatdat, celloptions{:});
-                end
-                
+                    adjusted_data = bgs_builtinBackAdj(xbase, flatdat, options)
+                adjusted_data = bgs_builtinBackAdj(xbase, flatdat, WindowSize=100);
             case 'airPLS'
                 adjusted_data = bgs_airPLS(flatdat, 10e4, 2, 0.05);
             otherwise

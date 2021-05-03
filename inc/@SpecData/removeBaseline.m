@@ -5,7 +5,7 @@ function self = removeBaseline(self, method, options)
     arguments
         self;
         method = 'builtin';
-        options = [];
+        options struct = [];
     end
 
     for i = 1:numel(self)

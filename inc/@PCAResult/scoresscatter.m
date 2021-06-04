@@ -86,9 +86,14 @@ function scoresscatter(pcaresult, pcax, options)
     ax.YAxisLocation = 'left';
     
     % Make plot box square
-    if (class(options.Axes) == "matlab.ui.control.UIAxes")
+    if (class(ax) == "matlab.ui.control.UIAxes")
+        % For App Designer
+        ax.PlotBoxAspectRatio = [1 1 1];
+    elseif class(ax) == "matlab.graphics.axis.Axes"
+        % For MATLAB >=2020a
         ax.PlotBoxAspectRatio = [1 1 1];
     else
+        % For MATLAB <2020a
         ax.pbaspect = [1 1 1];
     end
 

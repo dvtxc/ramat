@@ -103,6 +103,20 @@ classdef SpecData < DataItem
             end
         end
         
+        function idx = wavnumtoidx(self, wavnum)
+            % WAVNUMTOIDX Convert wavenumbers to indices
+            
+            if numel(wavnum) == 1
+                idx = find(self.Graph > wavnum, 1, 'first');
+            elseif numel(wavnum) == 2
+                startIdx = find(self.Graph > wavnum(1), 1, 'first');
+                endIdx = find(self.Graph < wavnum(2), 1, 'last');
+                
+                idx = [startIdx, endIdx];
+            end
+            
+        end
+        
         % DEPENDENT PROPERTIES
         function wavres = get.GraphSize(self)
             % Returns size or wave resolution of the spectral graph

@@ -1,5 +1,5 @@
-classdef TextData < DataItem
-    %TEXTDATA Summary of this class goes here
+classdef ImageData
+    %IMAGEDATA Summary of this class goes here
     %   Detailed explanation goes here
     
     properties
@@ -7,12 +7,12 @@ classdef TextData < DataItem
     end
     
     properties (SetAccess = private)
-        Type = "TextData";
+        Type = "ImageData";
     end
     
     methods
-        function self = TextData(name, data)
-            %TEXTDATA Construct an instance of this class
+        function self = ImageData(name, data)
+            %IMAGEDATA Construct an instance of this class
             %   Detailed explanation goes here
             
             if (nargin == 0)
@@ -29,4 +29,3 @@ classdef TextData < DataItem
         
     end
 end
-

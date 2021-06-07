@@ -160,6 +160,9 @@ classdef DataContainer < handle
             %   Appends specdata object to list of data items
             %   It can also append multiple SpecData objects to multiple
             %   DataContainer objects if the number of instances is equal.
+            %   
+            %   TO DO:
+            %   Make general data item function
             
             numSpecDataObj = numel(specdataobj);
             numSelf = numel(self);
@@ -294,10 +297,18 @@ classdef DataContainer < handle
 %         end
 %         
         function dataType = get.dataType(self)
+            %DATATYPE GETTER
+            %   Get Type attribute value of active DataItem instance.
+            
             if numel(self.DataItems)
+                % DataContainer contains data items
+                % Get Type attribute value
                 dataType = self.Data.Type;
+                
             else
+                % DataContainer does not contain any data items
                 dataType = "empty";
+                
             end
         end
 %         

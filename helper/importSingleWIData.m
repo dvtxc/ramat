@@ -8,6 +8,7 @@ dataObject.Name = item_name;
 
 fprintf('\n%s\n', dataObject.DisplayName);
 
+% Append data item to data container based on data type
 switch widO.Type
     case 'TDGraph'
         %% RAW DATA
@@ -78,13 +79,25 @@ switch widO.Type
 %         fprintf('-- Normalising Spectrum ...\n');
 %         specdat = specdat.normalizeSpectrum();
         
-        dataObject.appendSpecData(specdat)
+        dataObject.appendSpecData(specdat);
         
     case 'TDText'
         fprintf('## Text File\n');
         
+        textdat = TextData(item_name, widO.Data);
+        textdat.Description = "Imported Text";
+        
+        % Append to data container
+        dataObject.appendSpecData(textdat);
+        
     case 'TDImage'
         fprintf('## Image\n');
+        
+        imgdat = ImageData(item_name, widO.Data);
+        imgdat.Description = "Imported Image";
+        
+        % Append to data container
+        dataObject.appendSpecData(imgdat);
         
 end
         

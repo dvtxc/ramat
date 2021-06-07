@@ -90,7 +90,7 @@ switch widO.Type
         % Append to data container
         dataObject.appendSpecData(textdat);
         
-    case 'TDImage'
+    case 'TDBitmap'
         fprintf('## Image\n');
         
         imgdat = ImageData(item_name, widO.Data);

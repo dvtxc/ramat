@@ -6,20 +6,12 @@ classdef DataContainer < handle
     
     properties (Access = public)
         Name;
-%         xUnits;
-%         xDataRaw;
-%         yDataRaw;
-%         nSpectra;
-%         imageSize;
-%         imageAxisScale;
         selected;
         Group;
     end
     
     properties (Access = public, Dependent)
-        Data % This will always be the handle to the last/active data item in DataItems
-        %xData;
-        %yData;
+        Data        % This will always be the handle to the last/active data item in DataItems
         dataType;
         
         Graph;
@@ -32,6 +24,9 @@ classdef DataContainer < handle
         AnalysisGroupParent = AnalysisGroup.empty;
         
         DisplayName;
+        
+        Filter = SpecFilter.empty;
+        FilterOutput;
     end
     
     properties (Access = public)
@@ -40,6 +35,8 @@ classdef DataContainer < handle
     
     properties (Access = private)
         ProjectParent;
+        
+        ActiveFilter = SpecFilter.empty;
     end
     
     methods
@@ -50,17 +47,12 @@ classdef DataContainer < handle
             
             if (nargin > 1)
                 obj.Name = name;
-%                 obj.xUnits = xUnits;
-%                 obj.xDataRaw = xDataRaw;
-%                 obj.yDataRaw = yDataRaw;
-%                 obj.nSpectra = nSpectra;
-%                 obj.imageSize = imageSize;
-%                 obj.imageAxisScale = imageAxisScale;
-                
                 obj.DataItems = SpecData('Spectrum', xData, yData);
+                
             elseif (nargin == 1)
                 obj.Name = name;
                 obj.DataItems = SpecData;
+                
             else
                 obj.Name = "";
                 %obj.DataItems = SpecData; % empty SpecData instance
@@ -78,8 +70,20 @@ classdef DataContainer < handle
             % Return handle for the last/active data item
             
             if numel(self.DataItems)    
-                % Container contains data items, return last one
-                h = self.DataItems(end);
+                % Container contains data items, return last one of
+                % following types: SpecData, ImageData, TextData
+                dataitemtypes = self.listDataItemTypes();
+                
+                if any(dataitemtypes == "SpecData")
+                    h = self.DataItems( find(dataitemtypes == "SpecData", 1, 'last') );
+                elseif any(dataitemtypes == "ImageData")
+                    h = self.DataItems( find(dataitemtypes == "ImageData", 1, 'last') );
+                elseif any(dataitemtypes == "TextData")
+                    h = self.DataItems( find(dataitemtypes == "TextData", 1, 'last') );
+                else
+                    h = self.DataItems(end);
+                end
+                
             else
                 % Container is empty, return empty DataItem instance
                 h = DataItem.empty;
@@ -206,7 +210,7 @@ classdef DataContainer < handle
         end
         
         function pcaresult = grouped_pca(self)
-            %GROUPED_PCA
+            %GROUPED_PCA DEPRECATED
             %   Groups Data Containes, Sorts by group, calculates PCA
             
             % Filter for SpecDat
@@ -277,25 +281,7 @@ classdef DataContainer < handle
                 displayname = self.Name;
             end
         end
-        
-%         function ydat = get.yData(self)
-%             
-%             if (self.dataType == "SpecData")
-%                 ydat = self.Data.YData;
-%             else
-%                 ydat = [];
-%             end
-%         end
-%
-%         function xdat = get.xData(self)
-%             
-%             if (self.dataType == "SpecData")
-%                 xdat = self.Data.XData;
-%             else
-%                 xdat = [];
-%             end
-%         end
-%         
+              
         function dataType = get.dataType(self)
             %DATATYPE GETTER
             %   Get Type attribute value of active DataItem instance.
@@ -311,16 +297,7 @@ classdef DataContainer < handle
                 
             end
         end
-%         
-%         function set.yData(self, ydata)
-%             lastInstance = numel(self.DataItems);
-%             self.DataItems(lastInstance).YData = ydata;
-%         end
-%         
-%         function set.xData(self, xdata)
-%             lastInstance = numel(self.DataItems);
-%             self.DataItems(lastInstance).XData = xdata;
-%         end
+
 
         function graph = get.Graph(self)
             % Get a graph preview
@@ -382,6 +359,57 @@ classdef DataContainer < handle
             end
         end
         
+        function filter = get.Filter(self)
+            %FILTER Returns the active filter
+            
+            if self.dataType ~= "SpecData"
+                % Only specdata can be filtered
+                filter = SpecFilter.empty();
+                return
+            end
+            
+            dataitemtypes = self.listDataItemTypes();
+            
+            % Is there no filter present?
+            if ~any(dataitemtypes == "SpecFilter")
+                % Create new filter
+                newfilter = SpecFilter();
+                self.appendSpecData(newfilter)
+                self.setFilter(newfilter);
+                
+            end
+            
+            % Is there a filter present, but not set to active?
+            if isempty(self.ActiveFilter)
+                % Return last SpecFilter from data items
+                dataitemtypes = self.listDataItemTypes();
+                idx = find(dataitemtypes == "SpecFilter", 1, 'last');
+                self.setFilter(self.DataItems(idx));
+            end
+            
+            filter = self.ActiveFilter;
+            
+        end
+        
+        function setFilter(self, filter)
+            self.ActiveFilter = filter;
+        end
+        
+        function output = get.FilterOutput(self)
+            %FILTEROUTPUT Output of filter operation.
+            
+            if isempty(self.Filter)
+                output = [];
+                return
+                
+            end
+            
+            % Return output of filter
+            specdat = self.Data;
+            output = self.Filter.getResult(specdat);
+            
+        end
+        
         %% Destructor
         
         function delete(self)
@@ -397,6 +425,12 @@ classdef DataContainer < handle
         %% Other methods
         function t = listDataItems(self)
             t = listItems(self.DataItems);
+        end
+        
+        function types = listDataItemTypes(self)
+            %LISTDATAITEMTYPES Returns array of data item types
+            types = vertcat(self.DataItems.Type);
+            
         end
         
         trimData(self, startx, endx, overwrite);

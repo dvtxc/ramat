@@ -278,7 +278,7 @@ classdef DataContainer < handle
             if (self.Name == "")
                 displayname = "No Name";
             else
-                displayname = self.Name;
+                displayname = string(self.Name);
             end
         end
               

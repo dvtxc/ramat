@@ -4,15 +4,14 @@ function updateSpecAreaFilterOutput(app)
     dc = app.DataCon;
     output = dc.FilterOutput;
     
+    cla(ax, 'reset');
+    
     % Set-Up Axes
     ax.XTick = [];
     ax.YTick = [];
     ax.XAxis.Label.delete();
     ax.YAxis.Label.delete();
-    
-    ax.XLim = [1, dc.XSize];
-    ax.YLim = [1, dc.YSize];
-    
+        
     % Set Title
     string = sprintf("%s: %s of [%.0f - %.0f]", ...
         dc.DisplayName, ...
@@ -22,7 +21,10 @@ function updateSpecAreaFilterOutput(app)
     ax.Title.String = string;
     
     imagesc(ax, output );
-    
+
+    ax.DataAspectRatio = [1 1 1];
+%     ax.XLim = [0.5, dc.XSize + 0.5];
+%     ax.YLim = [0.5, dc.YSize + 0.5];
     
 end
 

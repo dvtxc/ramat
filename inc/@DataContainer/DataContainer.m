@@ -410,6 +410,16 @@ classdef DataContainer < handle
             
         end
         
+        %% Overloads
+        
+        function maxval = max(self)
+            %MAX Returns maximum value of Data attribute
+            
+            maxval = max( vertcat( self.DataPreview ) );
+            
+        end
+        
+        
         %% Destructor
         
         function delete(self)
@@ -440,6 +450,8 @@ classdef DataContainer < handle
         subsetHandle = addToNewSubset(self);
         
         addToSubset(self, subsetHandle);
+        
+        plot(self, kwargs);
         
         function idx = currentlySelectedDataItem(self)
             idx = numel(self.DataItems);

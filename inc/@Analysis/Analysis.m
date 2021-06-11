@@ -100,7 +100,8 @@ classdef Analysis < handle
         end
         
         function dataset = get.DataSet(self)
-            %DATASET Ungrouped data set of this analysis subset.
+            %DATASET Ungrouped list of datacontainers of this analysis
+            %subset.
             
             dataset = DataContainer.empty;
             
@@ -116,6 +117,25 @@ classdef Analysis < handle
                     
                 end
             end
+            
+        end
+        
+        function plot(self, options)
+            %PLOT
+            
+            arguments
+                self
+                options.Selection = self.dataset;
+            end
+            
+            data = options.Selection;
+            
+            [sortedData, groupNames, groupSizes, dataSizes] = self.sortdata(Selection=data);
+            
+            SpectralPlotDlg(sortedData, ...
+                GroupNames=groupNames, ...
+                GroupSizes=groupSizes, ...
+                DataSizes=dataSizes);
             
         end
         
@@ -217,8 +237,60 @@ classdef Analysis < handle
             
         end
         
+        
+        function [sortedData, groupNames, groupSizes, dataSizes] = sortdata(self, options)
+            %SORTDATA Output sorted list of data and corresponding group
+            %names and group sizes
+            
+            arguments
+                self;                               % Analysis Subset
+                options.Selection = self.DataSet;   % Selection
+                options.FlatSizes = false;          % Roll out sizes?
+            end
+            
+            % Take data from provided selection
+            data = options.Selection;
+                                    
+            if ~isempty(data)
+                % Get list of groups
+                grouplist = self.getParentGroups(data, ExclusiveDataType="SpecData");
+                
+                % Get only spectral data
+                data = data([data.dataType] == 'SpecData');
+                
+                % Check whether we have group information for all data
+                if (numel(grouplist) ~= numel(data))
+                    warning("Data selection failed.");
+                    return
+                end
+                                
+                % Sort data by group
+                [groups, ~, groupIdx] = unique(grouplist);
+                [sortedGroupIdx, sortingIdx] = sort(groupIdx);
+                
+                sortedData = data(sortingIdx);
+                
+                groupNames = vertcat( groups.DisplayName );
+                
+                % Get data sizes
+                if options.FlatSizes
+                    % Get all sizes and count spectra of LA scans as
+                    % individual data
+                    dataSizes = vertcat( sortedData.DataSize ); 
+                else
+                    % Take LA Scans as single data containers
+                    dataSizes = ones(numel(sortedData), 1);
+                end
+                
+                groupSizes = accumarray( sortedGroupIdx, dataSizes);
+                
+            end
+            
+        end
+        
+        
         function groupList = getParentGroups(self, dataContainer, options)
-            % Get parent groups belonging to data containers
+            %GETPARENTGROUPS Get parent groups belonging to data containers
             
             arguments
                 self

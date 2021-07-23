@@ -22,7 +22,7 @@ function plot(self, kwargs)
         kwargs.GroupNames;              % Array of Group Names
         kwargs.GroupSizes;              % Num. of DataContainer instances per group
         kwargs.DataSizes;               % Redundant?
-        kwargs.PlotType = 'Overlaid';   % 'Overlaid', 'Stacked'
+        kwargs.PlotType = "Overlaid";   % 'Overlaid', 'Stacked'
         kwargs.PlotStackDistance = 1;   % Stacking Shift Multiplier
         kwargs.Normalize = false;
     end

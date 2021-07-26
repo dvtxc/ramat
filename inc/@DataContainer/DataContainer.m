@@ -382,18 +382,19 @@ classdef DataContainer < handle
             
             analysisGroupParent = AnalysisGroup.empty;
             
-            global prj
-            
-            if ~exist('prj','var')
-                warning('Could not find project parent');
-                return
-                
-            end
-            
-            if isempty(prj.AnalysisSet)
-                return
-                
-            end
+%             CAUSING MEMORY LEAK
+%             global prj
+%             
+%             if ~exist('prj','var')
+%                 warning('Could not find project parent');
+%                 return
+%                 
+%             end
+%             
+%             if isempty(prj.AnalysisSet)
+%                 return
+%                 
+%             end
             
             % Retrieve analysis group parent
             for i = 1 : numel(prj.AnalysisSet)
@@ -408,9 +409,15 @@ classdef DataContainer < handle
         function filter = get.Filter(self)
             %FILTER Returns the active filter
             
+            % Only specdata can be filtered
             if self.dataType ~= "SpecData"
-                % Only specdata can be filtered
-                filter = SpecFilter.empty();
+%                 filter = SpecFilter.empty();
+                return
+            end
+            
+            % Only LA Scans
+            if self.DataSize <= 1
+%                 filter =
                 return
             end
             
@@ -468,15 +475,25 @@ classdef DataContainer < handle
         
         %% Destructor
         
-        function delete(self)
-            %DESTRUCTOR Delete all references to object
-            
-%             for i = 1:numel(self)
-%                 % For every instance
-%                 ds = self.ProjectParent.DataSet;
-%                 
+%         function delete(self)
+%             %DESTRUCTOR Delete all references to object
+%             
+%             global prj
+%             
+%             % Remove itself from the dataset
+%             idx = find(self == prj.DataSet);
+%             prj.DataSet(idx) = [];
+%             
+%             % Remove itself from every analysis group
+%             % TODO: Make more efficient
+%             for i = 1:numel(prj.AnalysisSet)
+%                 for j = 1:numel(prj.AnalysisSet(i).GroupSet)
+%                     idx = find(self == prj.AnalysisSet(i).GroupSet(j).Children);
+%                     prj.AnalysisSet(i).GroupSet(j).Children(idx) = [];
+%                 end
 %             end
-        end
+%             
+%         end
         
         %% Other methods
         function t = listDataItems(self)

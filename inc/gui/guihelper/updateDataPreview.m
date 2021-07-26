@@ -1,5 +1,6 @@
 function updateDataPreview(app, data)
-%UPDATEDATAPREVIEW Update the preview pane
+%UPDATEDATAPREVIEW Deprecated: Update the preview pane
+%   Deprecated: use plot method of DataContainer instead
             
     if isempty(data)
         % Nothing has been selected
@@ -65,6 +66,8 @@ function updateDataPreview(app, data)
 % 
 %             ax.XLim = [0.5, data.XSize + 0.5];
 %             ax.YLim = [0.5, data.YSize + 0.5];
+
+    end
             
 end
 

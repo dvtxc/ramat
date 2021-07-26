@@ -322,34 +322,80 @@ classdef DataContainer < handle
         end
         
         function xsize = get.XSize(self)
+            % Get XSize
+            
+            xsize = [];
+            
+            if (self.dataType == "TextData")
+                return    
+            end
+            
+            % Retrieve XSize of DataItem
             if numel(self.DataItems)
                 xsize = self.Data.XSize;
             else
                 xsize = [];
             end
+            
         end
         
         function ysize = get.YSize(self)
+            % Get YSize
+            
+            ysize = [];
+            
+            if (self.dataType == "TextData")
+                return    
+            end
+            
+            % Retrieve YSize of DataItem
             if numel(self.DataItems)
                 ysize = self.Data.YSize;
             else
                 ysize = [];
             end
+            
         end
         
         function datasize = get.DataSize(self)
+            % Get DataSize
+            
+            datasize = [];
+            
+            if (self.dataType == "TextData")
+                return    
+            end
+            
+            % Retrieve DataSize of DataItem
             if numel(self.DataItems)
                 datasize = self.Data.DataSize;
             else
                 datasize = [];
             end
+            
         end
         
         function analysisGroupParent = get.AnalysisGroupParent(self)
-            % TO DO: return the parent group
+            % TO DO: 
+            % - return the parent group
+            % - what if n of parents > 1 ?
             
             analysisGroupParent = AnalysisGroup.empty;
             
+            global prj
+            
+            if ~exist('prj','var')
+                warning('Could not find project parent');
+                return
+                
+            end
+            
+            if isempty(prj.AnalysisSet)
+                return
+                
+            end
+            
+            % Retrieve analysis group parent
             for i = 1 : numel(prj.AnalysisSet)
                 subset = prj.AnalysisSet(i);
                 

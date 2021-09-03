@@ -5,6 +5,10 @@ classdef SpecFilter < DataItem
     properties
         Range;  % Working Range of Filter
         Operation;  % Mathematical Operation to Perform
+        XSize = 0;
+        YSize = 0;
+        ZSize = 0;
+        DataSize = 0;
     end
     
     properties (SetAccess = private)

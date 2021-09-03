@@ -4,6 +4,10 @@ classdef TextData < DataItem
     
     properties
         Data;
+        XSize = 0;
+        YSize = 0;
+        ZSize = 0;
+        DataSize = 0;
     end
     
     properties (SetAccess = private)

@@ -58,10 +58,13 @@ classdef DataContainer < handle
                 %obj.DataItems = SpecData; % empty SpecData instance
             end
             
+            % Assign project parent
             global prj
             
             if ~isempty(prj)
                 obj.ProjectParent = prj;
+            else
+                warning('Could not assign project parent. Check whether the project has been initialised.');
             end
             
         end
@@ -346,15 +349,28 @@ classdef DataContainer < handle
         end
         
         function analysisGroupParent = get.AnalysisGroupParent(self)
-            % TO DO: return the parent group
+            %ANALYSISGROUPPARENT Retrieve analysis group this data
+            %container has been assigned to.
+            
+            % Search in project.
+            prj = self.ProjectParent;
             
             analysisGroupParent = AnalysisGroup.empty;
             
+            % Search in analysis sets.
             for i = 1 : numel(prj.AnalysisSet)
                 subset = prj.AnalysisSet(i);
                 
+                % Search in analysis groups.
                 for j = 1:numel(subset.GroupSet)
                     subsetgroup = subset.GroupSet(j);
+                    
+                    if any(self == subsetgroup.Children)
+                        % Parent found.
+                        analysisGroupParent = subsetgroup;
+                        
+                    end
+                    
                 end
             end
         end

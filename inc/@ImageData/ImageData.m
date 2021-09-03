@@ -9,6 +9,7 @@ classdef ImageData < DataItem
         XSize;
         YSize;
         ZSize;
+        DataSize;
     end
     
     properties (SetAccess = private)
@@ -43,6 +44,10 @@ classdef ImageData < DataItem
         function zres = get.ZSize(self)
             % TO BE IMPLEMENTED
             zres = 0;
+        end
+        
+        function datasize = get.DataSize(self)
+            datasize = self.XSize * self.YSize;
         end
         
     end

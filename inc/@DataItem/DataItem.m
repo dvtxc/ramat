@@ -11,6 +11,16 @@ classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
         Type;
     end
     
+    % Following properties are needed for verbose table output. TO DO:
+    % remove necessity to instantiate these properties in child classes for
+    % clarity.
+    properties (Abstract, SetAccess = public)
+        XSize;
+        YSize;
+        ZSize;
+        DataSize;
+    end
+    
     methods (Sealed)
         function T = listItems(self)
             %LISTITEMS: brief overview

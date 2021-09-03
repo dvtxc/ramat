@@ -10,7 +10,7 @@ classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
     properties (Abstract, SetAccess = private)
         Type;
     end
-    
+        
     % Following properties are needed for verbose table output. TO DO:
     % remove necessity to instantiate these properties in child classes for
     % clarity.
@@ -25,8 +25,8 @@ classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
         function T = listItems(self)
             %LISTITEMS: brief overview
             
-            T = table(self);
-            T = T(:, {'Name', 'Description'});
+            T = self.totable();
+            T = T(:, {'Type', 'Description'});
         end
 
         function T = totable(self)
@@ -41,15 +41,16 @@ classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
             %STRUCT Output data formatted as structure
             %   This method overrides struct()
             
-            publicProperties = properties(self);
             s = struct();
             for i = 1:numel(self)
-                for j = 1:numel(publicProperties)
-                    s(i).(publicProperties{j}) = self(i).(publicProperties{j}); 
-                end 
+                s(i).Type = self(i).Type;
+                s(i).Description = self(i).Description;
+                s(i).DataItem = self(i);
             end
             
         end
+        
     end
+    
 end
 

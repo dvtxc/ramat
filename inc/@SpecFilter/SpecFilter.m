@@ -14,7 +14,7 @@ classdef SpecFilter < DataItem
     properties (SetAccess = private)
         Type = "SpecFilter";
     end
-        
+            
     methods
         function self = SpecFilter(options)
             %SPECFILTER Construct an instance of this class
@@ -29,6 +29,8 @@ classdef SpecFilter < DataItem
             self.Name = options.Name;
             self.Range = options.Range;
             self.Operation = options.Operation;
+            
+            self.autodescription();
             
         end
         
@@ -51,6 +53,7 @@ classdef SpecFilter < DataItem
             end
             
         end
+        
     end
 end
 

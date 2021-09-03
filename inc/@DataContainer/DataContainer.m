@@ -498,6 +498,7 @@ classdef DataContainer < handle
                 self.AnalysisGroupParent.Children(idx) = [];
             end
             
+            
         end
         
         %% Other methods

@@ -476,25 +476,29 @@ classdef DataContainer < handle
         
         %% Destructor
         
-%         function delete(self)
-%             %DESTRUCTOR Delete all references to object
-%             
-%             global prj
-%             
-%             % Remove itself from the dataset
-%             idx = find(self == prj.DataSet);
-%             prj.DataSet(idx) = [];
-%             
-%             % Remove itself from every analysis group
-%             % TODO: Make more efficient
-%             for i = 1:numel(prj.AnalysisSet)
-%                 for j = 1:numel(prj.AnalysisSet(i).GroupSet)
-%                     idx = find(self == prj.AnalysisSet(i).GroupSet(j).Children);
-%                     prj.AnalysisSet(i).GroupSet(j).Children(idx) = [];
-%                 end
-%             end
-%             
-%         end
+        function delete(self)
+            %DESTRUCTOR Delete all references to object
+            
+            prj = self.ProjectParent;
+            
+            if ~isvalid(prj)
+                % Program is probably closing, prj hasn't been found
+                % Skip checks
+                return
+                
+            end
+            
+            % Remove itself from the dataset
+            idx = find(self == prj.DataSet);
+            prj.DataSet(idx) = [];
+            
+            % Remove itself from every analysis group
+            if ~isempty(self.AnalysisGroupParent)
+                idx = find(self == self.AnalysisGroupParent.Children);
+                self.AnalysisGroupParent.Children(idx) = [];
+            end
+            
+        end
         
         %% Other methods
         function t = listDataItems(self)

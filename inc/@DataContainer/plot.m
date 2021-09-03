@@ -22,7 +22,7 @@ function plot(self, kwargs)
         kwargs.GroupNames;              % Array of Group Names
         kwargs.GroupSizes;              % Num. of DataContainer instances per group
         kwargs.DataSizes;               % Redundant?
-        kwargs.PlotType = 'Overlaid';   % 'Overlaid', 'Stacked'
+        kwargs.PlotType = "Overlaid";   % 'Overlaid', 'Stacked'
         kwargs.PlotStackDistance = 1;   % Stacking Shift Multiplier
         kwargs.Normalize = false;
     end
@@ -116,6 +116,25 @@ function plot(self, kwargs)
 
             % Release hold
             hold(ax, 'off');
+
+        case "ImageData"
+            % Plot first
+            imagesc(ax, self.Data.Data );
+            
+            % Set-Up Axes
+            ax.DataAspectRatio = [1 1 1];
+            ax.XDir = 'normal';
+            ax.YDir = 'normal';
+            
+%             ax.XTick = [];
+%             ax.YTick = [];
+%             ax.XAxis.Label.delete();
+%             ax.YAxis.Label.delete();
+% 
+%             ax.XLim = [0.5, data.XSize + 0.5];
+%             ax.YLim = [0.5, data.YSize + 0.5];
+
+
     end
 
 end

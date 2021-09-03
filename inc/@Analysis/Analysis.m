@@ -125,14 +125,14 @@ classdef Analysis < handle
             
             arguments
                 self
-                options.Selection = self.dataset;
+                options.Selection = self.DataSet;
             end
             
             data = options.Selection;
             
             [sortedData, groupNames, groupSizes, dataSizes] = self.sortdata(Selection=data);
             
-            SpectralPlotDlg(sortedData, ...
+            SpectralPlotEditor(sortedData, ...
                 GroupNames=groupNames, ...
                 GroupSizes=groupSizes, ...
                 DataSizes=dataSizes);

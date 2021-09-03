@@ -1,5 +1,7 @@
 function updateScoresScatterPlot(app)
 %UPDATESCORESSCATTERPLOT
+%   TO-DO:
+%   - Implement into single plot method
 
     pcx = app.PCXSpinner.Value;
     pcy = app.PCYSpinner.Value;

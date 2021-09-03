@@ -325,27 +325,57 @@ classdef DataContainer < handle
         end
         
         function xsize = get.XSize(self)
+            % Get XSize
+            
+            xsize = [];
+            
+            if (self.dataType == "TextData")
+                return    
+            end
+            
+            % Retrieve XSize of DataItem
             if numel(self.DataItems)
                 xsize = self.Data.XSize;
             else
                 xsize = [];
             end
+            
         end
         
         function ysize = get.YSize(self)
+            % Get YSize
+            
+            ysize = [];
+            
+            if (self.dataType == "TextData")
+                return    
+            end
+            
+            % Retrieve YSize of DataItem
             if numel(self.DataItems)
                 ysize = self.Data.YSize;
             else
                 ysize = [];
             end
+            
         end
         
         function datasize = get.DataSize(self)
+            % Get DataSize
+            
+            datasize = [];
+            
+            if (self.dataType == "TextData")
+                return    
+            end
+            
+            % Retrieve DataSize of DataItem
             if numel(self.DataItems)
                 datasize = self.Data.DataSize;
             else
                 datasize = [];
             end
+            
         end
         
         function analysisGroupParent = get.AnalysisGroupParent(self)
@@ -378,9 +408,17 @@ classdef DataContainer < handle
         function filter = get.Filter(self)
             %FILTER Returns the active filter
             
+            filter = SpecFilter.empty();
+            
+            % Only specdata can be filtered
             if self.dataType ~= "SpecData"
-                % Only specdata can be filtered
-                filter = SpecFilter.empty();
+%                 filter = SpecFilter.empty();
+                return
+            end
+            
+            % Only LA Scans
+            if self.DataSize <= 1
+%                 filter =
                 return
             end
             
@@ -438,15 +476,25 @@ classdef DataContainer < handle
         
         %% Destructor
         
-        function delete(self)
-            %DESTRUCTOR Delete all references to object
-            
-%             for i = 1:numel(self)
-%                 % For every instance
-%                 ds = self.ProjectParent.DataSet;
-%                 
+%         function delete(self)
+%             %DESTRUCTOR Delete all references to object
+%             
+%             global prj
+%             
+%             % Remove itself from the dataset
+%             idx = find(self == prj.DataSet);
+%             prj.DataSet(idx) = [];
+%             
+%             % Remove itself from every analysis group
+%             % TODO: Make more efficient
+%             for i = 1:numel(prj.AnalysisSet)
+%                 for j = 1:numel(prj.AnalysisSet(i).GroupSet)
+%                     idx = find(self == prj.AnalysisSet(i).GroupSet(j).Children);
+%                     prj.AnalysisSet(i).GroupSet(j).Children(idx) = [];
+%                 end
 %             end
-        end
+%             
+%         end
         
         %% Other methods
         function t = listDataItems(self)

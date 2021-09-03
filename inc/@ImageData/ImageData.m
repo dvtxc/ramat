@@ -43,11 +43,11 @@ classdef ImageData < DataItem
         
         function zres = get.ZSize(self)
             % TO BE IMPLEMENTED
-            zres = 0;
+            zres = 1;
         end
         
-        function datasize = get.DataSize(self)
-            datasize = self.XSize * self.YSize;
+        function datares = get.DataSize(self)
+            datares = self.XSize * self.YSize * self.ZSize;
         end
         
     end

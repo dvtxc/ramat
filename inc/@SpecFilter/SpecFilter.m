@@ -30,7 +30,6 @@ classdef SpecFilter < DataItem
             self.Range = options.Range;
             self.Operation = options.Operation;
             
-            self.autodescription();
             
         end
         

@@ -29,9 +29,11 @@ classdef PCAResult < AnalysisResult
             self.Variance = variance;
         end
         
-        
+        % Method Signatures
         scoresscatter(self, pcax);
+        plotLoadings(self, pcax);
         
+        % Methods
         function desc = get.Description(self)
             desc = vertcat(...
                 sprintf( "Name:   %s", self.DisplayName ), ...

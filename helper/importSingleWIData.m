@@ -11,28 +11,31 @@ fprintf('\n%s\n', dataObject.DisplayName);
 % Append data item to data container based on data type
 switch widO.Type
     case 'TDGraph'
-        %% RAW DATA
-        excitation_wavlen = widO.Info.GraphInterpretation.Data.TDSpectralInterpretation.ExcitationWaveLength;
-              
-        % Raw Data, as imported.
-        specdat = SpecData( ...
-            item_name, ...
-            widO.Info.Graph, ...
-            widO.Data, ...
-            widO.Info.GraphUnit, ...
-            widO.Info.DataUnit);
         
-        specdat.ExcitationWavelength = excitation_wavlen;
-        specdat.Description = "Raw Data";
-        
+        % Display dimensions
         switch widO.SubType
             case 'Point'
                 fprintf('## Single Spectrum\n');
             case 'Image'
-                fprintf('## %i x %i Area Scan\n', specdat.XSize, specdat.YSize);
+                fprintf('## %i x %i Area Scan\n', widO.Info.XLength, widO.Info.YLength);
         end
         
-        % Append raw (=as-is) spectral data to DataContainer
+        %% RAW DATA
+        excitation_wavlen = widO.Info.GraphInterpretation.Data.TDSpectralInterpretation.ExcitationWaveLength;
+        
+        % For debug purposes? 
+        % Raw Data, as imported.
+%         specdat = SpecData( ...
+%             item_name, ...
+%             widO.Info.Graph, ...
+%             widO.Data, ...
+%             widO.Info.GraphUnit, ...
+%             widO.Info.DataUnit);
+%         
+%         specdat.ExcitationWavelength = excitation_wavlen;
+%         specdat.Description = "Raw Data";
+%  
+%         % Append raw (=as-is) spectral data to DataContainer
 %         dataObject.appendSpecData(specdat);
         
         %% PROCESSED DATA
@@ -49,11 +52,11 @@ switch widO.Type
                 error('Could not read graph unit for %s', widO.Name);
         end
         
-        
         % Convert to double and store in correct order
         data = double(widO.Data);
         data = permute(data, [2 1 3]);
         
+        % Create SpecData Object
         specdat = SpecData( ...
             item_name, ...
             gdata, ...
@@ -63,6 +66,11 @@ switch widO.Type
         
         specdat.ExcitationWavelength = excitation_wavlen;
         specdat.Description = "Imported Data";
+        
+        % Store meta information
+        specdat.X = widO.Info.X;
+        specdat.Y = widO.Info.Y;
+        specdat.Z = widO.Info.Z;
         
         % Trim Data?
         % specdat_obj.trimData(trimStart, trimEnd)
@@ -79,6 +87,7 @@ switch widO.Type
 %         fprintf('-- Normalising Spectrum ...\n');
 %         specdat = specdat.normalizeSpectrum();
         
+        % Append SpecData to Data Container
         dataObject.appendSpecData(specdat);
         
     case 'TDText'

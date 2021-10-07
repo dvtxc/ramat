@@ -11,4 +11,5 @@ initVar.prj = prj;
 
 % Run main app
 fprintf('Starting GUI.\n');
+global app;
 app = ramatguiapp(initVar);

@@ -113,6 +113,8 @@ function updateappmgr(app, options)
             % TO-DO: make dependent property of prj, make sure one
             % analysis subset is selected!
             activeSubset = app.prj.ActiveAnalysis;
+            
+            checkednodes = [];
 
             % Add groups
             for g = 1:numel(activeSubset.GroupSet)
@@ -142,12 +144,21 @@ function updateappmgr(app, options)
                             otherwise
                                 datanode.Icon = "default";
                         end
+                        
+                        % Evaluate whether the node should be checked and
+                        % add to list of checked nodes
+                        if any(activeSubset.Selection == data)
+                            checkednodes = [checkednodes; datanode];
+                        end
 
                     end
                 end
 
             end
 
+            % Set Checked nodes based on Analysis.Selection
+            tree.CheckedNodes = checkednodes;
+            
             % Add uncategorised data
             % Removed
     %                 groupnode = uitreenode(tree, ...

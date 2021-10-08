@@ -6,7 +6,7 @@ classdef Analysis < handle
 %         DataSet = DataContainer.empty;
         GroupSet = AnalysisGroup.empty;
         Parent = Project.empty;
-        Selection = [];
+        Selection = DataContainer.empty;
         Name = "";
     end
     
@@ -160,9 +160,8 @@ classdef Analysis < handle
                         
             % Get handles of selected data containers
             if isempty(options.Selection)
-                % No selection has been provided, take all data containers
-                % in the current analysis
-                data = self.DataSet;
+                % No selection has been provided, take self.Selection
+                data = self.Selection;
                 
             else
                 % Selection has been provided
@@ -323,6 +322,43 @@ classdef Analysis < handle
                 end
             end
         end
+        
+        function set.Selection(self, selection)
+            %SELECTION Update the list of selected data containers
+            %   Input:
+            %   selection:  can be either list of datacontainers or of GUI
+            %   tree nodes
+            
+            datacontainers = DataContainer.empty();
+            
+            % Type-Based
+            switch class(selection)
+                case "matlab.ui.container.TreeNode"
+                    % Tree nodes provided
+                    
+                    % Only include nodes that contain data
+                    for i=1:numel(selection)
+                        if class(selection(i).NodeData) == "DataContainer"
+                            datacontainers(end+1) = selection(i).NodeData;
+                        end
+                    end
+                    
+                case "DataContainer"
+                    % Actual datacontainers provided
+                    
+                    datacontainers = selection;
+                    
+            end
+            
+            % Check whether provided selection actually only contains
+            % elements that are present in this analysis
+            datacontainers = intersect(self.DataSet, datacontainers);
+            
+            % Update Selection
+            self.Selection = datacontainers;
+            
+        end
+            
     end
 end
 

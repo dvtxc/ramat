@@ -1,24 +1,30 @@
-function obj = trimSpectrum(obj, startG, endG)
+function self = trimSpectrum(self, startG, endG)
     % Trims spectral data to [startG, endG]
     % startG and endG should be provided in the graph units, ie. if
     % graph units are given in 1/cm, the trim limits should be in
     % the same units.
 
+    arguments
+        self;
+        startG;
+        endG;
+    end
+
     if (endG > startG)
         % Trim Region is valid
 
-        for i = 1:numel(obj)
+        for i = 1:numel(self)
             % Repeat operation for each spectral data object
 
-            gdat = obj(i).Graph;
-            dat = obj(i).Data;
+            gdat = self(i).Graph;
+            dat = self(i).Data;
 
             % Find indices of trim region
             startIdx = find(gdat > startG, 1, 'first');
             endIdx = find(gdat < endG, 1, 'last');
 
-            obj(i).Graph = gdat( startIdx:endIdx , :);
-            obj(i).Data = dat(:, :, startIdx:endIdx);
+            self(i).Graph = gdat( startIdx:endIdx , :);
+            self(i).Data = dat(:, :, startIdx:endIdx);
         end
     else
         warning('Trim region is invalid. Second values should be greater than the first value.');

@@ -75,16 +75,16 @@ classdef SpecData < DataItem
         
         clipByMask(self, mask);
         
-        function obj = normalizeSpectrum(obj)
+        function normalizeSpectrum(self)
             % Normalizes spectrum, so sum(Data) = 1
             
             % Repeat operation for each spectral data object
-            for i = 1:numel(obj)                
+            for i = 1:numel(self)                
                 % Convert to double
-                dat = double(obj(i).Data);
+                dat = double(self(i).Data);
                 
                 % Divide by sums of the individual spectra
-                obj(i).Data = dat ./ sum( dat, 3 );
+                self(i).Data = dat ./ sum( dat, 3 );
             end
         end
         

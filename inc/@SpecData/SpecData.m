@@ -21,9 +21,13 @@ classdef SpecData < DataItem
         XLength;
         YLength;
         ZLength;
+
+        % Mask
+        Mask = Mask().empty;
     end
     
     properties (Access = public, Dependent)
+        FilteredData;
         FlatDataArray;
         GraphSize;
         XSize;
@@ -73,7 +77,7 @@ classdef SpecData < DataItem
 
         end
         
-        clipByMask(self, mask);
+        out = clipByMask(self, mask);
         
         function normalizeSpectrum(self)
             % Normalizes spectrum, so sum(Data) = 1
@@ -146,6 +150,13 @@ classdef SpecData < DataItem
             
             flatdata = permute(self.Data, [3 1 2]);
             flatdata = reshape(flatdata, graphsize, [], 1);
+        end
+
+        function filtereddata = get.FilteredData(self)
+            % Returns filtered and masked data
+
+            filtereddata = clipByMask(self, self.Mask, Clip=false);
+
         end
         
         

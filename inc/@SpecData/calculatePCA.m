@@ -12,7 +12,13 @@ function pcaresult = calculatePCA(self, range)
             tmpdat = trimSpectrum(copy(self), startG, endG);
             graphBase = tmpdat.Graph;            
             
-            flatdata = horzcat(tmpdat.FlatDataArray);
+            % horzcat( tmpdat.FlatDataArray );
+            % tempfix
+            graphbasefix = length(graphBase);
+            flatdata = zeros(graphbasefix , length(self));
+            for i=1:length(self)
+                flatdata(:,i) = tmpdat(i).FlatDataArray(1:graphbasefix , :);
+            end
             
             % Free up memory
             delete(tmpdat);

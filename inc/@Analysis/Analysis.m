@@ -142,6 +142,7 @@ classdef Analysis < handle
         function pcaresult = compute_pca(self, options)
             %COMPUTE_PCA Compute a principle component analysis (PCA) of
             %current analysis subset.
+            %TODO: pass source data as analysis groups!!
             %Input:
             %   self
             %   options.Range:      range [2x1 array] in cm^-1
@@ -220,9 +221,18 @@ classdef Analysis < handle
                 end
                 
                 % Add source data information to PCA result
+                % TODO: perhaps implement AnalysisGroup()?
+                groupChildren = cell(numel(groupSizes),1);
+                jidx = 1;
+                for i = 1:numel(groupSizes)
+                    groupChildren{i} = vertcat( specdata(jidx : jidx + groupSizes(i) - 1));
+                    jidx = jidx + groupSizes(i);
+                end
+
                 sourcedata = struct( ...
                     'GroupName', num2cell(groupNames), ...
-                    'GroupSize', num2cell(groupSizes) ...
+                    'GroupSize', num2cell(groupSizes), ...
+                    'GroupChildren', groupChildren ...
                     );
                 
                 pcaresult.SrcData = sourcedata;

@@ -45,6 +45,16 @@ To preview the data in the **Data Preview**, simply click the measurement. A mea
 * **ImageData**: an image; either an extracted bitmap or a stitched video image exported by WiTEC's Project FIVE.
 * **SpecFilter**: spectral filter
 
+## Data Correction
+
+### Baseline Subtraction
+
+1. Select measurements (hold CTRL to select multiple measurements)
+2. Under Spectral Correction, select `Remove Baseline...`. This will open a new dialog.
+3. Select a baseline subtraction method, preview the results, and confirm with `Apply`.
+
+![The baseline subtraction dialog](docs/images/baseline_subtraction.png)
+
 ## Data Analysis
 
 ### Principal Component Analysis

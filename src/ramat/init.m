@@ -17,11 +17,7 @@ addpath(fullfile('helper', 'io'));
 
 % Check if WITIO redist is enabled
 [witio_status, ~] = witio_isenabled();
-if ~witio_status
-    fprintf('WARNING: The WITIO reader is not enabled. This is required to read WITec project files.');
-else
-    fprintf('WITIO reader found.\n');
-end
+
 
 % Create new empty project
 global prj;

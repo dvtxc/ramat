@@ -1,6 +1,6 @@
 function self = removeBaseline(self, method, options)
-    % Returns object with baseline removed
-    % NaN-safe and preserves NaN values
+    % REMOVEBASELINE Returns object with baseline removed
+    %   NaN-safe and preserves NaN values
     
     arguments
         self;
@@ -8,7 +8,21 @@ function self = removeBaseline(self, method, options)
         options struct = [];
     end
 
+    % To pass options kwargs, convert to named args
+    if ~isempty(options)
+        celloptions = namedargs2cell(options);
+    else
+        celloptions = cell.empty();
+    end
+
     for i = 1:numel(self)
+
+        if method == "constant"
+            % Use class method SUBTRACT_MINIMUM
+            self(i).subtract_minimum(celloptions{:});
+            return
+        end
+
         % Retrieve flattened 2-dimensional array
         flatdat = self(i).FlatDataArray;
         nSpectra = self(i).XSize * self(i).YSize;
@@ -32,23 +46,26 @@ function self = removeBaseline(self, method, options)
         switch method
             case 'constant'
                 % Subtract constant value
-                minima = min(flatdat);
-                adjusted_data = flatdat - minima;
+                
+                % Already implemented
                 
             case 'builtin'
+                % Use MATLAB builtin function
+
+                % Repeat x axis
+                % TO DO: make it work with different xbase lengths
                 xbase = repmat(self(i).Graph, 1, nSpectra);
                 
-                if isempty(options)
-                    adjusted_data = bgs_builtinBackAdj(xbase, flatdat);
-                else
-                    celloptions = namedargs2cell(options);
-                    
-                    adjusted_data = bgs_builtinBackAdj(xbase, flatdat, celloptions{:});
-                end
+                % Run background subtraction and pass options
+                adjusted_data = bgs_builtinBackAdj(xbase, flatdat, celloptions{:});
                 
             case 'airPLS'
+                % Use airPLS algorithm
+
                 adjusted_data = bgs_airPLS(flatdat, 10e4, 2, 0.05);
             otherwise
+
+                fprintf('Baseline Correction Method not implemented.\n');
                 return
         end
         

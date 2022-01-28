@@ -1,5 +1,5 @@
 function adjustedData = bgs_builtinBackAdj(x, y, options)
-    %BUILTINBACKADJ Default MATLAB Background adjustment
+    % BGS_BUILTINBACKADJ Default MATLAB Background adjustment
     %   Detailed explanation goes here
     
     arguments

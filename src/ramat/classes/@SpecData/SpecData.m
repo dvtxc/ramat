@@ -42,6 +42,11 @@ classdef SpecData < DataItem
     properties (SetAccess = private)
         Type = "SpecData";
     end
+
+    % Signatures
+    methods
+        remove_baseline(self, options);
+    end
     
     methods
         function obj = SpecData(name, graphbase, data, graphunit, dataunit)

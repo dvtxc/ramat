@@ -5,12 +5,12 @@ global rootdir;
 rootdir = GetExecutableFolder();
 
 % Add subfolders
-addpath('inc');
-addpath(fullfile('inc','gui'));
-addpath(fullfile('inc','gui','images'));
-addpath(fullfile('inc','gui','wit_icons'));
-addpath(fullfile('inc','gui','guihelper'));
-addpath(fullfile('inc','algo'));
+addpath('algo');
+addpath('classes');
+addpath('gui');
+addpath(fullfile('gui','images'));
+addpath(fullfile('gui','wit_icons'));
+addpath(fullfile('gui','guihelper'));
 addpath('helper');
 addpath('helper2'); % deprecated helper functions
 addpath(fullfile('helper', 'io'));

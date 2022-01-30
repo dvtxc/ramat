@@ -5,6 +5,7 @@ classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
     properties
         Name;
         Description;
+        ParentContainer = [];
     end
     
     properties (Abstract, SetAccess = private)
@@ -22,6 +23,28 @@ classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
     end
     
     methods (Sealed)
+        function append_sibling(self, new_data_item)
+            %APPENDSIBLING Appends a new data item to parent data container
+            %   Appends the new data item NEW_DATA_ITEM to the parent data
+            %   container of SELF.
+            %
+            %   TO-DO: make it possible to append to array of DataItems
+
+            if ~isa(new_data_item, 'DataItem')
+                % Not a DataItem
+                return
+            end
+
+            if isempty(self.ParentContainer) || ~isvalid(self.ParentContainer)
+                % Handle to deleted object?
+                return
+            end
+
+            % Append DataItem
+            self.ParentContainer.appendDataItem(new_data_item);
+            
+        end
+
         function T = listItems(self)
             %LISTITEMS: brief overview
             

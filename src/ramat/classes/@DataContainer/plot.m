@@ -1,4 +1,4 @@
-function plot(self, kwargs)
+function ax = plot(self, kwargs)
 %PLOT Default plotting method, overloads default plot function.
 %   This is the default method to plot data within the DataContainer. It
 %   only takes the data container as necessary input argument, additional
@@ -26,6 +26,8 @@ function plot(self, kwargs)
         kwargs.PlotStackDistance = 1;   % Stacking Shift Multiplier
         kwargs.Normalize = false;
     end
+
+    ax = [];
     
     if isempty(self)
         % Nothing has been selected

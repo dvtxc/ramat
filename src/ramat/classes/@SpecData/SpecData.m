@@ -24,6 +24,9 @@ classdef SpecData < DataItem
 
         % Mask
         Mask = Mask().empty;
+
+        % PeakTable
+        PeakTable = PeakTable.empty();
     end
     
     properties (Access = public, Dependent)
@@ -46,6 +49,8 @@ classdef SpecData < DataItem
     % Signatures
     methods
         remove_baseline(self, options);
+        peak_table = extract_peak_table(self, options);
+        peak_table = find_peaks(self, options);
     end
     
     methods

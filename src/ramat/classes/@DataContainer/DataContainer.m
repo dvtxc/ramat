@@ -38,7 +38,17 @@ classdef DataContainer < handle
         
         ActiveFilter = SpecFilter.empty;
     end
-    
+
+    % Method signatures
+    methods (Access = public)
+        trimData(self, startx, endx, overwrite);
+        normalizeData(self, overwrite);
+        subsetHandle = addToNewSubset(self);
+        addToSubset(self, subsetHandle);
+        ax = plot(self, kwargs);
+        appendDataItem(self, data_item);
+    end
+
     methods
         function obj = DataContainer(name, xUnits, ...
                 xData, xDataRaw, yData, yDataRaw, ...
@@ -167,6 +177,8 @@ classdef DataContainer < handle
             %   Appends specdata object to list of data items
             %   It can also append multiple SpecData objects to multiple
             %   DataContainer objects if the number of instances is equal.
+            %
+            %   This function is deprecated. Use APPENDDATAITEM() instead.
             %   
             %   TO DO:
             %   Make general data item function
@@ -181,19 +193,14 @@ classdef DataContainer < handle
                 return
             end
             
-            if numSpecDataObj == 1
-                newSpecData = specdataobj;
-            end
-            
             for i = 1 : numSelf
                 % For every instance of DataContainer
-                
-                if (numSpecDataObj > 1)
-                    newSpecData = specdataobj(i);
-                end
-                
-                lastInstance = numel(self(i).DataItems);
-                self(i).DataItems( lastInstance + 1 ) = newSpecData;
+
+                % Deprecated notice
+                warning("The function appendSpecData() is deprecated. " + ...
+                    "Please replace with appendDataItem().");
+
+                self(i).appendDataItem(specdataobj);
             end
         end
         
@@ -512,15 +519,7 @@ classdef DataContainer < handle
             
         end
         
-        trimData(self, startx, endx, overwrite);
         
-        normalizeData(self, overwrite);
-        
-        subsetHandle = addToNewSubset(self);
-        
-        addToSubset(self, subsetHandle);
-        
-        plot(self, kwargs);
         
         function idx = currentlySelectedDataItem(self)
             idx = numel(self.DataItems);

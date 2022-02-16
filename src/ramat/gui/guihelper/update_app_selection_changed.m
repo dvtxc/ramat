@@ -6,17 +6,16 @@ function update_app_selection_changed(app)
             
     % Get associated data containers
     nodeData = vertcat( selectedNodes.NodeData );
+
+    % Update data items tree
+    update_data_items_tree(app, nodeData);
                 
 
     if (numel(nodeData) == 1)
         % Actions for single selections: 
         
         if (class(nodeData) == "DataContainer")
-            
-            % Show Information
-            itemsTable = nodeData.DataItems.listItems();
-            app.DataItemsTable.Data = itemsTable;   
-            
+                        
             % Spectral data is selected
             if (nodeData.dataType == "SpecData")                   
                 
@@ -67,7 +66,6 @@ function update_app_selection_changed(app)
         % Actions for multiple selections:
         
         % Data Items Table should be empty
-        app.DataItemsTable.Data = [];
         
     end
     

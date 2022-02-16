@@ -48,7 +48,7 @@ classdef SpecData < DataItem
 
     % Signatures
     methods
-        remove_baseline(self, options);
+        removeBaseline(self, method, kwargs);
         peak_table = extract_peak_table(self, options);
         peak_table = find_peaks(self, options);
     end
@@ -57,6 +57,14 @@ classdef SpecData < DataItem
         function obj = SpecData(name, graphbase, data, graphunit, dataunit)
             %SPECDATA Construct an instance of this class
             %   Stores x-data and y-data
+
+            arguments
+                name string = "";
+                graphbase = [];
+                data = [];
+                graphunit = "";
+                dataunit = "";
+            end
             
             if (nargin == 0)
                 % Create empty spectral data object

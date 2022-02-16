@@ -1,25 +1,21 @@
-function self = removeBaseline(self, method, options)
+function self = removeBaseline(self, method, kwargs)
     % REMOVEBASELINE Returns object with baseline removed
     %   NaN-safe and preserves NaN values
     
     arguments
         self;
         method = 'builtin';
-        options struct = [];
+        kwargs struct = [];
     end
 
-    % To pass options kwargs, convert to named args
-    if ~isempty(options)
-        celloptions = namedargs2cell(options);
-    else
-        celloptions = cell.empty();
-    end
+    % Do python-like unpacking of kwargs
+    kwargs = unpack(kwargs);
 
     for i = 1:numel(self)
 
         if method == "constant"
             % Use class method SUBTRACT_MINIMUM
-            self(i).subtract_minimum(celloptions{:});
+            self(i).subtract_minimum(kwargs{:});
             return
         end
 
@@ -57,7 +53,7 @@ function self = removeBaseline(self, method, options)
                 xbase = repmat(self(i).Graph, 1, nSpectra);
                 
                 % Run background subtraction and pass options
-                adjusted_data = bgs_builtinBackAdj(xbase, flatdat, celloptions{:});
+                adjusted_data = bgs_builtinBackAdj(xbase, flatdat, kwargs{:});
                 
             case 'airPLS'
                 % Use airPLS algorithm

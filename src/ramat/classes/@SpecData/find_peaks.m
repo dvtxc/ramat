@@ -8,6 +8,12 @@ function peak_table = find_peaks(self, options)
 
     peak_table = [];
 
+    % Check if the signal processing toolbox is installed
+    if exist('findpeaks') == 0
+        warning("Function findpeaks() does not exist. Is the Signal Processing Toolbox installed?");
+        return
+    end
+    
     if ~isvalid(self) || isempty(self)
         % Handle to deleted object?
         return

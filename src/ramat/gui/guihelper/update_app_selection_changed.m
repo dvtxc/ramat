@@ -39,10 +39,7 @@ function update_app_selection_changed(app)
             end
             
         else
-            
-            % Data Items Table should be empty
-            app.DataItemsTable.Data = [];
-        
+                   
             % If node is an analysis result, set this to the current active
             % analysis result
             % PCA Result is selected

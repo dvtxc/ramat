@@ -7,7 +7,7 @@ classdef DataContainer < handle
     properties (Access = public)
         Name;
         selected;
-        Group;
+        Group = Group.empty();
     end
     
     properties (Access = public, Dependent)
@@ -279,6 +279,42 @@ classdef DataContainer < handle
         function set.Name(self, newname)
             self.Name = newname;
         end
+
+
+        function move_to_group(self, new_group)
+            %MOVE_TO_GROUP Moves data container to new group
+            %
+
+            arguments
+                self DataContainer;
+                new_group Group = Group.empty();
+            end
+
+            if numel(new_group) > 1
+                warning('Cannot move to multiple groups at once');
+                return;
+            end
+
+            % Move to a new group
+            if isempty(new_group)
+                new_group = self.ProjectParent.add_group("New Group");
+            end
+
+            % New group is invalid (i.e. deleted)
+            if ~isvalid(new_group)
+                warning('Reference to deleted group');
+                return
+            end
+
+            % Remove from old group
+            for i = 1:numel(self)
+                self(i).Group.remove_child(self(i));
+            end
+
+            % Add to new group and set new group
+            new_group.add_children(self);
+
+        end
    
                 
         %% Getters and setters of Dependent Properties
@@ -498,6 +534,11 @@ classdef DataContainer < handle
             % Remove itself from the dataset
             idx = find(self == prj.DataSet);
             prj.DataSet(idx) = [];
+
+            % Remove itself from the group
+            if ~isempty(self.Group)
+                self.Group.remove_child(self);
+            end
             
             % Remove itself from every analysis group
             if ~isempty(self.AnalysisGroupParent)

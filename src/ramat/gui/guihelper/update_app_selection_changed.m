@@ -38,7 +38,7 @@ function update_app_selection_changed(app)
                 
             end
             
-        else
+        elseif (class(nodeData) == "AnalysisResult")
                    
             % If node is an analysis result, set this to the current active
             % analysis result
@@ -61,8 +61,7 @@ function update_app_selection_changed(app)
 
     else
         % Actions for multiple selections:
-        
-        % Data Items Table should be empty
+
         
     end
     
@@ -71,7 +70,7 @@ function update_app_selection_changed(app)
     % TO-DO: create superclass for all containers and implement plot method there
     % TEMPORARY WORKAROUND:
     % Check if non-uniform data types have been selected
-    if isempty(nodeData)
+    if isempty(nodeData) || class(nodeData) == "Group"
         % Nothing has been selected
 
         return;

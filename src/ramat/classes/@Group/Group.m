@@ -4,10 +4,12 @@ classdef Group < handle
     
     properties (Access = public)
         Name;
+        Parent;
+        Children;
     end
     
     properties (Access = public, Dependent)
-        Children
+%         Children
     end
     
     properties (Access = public)
@@ -16,66 +18,75 @@ classdef Group < handle
     end
        
     methods
-        function self = Group(name)
+        function self = Group(parent, name)
             %GROUP Construct an instance of this class
             %   Detailed explanation goes here
+
+            arguments
+                parent Project = [];
+                name string = "";
+            end
+            
+            self.Parent = parent;
+            self.Name = name;
+
             global prj
             
             if ~isempty(prj)
                 self.ProjectParent = prj;
             end
             
-            self.Name = name;
+            
+        end
+
+        function add_children(self, dataset)
+            %ADD_CHILDREN Adds children containers and sets their group
+            %
+            %   Usage:
+            %   add_children(group, datacon_arr)
+
+            arguments
+                self Group;
+                dataset DataContainer = [];
+            end
+
+            % Append to list of children
+            self.Children = [self.Children; dataset];
+
+            % Set group
+            dataset.setgroup(self);
+
+        end
+
+        function remove_child(self, dataset)
+            %REMOVE_CHILD Deletes child
+            %   Checks if dataset is part of children and removes it from
+            %   the list of children
+
+            arguments
+                self Group;
+                dataset DataContainer;
+            end
+
+            % Unset the corresponding children
+            idx = find(dataset == self.Children);
+            self.Children(idx) = [];
+
         end
         
-        function children = get.Children(self)
-            %global prj
-            
-            if ~isempty(self.ProjectParent)
-                children = self.ProjectParent.DataSet.findgroup( self );
-            end
-        end
+%         function children = get.Children(self) - DEPRECATED
+%             %global prj
+%             
+%             if ~isempty(self.ProjectParent)
+%                 children = self.ProjectParent.DataSet.findgroup( self );
+%             end
+%         end
         
         function id = getid(self)
             id = vertcat(self.ID);
         end
         
-        function sizes = countGroupFlatDataSizes(self, omitnan)
-            %COUNTGROUPFLATDATASIZES
-            %   Since groups are stored in DataContainer, we need to
-            %   calculate the flat data sizes of the contained data items
-            %   here.
-            
-            sizes = zeros( numel(self), 1 );
-            
-            for i = 1:numel(self)
-                % For every instance of Group.
-                
-                % Get handles of all instances of DataContainer() within
-                % the current instance Group() that contain spectral data.
-                h = self(i).Children.getDataHandles('SpecData');
-                      
-                if ~isempty(h)
-                    % Current instance of Group() has instances of
-                    % DataContainer()
-                
-                    if (nargin > 1 && strcmp(omitnan, 'omitnan'))
-                        % Calculate number of spectra, whilst OMITTING
-                        % NaN-spectra.
-                        sizes(i) = sum( ~any( isnan( horzcat(h.FlatDataArray) ) ) );
-                    else
-                        % Calculate number of spectra, INCLUDING NaN-spectra.
-                        sizes(i) = size( horzcat( h.Data.FlatDataArray ), 2);
-                    end
-                else
-                    % Current instance of Group() is empty or has
-                    % non-spectral data.
-                    sizes(i) = 0;
-                end
-
-            end
- 
-        end
+       
         
         function specplot(self, stacked)
             % SPECPLOT
@@ -137,6 +148,43 @@ classdef Group < handle
                 end 
             end
         end
+
+%         function sizes = countGroupFlatDataSizes(self, omitnan)
+%             %COUNTGROUPFLATDATASIZES -- DEPRECATED
+%             %   Since groups are stored in DataContainer, we need to
+%             %   calculate the flat data sizes of the contained data items
+%             %   here.
+%             
+%             sizes = zeros( numel(self), 1 );
+%             
+%             for i = 1:numel(self)
+%                 % For every instance of Group.
+%                 
+%                 % Get handles of all instances of DataContainer() within
+%                 % the current instance Group() that contain spectral data.
+%                 h = self(i).Children.getDataHandles('SpecData');
+%                       
+%                 if ~isempty(h)
+%                     % Current instance of Group() has instances of
+%                     % DataContainer()
+%                 
+%                     if (nargin > 1 && strcmp(omitnan, 'omitnan'))
+%                         % Calculate number of spectra, whilst OMITTING
+%                         % NaN-spectra.
+%                         sizes(i) = sum( ~any( isnan( horzcat(h.FlatDataArray) ) ) );
+%                     else
+%                         % Calculate number of spectra, INCLUDING NaN-spectra.
+%                         sizes(i) = size( horzcat( h.Data.FlatDataArray ), 2);
+%                     end
+%                 else
+%                     % Current instance of Group() is empty or has
+%                     % non-spectral data.
+%                     sizes(i) = 0;
+%                 end
+% 
+%             end
+%  
+%         end
         
     end
 end

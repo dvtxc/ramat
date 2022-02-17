@@ -20,15 +20,17 @@ classdef Project < handle
             self.DataSet = [self.DataSet; dataset];
             
             % Create a new group for the newly appended data
-            newGroup = self.add_group("New Import");
-            dataset.setgroup( newGroup );
+            new_group = self.add_group("New Import");
+            new_group.add_children(dataset);
+            
+            dataset.setgroup( new_group );
         end
         
-        function newGroupHandle = add_group(self, groupname)
+        function new_group = add_group(self, groupname)
             %ADD_GROUP
             
-            newGroupHandle = Group( groupname );
-            self.GroupSet(end + 1) = newGroupHandle;
+            new_group = Group( self, groupname );
+            self.GroupSet(end + 1) = new_group;
             
         end
         

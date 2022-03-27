@@ -38,7 +38,7 @@ function update_app_selection_changed(app)
                 
             end
             
-        elseif (class(nodeData) == "AnalysisResult")
+        elseif (class(nodeData) == "PCAResult")
                    
             % If node is an analysis result, set this to the current active
             % analysis result

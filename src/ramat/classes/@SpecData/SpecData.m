@@ -184,7 +184,14 @@ classdef SpecData < DataItem
             if numel(size(data)) == 3
                 self.Data = data;
             else
-                self.Data = permute(reshape(data', self.XSize, self.YSize, self.GraphSize), [2 1 3]);
+                if isempty(self.Data)
+                    xs = 1;
+                    ys = 1;
+                else
+                    xs = self.XSize;
+                    ys = self.YSize;
+                end
+                self.Data = permute(reshape(data', xs, ys, self.GraphSize), [2 1 3]);
             end
         end
         

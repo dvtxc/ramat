@@ -23,9 +23,14 @@ classdef Analysis < handle
             self.append_data(dataset);
         end
         
-        function append_data(self, dataset)
+        function append_data(self, dataset, new_group_name)
+            arguments
+                self;
+                dataset;
+                new_group_name string = "";
+            end
             
-            newgroup = self.add_group();
+            newgroup = self.add_group(new_group_name);
             newgroup.append_data(dataset);
             
         end

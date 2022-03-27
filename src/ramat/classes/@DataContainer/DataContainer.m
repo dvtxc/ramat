@@ -290,20 +290,22 @@ classdef DataContainer < handle
                 new_group Group = Group.empty();
             end
 
+            % Check if new group is singular
             if numel(new_group) > 1
                 warning('Cannot move to multiple groups at once');
                 return;
-            end
-
-            % Move to a new group
-            if isempty(new_group)
-                new_group = self.ProjectParent.add_group("New Group");
             end
 
             % New group is invalid (i.e. deleted)
             if ~isvalid(new_group)
                 warning('Reference to deleted group');
                 return
+            end
+
+            % Move to a new group
+            if isempty(new_group)
+                % Create new group. Retrieve from first self.
+                new_group = self(1).ProjectParent.add_group("New Group");
             end
 
             % Remove from old group

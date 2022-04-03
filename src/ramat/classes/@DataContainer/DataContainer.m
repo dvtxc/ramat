@@ -509,13 +509,24 @@ classdef DataContainer < handle
             
         end
         
-        %% Overloads
+        %% Overrides
         
         function maxval = max(self)
             %MAX Returns maximum value of Data attribute
             
             maxval = max( vertcat( self.DataPreview ) );
             
+        end
+
+        function avg_datacontainer = mean(self)
+            % MEAN Returns averaged spectra
+
+            % Calculate mean
+            specdat = self.getDataHandles;
+            avg_specdat = specdat.mean();
+            avg_datacontainer = DataContainer(avg_specdat.Name);
+            avg_datacontainer.appendDataItem(avg_specdat);
+
         end
         
         

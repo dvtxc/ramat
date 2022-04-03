@@ -138,6 +138,29 @@ classdef SpecData < DataItem
             end
             
         end
+
+        %% Overrides
+
+        function avg_specdat = mean(self)
+            % MEAN Returns averaged spectral data
+
+            arguments
+                self
+            end
+
+            % Can only do for similarly sizes specdats
+            assert(range(vertcat(self.GraphSize)) == 0, "Not all SpecData instances are equal in size.");
+            assert(range(vertcat(self.XSize)) == 0, "Not all SpecData instances are equal in size.");
+            assert(range(vertcat(self.YSize)) == 0, "Not all SpecData instances are equal in size.");
+
+            % Calculate average
+            avg_dat = mean(cat(4, self.Data), 4);
+
+            % Create SpecDat
+            newname = sprintf("Average of %d", numel(self));
+            avg_specdat = SpecData(newname, self(1).Graph, avg_dat, self(1).GraphUnit, self(1).DataUnit);
+    
+        end
         
         % DEPENDENT PROPERTIES
         function wavres = get.GraphSize(self)
@@ -211,6 +234,10 @@ classdef SpecData < DataItem
         function self = set.XData(self, xdata)
             self.Graph = xdata;
         end
+
+        %% Overrides
+
+       
         
     end
 end

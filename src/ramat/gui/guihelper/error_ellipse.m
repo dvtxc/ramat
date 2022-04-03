@@ -57,7 +57,7 @@ function error_ellipse(y1,y2,color, options)
     avg = mean(data);
 
     % Get the 95% confidence interval error ellipse
-    chisquare_val = 2.4477;
+    chisquare_val = 2;%2.4477;
     theta_grid = linspace(0,2*pi);
     phi = angle;
     X0=avg(1);
@@ -78,6 +78,8 @@ function error_ellipse(y1,y2,color, options)
     % Draw the error ellipse
     plot(ax, r_ellipse(:,1) + X0,r_ellipse(:,2) + Y0,'-','Color',color);
     % e.HandleVisibility = 'off';
+
+    scatter(ax, mean(y1),mean(y2),'+', MarkerEdgeColor=color);
 
 
 end

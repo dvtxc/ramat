@@ -139,7 +139,15 @@ function updateappmgr(app, options)
                         % Assign icon to node
                         switch (data.dataType)
                             case "SpecData"
-                                datanode.Icon = "TDGraph_2.png";
+                                % Spectral Data, evaluate the datasize
+                                if data.DataSize > 1
+                                    % Spectral Data of a scanned area
+                                    datanode.Icon = "TDGraph_0.png";
+                                else
+                                    % Single Spectrum
+                                    datanode.Icon = "TDGraph_2.png";
+                                end
+
                             case "TextData"
                                 datanode.Icon = "TDText.png";
                             otherwise

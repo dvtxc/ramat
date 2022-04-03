@@ -50,7 +50,8 @@ classdef PeakTable < DataItem
         function t = get.Table(self)
             % TABLE Outputs peaks and locations as table
 
-            t = table(self.peaks, self.locations);
+            t = table(self.locations, self.peaks);
+            t.Properties.VariableNames = ["Wavenum", "Height"];
         end
 
     end
@@ -70,6 +71,8 @@ classdef PeakTable < DataItem
         function datares = get.DataSize(self)
             datares = 0;
         end
+
+
 
     end
 

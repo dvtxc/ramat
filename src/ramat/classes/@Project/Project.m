@@ -13,14 +13,26 @@ classdef Project < handle
     end
     
     methods
-        function append_data(self, dataset)
+        function append_data(self, dataset, group)
             %APPEND_DATA:
             %   Appends a dataset to the project object
 
+            arguments
+                self;
+                dataset;
+                group = Group.empty();
+            end
+
             self.DataSet = [self.DataSet; dataset];
             
-            % Create a new group for the newly appended data
-            new_group = self.add_group("New Import");
+            % What group will it be appended to
+            if isempty(group)
+                % Create a new group for the newly appended data
+                new_group = self.add_group("New Import");
+            else
+                new_group = group;
+            end
+
             new_group.add_children(dataset);
             
             dataset.setgroup( new_group );

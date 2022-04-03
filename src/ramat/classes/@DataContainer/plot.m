@@ -25,6 +25,7 @@ function ax = plot(self, kwargs)
         kwargs.PlotType = "Overlaid";   % 'Overlaid', 'Stacked'
         kwargs.PlotStackDistance = 1;   % Stacking Shift Multiplier
         kwargs.Normalize = false;
+        kwargs.PlotPeaks = true;
     end
 
     ax = [];
@@ -70,6 +71,8 @@ function ax = plot(self, kwargs)
             ax.XTickMode = 'auto';
             ax.YTick = [];
 
+            ax.Color = 'none';
+
             % Set Labels
             ax.XLabel.String = 'Raman Shift [cm^-^1]';
 
@@ -114,10 +117,26 @@ function ax = plot(self, kwargs)
                 end
 
                 plot(ax, xdat, ydat);
+
+                % Add peaks
+                if kwargs.PlotPeaks
+                    if any(vertcat(dat.DataItems.Type) == "PeakTable")
+                        % There are peaktables
+                        peaktable = dat.DataItems( find(vertcat(dat.DataItems.Type) == "PeakTable", 1, 'first' ) );
+                        peaktable.plot(Axes=ax);
+                    end
+                end
+
             end
+
+            % Add legend
+            leg = legend(ax, vertcat(self.DisplayName));
+            leg.Color = 'none';
+            leg.Box = "off";
 
             % Release hold
             hold(ax, 'off');
+
 
         case "ImageData"
             % Plot first

@@ -373,6 +373,38 @@ classdef Analysis < handle
             self.Selection = datacontainers;
             
         end
+
+        %% Destructor
+        
+        function delete(self)
+            %DESTRUCTOR Delete all references to object
+
+            fprintf("Deleting %s...", self.DisplayName);
+
+            % Delete all analysis groups (children)
+            for i = 1:numel(self.GroupSet)
+                if isvalid(self.GroupSet(i))
+                    delete(self.GroupSet(i));
+                end
+            end
+            
+            % Delete references at parent
+            prj = self.Parent;
+            
+            if ~isvalid(prj)
+                % Program is probably closing, prj hasn't been found
+                % Skip checks
+                return
+                
+            end
+            
+            % Remove itself from the dataset
+            idx = find(self == prj.AnalysisSet);
+            prj.AnalysisSet(idx) = [];
+
+            fprintf(" (%d analysis groups have been removed as well)\n", i);
+
+        end
             
     end
 end

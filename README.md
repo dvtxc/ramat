@@ -2,6 +2,8 @@
 *RAMAT* is a MATLAB-based software package for quick analysis, spectral correction, and plotting of spectroscopical Raman data.
 Data can be imported straight from WiTEC software or as one of the many supported ASCII formats.
 
+![](docs/images/overview.png)
+
 # Requirements
 **Minimal Requirements:** MATLAB 2021a or newer.
 

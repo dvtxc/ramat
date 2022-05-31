@@ -1,11 +1,10 @@
-function fileTypeMode = determineFileTypeMode(fileNames)
+function fileTypeMode = determine_file_type_mode(fileNames)
 % Determines the file type for import
 
 len = length(fileNames);
 
 if (len == 0)
-    fileTypeMode = -1;
-    return
+    throw(MException('Ramat:IO', "No files were found."));
 end
 
 % Determine extensions for all input files
@@ -29,12 +28,10 @@ if all(strcmp(ext, ext{1}))
         case '.txt'
             fileTypeMode = 3;
         otherwise
-            fileTypeMode = -1;
-            warning('File Extension not Supported');
+            throw(MException('Ramat:IO', 'File Extension not Supported'));
     end
 else
-    warning('Multiple files extensions provided.');
-    return
+    throw(MException('Ramat:IO', 'Multiple files extensions provided.'));
 end
 
 end

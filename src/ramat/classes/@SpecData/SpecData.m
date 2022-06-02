@@ -97,7 +97,7 @@ classdef SpecData < DataItem
             end
 
             % Create LA scan cursor
-            obj.cursor = Cursor();
+            obj.cursor = Cursor(obj);
 
         end
         
@@ -146,9 +146,22 @@ classdef SpecData < DataItem
         end
 
         function spec = get_single_spectrum(self)
-            %GET_SINGLE_SPECTRUM Retrieves single spectrum at cursor
+            %GET_SINGLE_SPECTRUM Retrieves single spectrum at cursor or
+            %accumulated over the size of the cursor
 
-            spec = self.Data(self.cursor.x, self.cursor.y, :);
+            if (self.cursor.size == 1)
+                spec = self.Data(self.cursor.x, self.cursor.y, :);
+
+            else
+                % Accumulate over cursor
+                
+                rows = self.cursor.mask_coords.rows;
+                cols = self.cursor.mask_coords.cols;
+                spec = mean(self.Data(rows(1):rows(2), cols(1):cols(2), :),[1 2]);
+
+            end
+
+            % Return 1-dimensional array
             spec = permute(spec, [3 1 2]);
 
         end

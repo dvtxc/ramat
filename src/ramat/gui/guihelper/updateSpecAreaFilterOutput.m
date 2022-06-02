@@ -1,8 +1,20 @@
-function updateSpecAreaFilterOutput(app)
+function updateSpecAreaFilterOutput(viewer, dc)
 %UPDATESPECAREAFILTEROUTPUT 
-    ax = app.UIAxes;
-    dc = app.DataCon;
+
+    arguments
+        viewer SpecAreaDataViewer = [];
+        dc DataContainer = [];
+    end
+
+    ax = viewer.UIAxes;
+
+    % Check if handles have been provided
+    if isempty(ax) || isempty(dc)
+        return;
+    end
+
     output = dc.FilterOutput;
+    specdat = dc.Data;
     
     cla(ax, 'reset');
     
@@ -20,7 +32,8 @@ function updateSpecAreaFilterOutput(app)
         dc.Filter.Range(2));
     ax.Title.String = string;
     
-    imagesc(ax, output );
+    img = imagesc(ax, output);
+    img.ButtonDownFcn = @(~,event) update_spec_area_cursor(specdat, event.IntersectionPoint, ax, viewer.get_main_axes());
 
     ax.DataAspectRatio = [1 1 1];
 %     ax.XLim = [0.5, dc.XSize + 0.5];

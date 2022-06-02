@@ -1,4 +1,4 @@
-function self = removeBaseline(self, method, kwargs)
+function removeBaseline(self, method, kwargs)
     % REMOVEBASELINE Returns object with baseline removed
     %   NaN-safe and preserves NaN values
     
@@ -35,7 +35,7 @@ function self = removeBaseline(self, method, kwargs)
         end
 
         if (nSpectra > 100)
-            fprintf('--- Removing baseline from %i spectra. This might take a while.\n', nSpectra)
+            fprintf('--- Removing baseline from %i spectra. This might take a while.\n', nSpectra);
         end
 
         % Perform removal of baseline

@@ -22,6 +22,9 @@ classdef SpecData < DataItem
         YLength;
         ZLength;
 
+        % Cursor for large area spectra
+        cursor;
+
         % Mask
         Mask = Mask().empty;
 
@@ -93,6 +96,9 @@ classdef SpecData < DataItem
                 obj.YData = data;
             end
 
+            % Create LA scan cursor
+            obj.cursor = Cursor();
+
         end
         
         out = clipByMask(self, mask);
@@ -137,6 +143,14 @@ classdef SpecData < DataItem
                 idx = [startIdx, endIdx];
             end
             
+        end
+
+        function spec = get_single_spectrum(self)
+            %GET_SINGLE_SPECTRUM Retrieves single spectrum at cursor
+
+            spec = self.Data(self.cursor.x, self.cursor.y, :);
+            spec = permute(spec, [3 1 2]);
+
         end
 
         %% Overrides

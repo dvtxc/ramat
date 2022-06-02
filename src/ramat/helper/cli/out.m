@@ -22,6 +22,7 @@ function out(str, opts)
     % Append string to GUI text component
     opts.gui.Value = [opts.gui.Value; str];
     drawnow;
+    scroll(opts.gui, 'bottom');
     
 end
 

@@ -9,6 +9,7 @@ function dataObject = import_single_widata(widO, kwargs)
         kwargs.remove_baseline = false;
         kwargs.remove_baseline_opts struct = [];
         kwargs.gui = [];
+        kwargs.processing = get_processing_options;
     end
 
     % Python-like kwargs unpacking
@@ -19,7 +20,7 @@ function dataObject = import_single_widata(widO, kwargs)
     item_name = widO.Name;
     dataObject.Name = item_name;
     
-    out(sprintf('\n%s\n', dataObject.DisplayName), gui=kwargs.gui);
+    out(sprintf('\n%s', dataObject.DisplayName), gui=kwargs.gui);
     
     % Append data item to data container based on data type
     switch widO.Type
@@ -28,9 +29,9 @@ function dataObject = import_single_widata(widO, kwargs)
             % Display dimensions
             switch widO.SubType
                 case 'Point'
-                    out(sprintf('## Single Spectrum\n'), gui=kwargs.gui);
+                    out(sprintf('## Single Spectrum'), gui=kwargs.gui);
                 case 'Image'
-                    out(sprintf('## %i x %i Area Scan\n', widO.Info.XLength, widO.Info.YLength), gui=kwargs.gui);
+                    out(sprintf('## %i x %i Area Scan', widO.Info.XLength, widO.Info.YLength), gui=kwargs.gui);
             end
 
             % Excitation wavelength
@@ -46,8 +47,8 @@ function dataObject = import_single_widata(widO, kwargs)
             %% RAW DATA
             
             % Keep copy of original data
-            if kwargs.retain_original
-                if any(kwargs.remove_offset, kwargs.remove_baseline, kwargs.normalize)
+            if kwargs.processing.retain_original
+                if any(kwargs.processing.remove_offset, kwargs.processing.remove_baseline, kwargs.processing.normalize)
 
                     % Create SpecData instance
                     specdat = SpecData( ...
@@ -101,28 +102,28 @@ function dataObject = import_single_widata(widO, kwargs)
             % specdat_obj.trimData(trimStart, trimEnd)
             
             % Remove Offset
-            if kwargs.remove_offset
-                fprintf('-- Removing Offset ...\n');
+            if kwargs.processing.remove_offset
+                out('-- Removing Offset ...', gui=kwargs.gui);
                 specdat.removeBaseline('constant');
             end
             
             % Remove Background
-            if kwargs.remove_baseline
-                fprintf('-- Removing Baseline ...\n');
-                specdat = specdat.removeBaseline();
+            if kwargs.processing.remove_baseline
+                out('-- Removing Baseline ...', gui=kwargs.gui);
+                specdat.removeBaseline();
             end
             
             % Normalize Data
-            if kwargs.normalize
-                fprintf('-- Normalising Spectrum ...\n');
-                specdat = specdat.normalizeSpectrum();
+            if kwargs.processing.normalize
+                out('-- Normalising Spectrum ...', gui=kwargs.gui);
+                specdat.normalizeSpectrum();
             end
             
             % Append SpecData to Data Container
             dataObject.appendDataItem(specdat);
             
         case 'TDText'
-            fprintf('## Text File\n');
+            out('## Text File', gui=kwargs.gui);
             
             textdat = TextData(item_name, widO.Data);
             textdat.Description = "Imported Text";
@@ -131,7 +132,7 @@ function dataObject = import_single_widata(widO, kwargs)
             dataObject.appendDataItem(textdat);
             
         case 'TDBitmap'
-            fprintf('## Image\n');
+            out('## Image', gui=kwargs.gui);
             
             imgdat = ImageData(item_name, widO.Data);
             imgdat.Description = "Imported Image";

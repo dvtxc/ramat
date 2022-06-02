@@ -362,7 +362,7 @@ classdef DataContainer < handle
             % Get a data preview
             
             if (self.dataType == "SpecData")
-                graph = self.Data.FlatDataArray(:,1);
+                graph = self.Data.get_single_spectrum();
             else
                 graph = [];
             end

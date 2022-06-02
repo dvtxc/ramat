@@ -31,14 +31,15 @@ function data = import_data(path, opts)
         opts.type int8 = 0;
         opts.folder logical = false;
         opts.gui = [];
-        opts.conversion = struct.empty();
+        opts.processing = get_processing_options;
+        opts.start_path = pwd;
     end
 
     % Get input path and validate input
     if isempty(path)
         % Ask for user input
         try
-            [files, base_dir] = get_path_user_input(opts.folder, start_path=pwd);
+            [files, base_dir] = get_path_user_input(opts.folder, start_path=opts.start_path);
         catch ME
             switch ME.identifier
                 case 'Ramat:User'
@@ -112,7 +113,7 @@ function data = import_data(path, opts)
             switch opts.type
                 case 0
                     % WIP Files
-                    newdata = import_single_wip(file, gui=opts.gui, conversion=opts.conversion);
+                    newdata = import_single_wip(file, gui=opts.gui, processing=opts.processing);
                     data = [data newdata];
                     
                 case 1

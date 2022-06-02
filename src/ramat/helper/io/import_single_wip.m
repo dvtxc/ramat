@@ -4,7 +4,7 @@ function out = import_single_wip(file, opts)
     arguments
         file string = string.empty();
         opts.gui = [];
-        opts.conversion = struct.empty();
+        opts.processing = get_processing_options;
     end
     
     %% Check whether WITIO reader is activated
@@ -23,7 +23,7 @@ function out = import_single_wip(file, opts)
     
     % Default: import everything, including text data objects
     for i = 1:size(O_wid,1)
-        out(i, 1) = importSingleWIData(O_wid(i, 1));
+        out(i, 1) = import_single_widata(O_wid(i, 1), processing=opts.processing, gui=opts.gui);
     end
 
 end

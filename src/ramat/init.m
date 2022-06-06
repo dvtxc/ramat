@@ -12,6 +12,7 @@ addpath(fullfile('gui','images'));
 addpath(fullfile('gui','wit_icons'));
 addpath(fullfile('gui','guihelper'));
 addpath('helper');
+addpath(fullfile('helper', 'cli'));
 addpath('helper2'); % deprecated helper functions
 addpath(fullfile('helper', 'io'));
 

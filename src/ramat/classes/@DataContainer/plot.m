@@ -49,6 +49,17 @@ function ax = plot(self, kwargs)
     else
         if ( class(kwargs.Axes) == "matlab.graphics.axis.Axes" || class(kwargs.Axes) == "matlab.ui.control.UIAxes")
             ax = kwargs.Axes;
+
+            % Get figure parent, might not be direct parent of axes
+            f = ax;
+            limit = 0;
+            while (class(f) ~= "matlab.ui.Figure")
+                f = f.Parent;
+                limit = limit + 1;
+                if limit > 10
+                    throw(MException('Ramat:UI',"Could not find figure"))
+                end
+            end
             
             % Clear axes
             cla(ax, 'reset');
@@ -157,6 +168,10 @@ function ax = plot(self, kwargs)
 
 
     end
+
+    % Create cursor
+    assign_spectral_cursor(f, ax);
+
 
 end
 

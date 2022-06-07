@@ -32,14 +32,25 @@ function scoresscatter(pcaresult, pcax, options)
     else
         if ( class(options.Axes) == "matlab.graphics.axis.Axes" || class(options.Axes) == "matlab.ui.control.UIAxes")
             ax = options.Axes;
+
+            % Get parent figure
+            f = get_parent_figure(ax);
             
             % Clear axes
             cla(ax);
+
+            % Reset axes mode
+            ax.XLimMode = 'auto';
+            ax.YLimMode = 'auto';
+
         else
             warning("Invalid Axes Handle");
             return;
         end
     end
+
+    % Make sure we don't have a cursor for this kind of plot
+    unassign_spectral_cursor(f);
     
     % Get standard MATLAB plot colors
     co = get(ax,'ColorOrder');

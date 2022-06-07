@@ -5,6 +5,7 @@ classdef SpectralCursor < handle
     properties
         cursor struct = [];
         axes = [];
+        active logical = true;
     end
     
     methods
@@ -23,11 +24,24 @@ classdef SpectralCursor < handle
             self.draw();
 
             % Assign callback to window
+            self.hook(f);
+
+            % Activate;
+            self.active = true;
+        end
+
+        function hook(self, f)
+            % Assign callback to window
             f.WindowButtonMotionFcn = @(~,~) self.redraw();
         end
 
         function draw(self)
             %DRAW Draw cursor for the first time
+
+            % Check if active
+            if ~self.active
+                return;
+            end
 
             self.cursor = [];
 
@@ -45,6 +59,11 @@ classdef SpectralCursor < handle
         
         function redraw(self)
             %REDRAW Redraw cursor in axes
+
+            % Check if active
+            if ~self.active
+                return;
+            end
 
             % Check if deleted
             if ~isgraphics(self.axes)

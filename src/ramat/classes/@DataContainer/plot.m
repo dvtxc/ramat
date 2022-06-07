@@ -51,15 +51,7 @@ function ax = plot(self, kwargs)
             ax = kwargs.Axes;
 
             % Get figure parent, might not be direct parent of axes
-            f = ax;
-            limit = 0;
-            while (class(f) ~= "matlab.ui.Figure")
-                f = f.Parent;
-                limit = limit + 1;
-                if limit > 10
-                    throw(MException('Ramat:UI',"Could not find figure"))
-                end
-            end
+            f = get_parent_figure(ax);
             
             % Clear axes
             cla(ax, 'reset');

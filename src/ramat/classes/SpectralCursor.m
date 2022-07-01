@@ -52,6 +52,19 @@ classdef SpectralCursor < handle
                 return;
             end
 
+            % Check if figure is being edited
+            if class(self.axes) == "matlab.graphics.axis.Axes"
+                f = self.axes.Parent;
+                if plotedit(f, 'isactive')
+                    f.WindowButtonMotionFcn = '';
+                    delete(vertcat(self.cursor.h));
+                    f.UserData.Cursor = [];
+                    delete(self);
+                    return;
+                end
+            end
+
+
             % Check if cursor exists
             if isempty(self.cursor)
                 self.draw();

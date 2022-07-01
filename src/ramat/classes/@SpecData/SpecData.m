@@ -149,6 +149,16 @@ classdef SpecData < DataItem
             %GET_SINGLE_SPECTRUM Retrieves single spectrum at cursor or
             %accumulated over the size of the cursor
 
+            if (self.DataSize == 1)
+                spec = self.Data(1, 1, :);
+                spec = permute(spec, [3 1 2]);
+                return;
+            end
+
+            if isempty(self.cursor)
+                self.cursor = Cursor(self);
+            end
+
             if (self.cursor.size == 1)
                 spec = self.Data(self.cursor.x, self.cursor.y, :);
 

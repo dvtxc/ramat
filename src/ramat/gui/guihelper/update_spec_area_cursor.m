@@ -7,6 +7,11 @@ function update_spec_area_cursor(specdat, coords, ax, main_axes)
         ax matlab.ui.control.UIAxes = [];
         main_axes matlab.ui.control.UIAxes = [];
     end
+
+    % Check if cursor exists
+    if isempty(specdat.cursor)
+        specdat.cursor = Cursor(specdat);
+    end
     
     % Update cursor coordinates
     specdat.cursor.setx(coords(1));

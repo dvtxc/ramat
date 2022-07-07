@@ -1,15 +1,15 @@
 classdef SpecData < DataItem
-    %SPECDATA Instance containing spectral data
-    %   Detailed explanation goes here
+    %SPECDATA Class to contain spectral (Raman) data
+    %   This class contains spectral and meta data of a single measurement.
     
     properties      
         % Spectral Data
-        Data;
-        DataUnit;
+        Data double;      % 3D array (size: m*n*o), spectral data (i,j,k)
+        DataUnit string;  % Data unit, usually: "cts." or "a.u."
         
         % Spectral Base
-        Graph;
-        GraphUnit;
+        Graph double;     % 1D array (size: o), spectral base vector (k)
+        GraphUnit string; % Spectral base units, usually: "cm-1"
         
         % Info
         ExcitationWavelength;
@@ -23,13 +23,13 @@ classdef SpecData < DataItem
         ZLength;
 
         % Cursor for large area spectra
-        cursor;
+        cursor Cursor;
 
         % Mask
-        Mask = Mask().empty;
+        Mask Mask = Mask().empty;
 
         % PeakTable
-        PeakTable = PeakTable.empty();
+        PeakTable PeakTable = PeakTable.empty();
     end
     
     properties (Access = public, Dependent)
@@ -39,7 +39,7 @@ classdef SpecData < DataItem
         XSize;
         YSize;
         ZSize;
-        DataSize;
+        DataSize;       % Size of first two dimensions of Data (m*n)
         
         XData; % Deprecated
         YData; % Deprecated
@@ -68,34 +68,14 @@ classdef SpecData < DataItem
                 graphunit = "";
                 dataunit = "";
             end
-            
-            if (nargin == 0)
-                % Create empty spectral data object
-                obj.Name = "empty";
-                obj.Graph = [];
-                obj.Data = [];
-            elseif (nargin >= 3)
-                obj.Name = name;
-                obj.Graph = graphbase; % Spectral x-axis
-                obj.Data = data;
-                
-                if nargin >= 4
-                    if ~isempty(graphunit)
-                        obj.GraphUnit = graphunit;
-                    end
-                end
-                
-                if nargin >= 5
-                    if ~isempty(dataunit)
-                        obj.DataUnit = dataunit;
-                    end
-                end
-                
-                % Deprecated;
-                obj.XData = graphbase;
-                obj.YData = data;
-            end
 
+            % Store properties
+            obj.Name = name;
+            obj.Graph = graphbase;
+            obj.Data = data;
+            obj.GraphUnit = graphunit;
+            obj.DataUnit = dataunit;
+            
             % Create LA scan cursor
             obj.cursor = Cursor(obj);
 
@@ -149,12 +129,26 @@ classdef SpecData < DataItem
             %GET_SINGLE_SPECTRUM Retrieves single spectrum at cursor or
             %accumulated over the size of the cursor
 
+            % Check if single spectrum to reduce computational time
+            if (self.DataSize == 1)
+                spec = self.Data(1, 1, :);
+                spec = permute(spec, [3 1 2]);
+                return;
+            end
+
+            % Do rest for large area scans
+
+            % Check for cursor
+            if isempty(self.cursor)
+                % Spectral Data does not have cursor. Create one.
+                self.cursor = Cursor(self);
+            end
+
             if (self.cursor.size == 1)
                 spec = self.Data(self.cursor.x, self.cursor.y, :);
 
             else
                 % Accumulate over cursor
-                
                 rows = self.cursor.mask_coords.rows;
                 cols = self.cursor.mask_coords.cols;
                 spec = mean(self.Data(rows(1):rows(2), cols(1):cols(2), :),[1 2]);

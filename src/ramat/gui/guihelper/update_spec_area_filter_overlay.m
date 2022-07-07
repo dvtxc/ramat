@@ -6,6 +6,11 @@ function update_spec_area_filter_overlay(ax, specdat)
         specdat SpecData = [];
     end
 
+    % Check if cursor exists
+    if isempty(specdat.cursor)
+        specdat.cursor = Cursor(specdat);
+    end
+
     hold(ax, 'on');
 
     % Delete overlay

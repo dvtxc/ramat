@@ -20,7 +20,7 @@ function success = enableWITIOhelper(kwargs)
 
         toolbox_path = fullfile('redist', 'wit_io');
 
-        if ~exist(fullfile(toolbox_path, 'dir'))
+        if ~exist(toolbox_path)
             fprintf('Toolbox installation file not found.\n');
             return
         end

@@ -129,18 +129,25 @@ classdef SpecData < DataItem
             %GET_SINGLE_SPECTRUM Retrieves single spectrum at cursor or
             %accumulated over the size of the cursor
 
+<<<<<<< HEAD
             % Check if single spectrum to reduce computational time
+=======
+>>>>>>> 316b3f117d55117a7e8db9880aedf134a0a40642
             if (self.DataSize == 1)
                 spec = self.Data(1, 1, :);
                 spec = permute(spec, [3 1 2]);
                 return;
             end
 
+<<<<<<< HEAD
             % Do rest for large area scans
 
             % Check for cursor
             if isempty(self.cursor)
                 % Spectral Data does not have cursor. Create one.
+=======
+            if isempty(self.cursor)
+>>>>>>> 316b3f117d55117a7e8db9880aedf134a0a40642
                 self.cursor = Cursor(self);
             end
 

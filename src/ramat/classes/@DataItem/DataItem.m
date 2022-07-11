@@ -1,27 +1,19 @@
 classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
-    %DATAITEM Summary of this class goes here
-    %   Detailed explanation goes here
+    %DATAITEM Abstract parent class of all data items
+    %   Subclasses are:
+    %   PCAResult, ImageData, SpecData, SpecFilter, TextData, PeakTable,
+    %   Mask
     
     properties
-        Name;
-        Description;
-        ParentContainer = [];
+        name string;
+        description string;
+        parent_container {mustbeA(parent_container, 'Container')};
     end
     
     properties (Abstract, SetAccess = private)
         Type;
     end
         
-    % Following properties are needed for verbose table output. TO DO:
-    % remove necessity to instantiate these properties in child classes for
-    % clarity.
-    properties (Abstract, SetAccess = public)
-        XSize;
-        YSize;
-        ZSize;
-        DataSize;
-    end
-    
     methods (Sealed)
         function append_sibling(self, new_data_item)
             %APPENDSIBLING Appends a new data item to parent data container
@@ -30,18 +22,18 @@ classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
             %
             %   TO-DO: make it possible to append to array of DataItems
 
-            if ~isa(new_data_item, 'DataItem')
-                % Not a DataItem
-                return
+            arguments
+                self
+                new_data_item {mustBeA(new_data_item, 'DataItem')};
             end
 
-            if isempty(self.ParentContainer) || ~isvalid(self.ParentContainer)
+            if isempty(self.parent_container) || ~isvalid(self.parent_container)
                 % Handle to deleted object?
                 return
             end
 
             % Append DataItem
-            self.ParentContainer.appendDataItem(new_data_item);
+            self.parent_container.appendDataItem(new_data_item);
             
         end
 

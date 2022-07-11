@@ -9,7 +9,9 @@ classdef Project < handle
         ActiveAnalysis = Analysis.empty;
         ActiveAnalysisResult = AnalysisResult.empty;
         Name = "";
-        AnalysisResults;
+        AnalysisResults; %OLD
+        analysis_result_root Group = Group.empty; %New
+        data_root Group = Group.empty; %New
     end
     
     methods
@@ -80,6 +82,18 @@ classdef Project < handle
             self.AnalysisResults = [self.AnalysisResults; newresult];
         end
         
+    end
+
+    methods
+        % Get root groups
+
+        function root = get_analysis_result_root(self)
+            root = self.analysis_result_root();
+        end
+
+        function root = get_data_root(self)
+            root = self.data_root();
+        end
     end
 end
 

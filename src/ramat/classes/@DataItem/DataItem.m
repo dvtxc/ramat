@@ -1,4 +1,4 @@
-classdef DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
+classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
     %DATAITEM Abstract parent class of all data items
     %   Subclasses are:
     %   PCAResult, ImageData, SpecData, SpecFilter, TextData, PeakTable,

@@ -1,37 +1,46 @@
-classdef SpecData < DataItem
-    %SPECDATA Instance containing spectral data
-    %   Detailed explanation goes here
-    
-    properties      
+classdef SpecData < SpecDataABC
+    %SPECDATA Full spectral data class
+    %   This class stores spectral data, including spatial information.
+    %   This class will generate a simple spectrum "SpectrumSimple" class
+    %   for plotting purposes.
+    %
+    %   Parent Class: SpecDataABC < DataItem
+    %
+    %   Properties inherited from parent class "DataItem":
+    %       name        string
+    %       description string
+    %       parent      DataContainer
+    %       Type        string
+    %
+    %   Properties inherited from parent class "SpecDataABC":
+    %       data        double  (abstract)
+    %       data_unit   string
+    %       graph       double (1xm)
+    %       graph_unit  string
+    %       peak_table  PeakTable
+
+    properties (Access = public)
         % Spectral Data
-        Data;
-        DataUnit;
-        
-        % Spectral Base
-        Graph;
-        GraphUnit;
-        
-        % Info
-        ExcitationWavelength;
+        data double;
+
+        % Meta
+        excitation_wavelength double;
         
         % Spatial Grid Data
-        X;
-        Y;
-        Z;
-        XLength;
-        YLength;
-        ZLength;
+        x double;
+        y double;
+        z double;
+        xlength double;
+        ylength double;
+        zlength double;
 
         % Cursor for large area spectra
-        cursor;
+        cursor cursor;
 
         % Mask
-        Mask = Mask().empty;
-
-        % PeakTable
-        PeakTable = PeakTable.empty();
+        mask Mask;
     end
-    
+
     properties (Access = public, Dependent)
         FilteredData;
         FlatDataArray;
@@ -40,109 +49,90 @@ classdef SpecData < DataItem
         YSize;
         ZSize;
         DataSize;
-        
-        XData; % Deprecated
-        YData; % Deprecated
-    end
-    
-    properties (SetAccess = private)
-        Type = "SpecData";
     end
 
     % Signatures
     methods
         removeBaseline(self, method, kwargs);
-        peak_table = extract_peak_table(self, options);
-        peak_table = find_peaks(self, options);
+        out = clipByMask(self, mask);
     end
     
     methods
-        function obj = SpecData(name, graphbase, data, graphunit, dataunit)
+        function self = SpecData(name, graphbase, data, graphunit, dataunit)
             %SPECDATA Construct an instance of this class
             %   Stores x-data and y-data
 
             arguments
                 name string = "";
-                graphbase = [];
-                data = [];
-                graphunit = "";
-                dataunit = "";
-            end
-            
-            if (nargin == 0)
-                % Create empty spectral data object
-                obj.Name = "empty";
-                obj.Graph = [];
-                obj.Data = [];
-            elseif (nargin >= 3)
-                obj.Name = name;
-                obj.Graph = graphbase; % Spectral x-axis
-                obj.Data = data;
-                
-                if nargin >= 4
-                    if ~isempty(graphunit)
-                        obj.GraphUnit = graphunit;
-                    end
-                end
-                
-                if nargin >= 5
-                    if ~isempty(dataunit)
-                        obj.DataUnit = dataunit;
-                    end
-                end
-                
-                % Deprecated;
-                obj.XData = graphbase;
-                obj.YData = data;
+                graphbase double = [];
+                data {mustBeA(data, ["double", "single"])} = [];
+                graphunit string = "";
+                dataunit string = "";
             end
 
+            % Convert data to double
+            if class(data) == "single"
+                data = double(data);
+            end
+
+            % Store input args as properties
+            self.name = name;
+            self.graph = graphbase;
+            self.graph_unit = graphunit;
+            self.data = data;
+            self.data_unit = dataunit;
+
             % Create LA scan cursor
-            obj.cursor = Cursor(obj);
+            self.cursor = Cursor(self);
 
         end
         
-        out = clipByMask(self, mask);
         
-        function normalizeSpectrum(self)
+        function normalize_spectrum(self)
             % Normalizes spectrum, so sum(Data) = 1
             
             % Repeat operation for each spectral data object
-            for i = 1:numel(self)                
-                % Convert to double
-                dat = double(self(i).Data);
-                
+            for i = 1:numel(self)               
                 % Divide by sums of the individual spectra
-                self(i).Data = dat ./ sum( dat, 3 );
+                self(i).data = dat ./ sum( dat, 3 );
             end
         end
-        
-        function obj = removeConstantOffset(obj)
+        function normalizeSpectrum(self)
+            warning("Rename SpecData.normalizeSpectrum()");
+            self.normalize_spectrum();
+        end
+                
+        function remove_constant_offset(self)
             % Removes a constant offset (minimum value)
             
             % Repeat operation for each spectral data object
-            for i = 1:numel(obj)
-                dat = obj(i).Data;
-                graph_resolution = obj(i).GraphSize;
+            for i = 1:numel(self)
+                dat = self(i).data;
+                graph_resolution = self(i).GraphSize;
                 
                 min_values = min(dat, [], 3);
                 subtractionMatrix = repmat(min_values, 1, 1, graph_resolution);
                 
-                obj(i).Data = dat - subtractionMatrix;
+                self(i).data = dat - subtractionMatrix;
             end
         end
+        function removeConstantOffset(self)
+            warning("Rename SpecData.removeConstantOffset()");
+            self.remove_constant_offset();
+        end
         
-        function idx = wavnumtoidx(self, wavnum)
-            % WAVNUMTOIDX Convert wavenumbers to indices
-            
-            if numel(wavnum) == 1
-                idx = find(self.Graph > wavnum, 1, 'first');
-            elseif numel(wavnum) == 2
-                startIdx = find(self.Graph > wavnum(1), 1, 'first');
-                endIdx = find(self.Graph < wavnum(2), 1, 'last');
-                
-                idx = [startIdx, endIdx];
-            end
-            
+
+        function spec_simple = get_spectrum_simple(self)
+            %GET_SPECTRUM_SIMPLE Get simple spectrum class, wrapper
+            % function of GET_SINGLE_SPECTRUM.
+
+            spec_simple = SpectrumSimple( ...
+                self.graph, ...                     % xdata
+                self.graph_unit, ...                % xdata_unit
+                self.get_single_spectrum(), ...     % ydata
+                self.data_unit, ...                 % ydata_unit
+                self);                              % source
+
         end
 
         function spec = get_single_spectrum(self)
@@ -239,7 +229,7 @@ classdef SpecData < DataItem
         
         
         %% Setter
-        function self = set.Data(self, data)
+        function set.data(self, data)
             % Force a three-dimensional matrix
             if numel(size(data)) == 3
                 self.Data = data;
@@ -255,26 +245,7 @@ classdef SpecData < DataItem
             end
         end
         
-        % Deprecated, still here for backwards compatibility
-        function ydatflat = get.YData(self)
-            ydatflat = self.FlatDataArray;
-        end
-        
-        function xdat = get.XData(self)
-            xdat = self.Graph;
-        end
-        
-        function self = set.YData(self, ydata)
-            self.Data = ydata;
-        end
-        
-        function self = set.XData(self, xdata)
-            self.Graph = xdata;
-        end
 
-        %% Overrides
-
-       
         
     end
 end

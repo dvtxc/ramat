@@ -1,8 +1,17 @@
-classdef DataContainer < handle
-    %DATACONTAINER class
+classdef DataContainer < Container
+    %DATACONTAINER Class
+    %   Parent Class: Container
+    %
     %   This object class contains all data objects belonging to a single
     %   measurement. It can contain multiple Data Items (e.g. SpecData
     %   Instances)
+    %
+    %   Properties inherited from parent class "Container"
+    %       name            string
+    %       parent          Group
+    %       project_parent  Project
+    %       DataItems       DataItem
+    %       dataType        string
     
     properties (Access = public)
         Name;
@@ -41,8 +50,8 @@ classdef DataContainer < handle
 
     % Method signatures
     methods (Access = public)
-        trimData(self, startx, endx, overwrite);
-        normalizeData(self, overwrite);
+        trimData(self, startx, endx, overwrite);    % should go to data item level
+        normalizeData(self, overwrite);             % should go to data item level
         subsetHandle = addToNewSubset(self);
         addToSubset(self, subsetHandle);
         ax = plot(self, kwargs);
@@ -133,6 +142,8 @@ classdef DataContainer < handle
         function L = findgroup(self, group)
             %FINDGROUP returns handles of objects belonging to the provided
             %Group (Group object)
+
+            warning("The function DataContainer.findgroup() is deprecated.");
             
             L = DataContainer.empty;
             
@@ -166,6 +177,8 @@ classdef DataContainer < handle
         function addSpecData(self, name, gdata, data, graph_unit, data_unit)
             %ADDSPECDATA
             %   Create new SpecData instance containing spectral data
+
+            warning("The function DataContainer.addSpecData() is deprecated.");
             
             lastInstance = numel(self.DataItems);
             self.DataItems( lastInstance + 1 ) = SpecData(name, gdata, data, graph_unit, data_unit);
@@ -222,6 +235,8 @@ classdef DataContainer < handle
         function pcaresult = grouped_pca(self)
             %GROUPED_PCA DEPRECATED
             %   Groups Data Containes, Sorts by group, calculates PCA
+
+            warning("The function DataContainer.grouped_pca() is deprecated.");
             
             % Filter for SpecDat
             set = findobj(self, 'dataType', "SpecData");

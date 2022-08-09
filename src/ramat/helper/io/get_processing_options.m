@@ -6,6 +6,10 @@ function opts_struct = get_processing_options(app)
         app = [];
     end
 
+    opts_struct.trim = false;
+    opts_struct.trim_opts.start = 0;
+    opts_struct.trim_opts.end = 0;
+
     if isempty(app)
         % Use defaults
         opts_struct.retain_original = false;
@@ -14,7 +18,9 @@ function opts_struct = get_processing_options(app)
         opts_struct.remove_baseline = false;
         opts_struct.convert_to_wavenum = false;
         opts_struct.remove_baseline_opts = struct.empty();
-
+%         opts_struct.trim = false;
+%         opts_struct.trim_opts.start = 0;
+%         opts_struct.trim_opts.end = 0;
         return;
     end
         
@@ -25,5 +31,5 @@ function opts_struct = get_processing_options(app)
     opts_struct.remove_baseline = app.BaselineCorrectionCheckBox.Value;
     opts_struct.convert_to_wavenum = app.ConverttoRelativeWavenumbersCheckBox.Value;
     opts_struct.remove_baseline_opts = struct.empty();
-
+    
 end

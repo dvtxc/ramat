@@ -1,4 +1,4 @@
-function dataObject = import_single_widata(widO, kwargs)
+function datacon = import_single_widata(widO, kwargs)
     % IMPORT_SINGLE_WIDATA parses a WID object (widO) into RAMAT objects.
 
     arguments
@@ -16,11 +16,11 @@ function dataObject = import_single_widata(widO, kwargs)
     %kwargs = unpack(kwargs);
     
     % Create a DataContainer object
-    dataObject = DataContainer();
+    datacon = DataContainer();
     item_name = widO.Name;
-    dataObject.Name = item_name;
+    datacon.name = item_name;
     
-    out(sprintf('\n%s', dataObject.DisplayName), gui=kwargs.gui);
+    out(sprintf('\n%s', datacon.display_name), gui=kwargs.gui);
     
     % Append data item to data container based on data type
     switch widO.Type
@@ -59,11 +59,11 @@ function dataObject = import_single_widata(widO, kwargs)
                         dataunit=widO.Info.DataUnit);
                     
                     % Add additional info
-                    specdat.ExcitationWavelength = excitation_wavlen;
-                    specdat.Description = "Raw Data";
+                    specdat.excitation_wavelength = excitation_wavlen;
+                    specdat.description = "Raw Data";
              
                     % Append raw (=as-is) spectral data to DataContainer
-                    dataObject.appendDataItem(specdat);
+                    datacon.append_child(specdat);
 
                 end
             end
@@ -90,16 +90,22 @@ function dataObject = import_single_widata(widO, kwargs)
                 graph_unit, ...
                 widO.Info.DataUnit);
             
-            specdat.ExcitationWavelength = excitation_wavlen;
-            specdat.Description = "Imported Data";
+            specdat.excitation_wavelength = excitation_wavlen;
+            specdat.description = "Imported Data";
             
             % Store meta information
-            specdat.X = widO.Info.X;
-            specdat.Y = widO.Info.Y;
-            specdat.Z = widO.Info.Z;
+            specdat.x = widO.Info.X;
+            specdat.y = widO.Info.Y;
+            specdat.z = widO.Info.Z;
             
             % Trim Data?
-            % specdat_obj.trimData(trimStart, trimEnd)
+            if kwargs.processing.trim
+                out('-- Removing Offset ...', gui=kwargs.gui);
+                specdat.trimSpectrum( ...
+                    kwargs.processing.trim_opts.start, ...
+                    kwargs.processing.trim_opts.end, ...
+                    copy=false);
+            end
             
             % Remove Offset
             if kwargs.processing.remove_offset
@@ -116,29 +122,29 @@ function dataObject = import_single_widata(widO, kwargs)
             % Normalize Data
             if kwargs.processing.normalize
                 out('-- Normalising Spectrum ...', gui=kwargs.gui);
-                specdat.normalizeSpectrum();
+                specdat.normalize_spectrum();
             end
             
             % Append SpecData to Data Container
-            dataObject.appendDataItem(specdat);
+            datacon.append_child(specdat);
             
         case 'TDText'
             out('## Text File', gui=kwargs.gui);
             
             textdat = TextData(item_name, widO.Data);
-            textdat.Description = "Imported Text";
+            textdat.description = "Imported Text";
             
             % Append to data container
-            dataObject.appendDataItem(textdat);
+            datacon.append_child(textdat);
             
         case 'TDBitmap'
             out('## Image', gui=kwargs.gui);
             
             imgdat = ImageData(item_name, widO.Data);
-            imgdat.Description = "Imported Image";
+            imgdat.description = "Imported Image";
             
             % Append to data container
-            dataObject.appendDataItem(imgdat);
+            datacon.append_child(imgdat);
             
     end
         

@@ -9,8 +9,8 @@ function pcaresult = calculatePCA(self, range)
             endG = range(2);
             
             % Create a trimmed SpecData() as a copy.
-            tmpdat = trimSpectrum(copy(self), startG, endG);
-            graphBase = tmpdat.Graph;            
+            tmpdat = trim_spectrum(copy(self), startG, endG);
+            graphBase = tmpdat.graph;            
             
             flatdata = horzcat(tmpdat.FlatDataArray);
             
@@ -22,7 +22,7 @@ function pcaresult = calculatePCA(self, range)
             % Use the full range
             
             flatdata = horzcat(self.FlatDataArray);
-            graphBase = self.Graph;
+            graphBase = self.graph;
             
         end
         
@@ -38,8 +38,7 @@ function pcaresult = calculatePCA(self, range)
     [coefs, score, ~, ~, variance] = pca(inputdata);
     
     % Return results as an PCAResult Object
-    pcaresult = PCAResult(coefs, score, variance);
-    
-    pcaresult.CoefsBase = graphBase;
+    pcaresult = PCAResult(graphBase, coefs, score, variance);
+
 end
 

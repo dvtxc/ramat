@@ -50,7 +50,7 @@ function removeBaseline(self, method, kwargs)
 
                 % Repeat x axis
                 % TO DO: make it work with different xbase lengths
-                xbase = repmat(self(i).Graph, 1, nSpectra);
+                xbase = repmat(self(i).graph, 1, nSpectra);
                 
                 % Run background subtraction and pass options
                 adjusted_data = bgs_builtinBackAdj(xbase, flatdat, kwargs{:});
@@ -70,9 +70,9 @@ function removeBaseline(self, method, kwargs)
         if has_nan
             % Only update the numerical columns
             rows = boolean(ones(1, self(i).GraphSize));
-            self(i).Data( rows , numerical_columns ) = adjusted_data;
+            self(i).data( rows , numerical_columns ) = adjusted_data;
         else
-            self(i).Data = adjusted_data;
+            self(i).data = adjusted_data;
         end
 
     end

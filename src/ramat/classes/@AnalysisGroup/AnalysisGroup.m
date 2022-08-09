@@ -1,57 +1,33 @@
 classdef AnalysisGroup < handle
-    %ANALYSISGROUP New Group class which has child data containers as
-    %public member
-    %   This is the new "active" group class. Will eventually replace the
-    %   passive group class. Currently used for analysis subsets.
+    %ANALYSISGROUP Analysis Group class which contains DataContainers
+    %   These groups are used for grouping in plots and pca analysis
     
     properties (Access = public)
-        Name = "";
-        Children;
-        AnalysisParent;
+        name string = "";
+        children DataContainer;
+        parent Analysis;
+        parent_project Project;
     end
     
     properties (Access = public, Dependent)
-        DisplayName;
-    end
-    
-    properties (Access = private)
-        ProjectParent;
+        display_name string;
     end
     
     methods
-        function self = AnalysisGroup(varargin)
+        function self = AnalysisGroup(parent, name, data)
             %CONSTRUCTOR
-            global prj
-            
-            if ~isempty(prj)
-                self.ProjectParent = prj;
+
+            arguments
+                parent Analysis;
+                name string = "";
+                data DataContainer = DataContainer.empty;
             end
-            
-            if (nargin == 1)
-                % Construct empty AnalysisGroup
-                parent = varargin{1};
-                
-                self.AnalysisParent = parent;
-                
-            elseif (nargin == 2)
-                % Construct empty AnalysisGroup with name
-                parent = varargin{1};
-                name = varargin{2};
-                
-                self.Name = name;
-                self.AnalysisParent = parent;
-                
-            elseif (nargin == 3)
-                % Construct AnalysisGroup with DataContainers
-                name = varargin{1};
-                data = varargin{2};
-                parent = varargin{3};
-                
-                self.Name = name;
-                self.Children = data;
-                self.AnalysisParent = parent;
-                
-            end
+
+            self.parent = parent;
+            self.parent_project = parent.parent;
+
+            self.name = name;
+            self.children = data;
             
         end
         
@@ -59,22 +35,22 @@ classdef AnalysisGroup < handle
             %APPEND_DATA Append data to children of current analysis group
             %   data:   nx1 DataContainer
             
-            self.Children = [self.Children; data];
+            self.children = [self.children; data];
             
             % TO-DO: checks
         end
         
-        function set.Name(self, newname)
-            self.Name = newname;
+        function set.name(self, newname)
+            self.name = newname;
         end
         
-        function displayname = get.DisplayName(self)
+        function displayname = get.display_name(self)
             %DISPLAYNAME Format name nicely
             
-            if (self.Name == "")
-                displayname = "Empty Group";
+            if (self.name == "")
+                displayname = "Unnamed Analysis Group";
             else
-                displayname = string( self.Name );
+                displayname = string( self.name );
             end
         end
         

@@ -2,7 +2,7 @@ classdef Mask < DataItem
     %MASK Logical mask for area scans
     
     properties
-        Data = logical.empty(); % Mask data
+        data logical = logical.empty(); % Mask data
     end
 
     properties (Dependent)
@@ -20,25 +20,14 @@ classdef Mask < DataItem
         function self = Mask(data, name)
             %MASK Construct an instance of this class
             
-            % Empty mask
-            if (nargin == 0)
-                self.Name = "Mask";
-                self.Data = "";
-                return;
-                
-            end
-
-            % Only data provided
-            if (nargin == 1)
-                self.Name = "Mask";
-                self.Data = data;
-                return;
-
+            arguments
+                data logical = logical.empty();
+                name string = "";
             end
 
             % Mask
-            self.Name = name;
-            self.Data = data;
+            self.name = name;
+            self.data = data;
             
         end
         

@@ -6,11 +6,11 @@ function scoresscatter(pcaresult, pcax, options)
 %   pcax:       2x1 integer array with the principal component axis numbers
 
     arguments
-        pcaresult
-        pcax
+        pcaresult PCAResult;
+        pcax uint8 = [1 2];
         options.Axes = []; % Handle to Axes, if empty a new figure will be created
         options.ErrorEllipse logical = false;
-        options.CenteredAxes = true;
+        options.CenteredAxes logical = true;
     end
 
     if isempty(pcaresult.SrcData)
@@ -89,7 +89,7 @@ function scoresscatter(pcaresult, pcax, options)
             
             % Create array of names for tooltips
             % TO DO: make sure DataItem.Name is string
-            scattertags = convertCharsToStrings( {s(i).UserData.Name} );
+            scattertags = convertCharsToStrings( {s(i).UserData.name} );
 
             % Add information to data tooltips
             s(i).DataTipTemplate.DataTipRows(end + 1) = dataTipTextRow("Spectrum: ", scattertags);

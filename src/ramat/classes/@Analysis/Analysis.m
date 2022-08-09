@@ -3,24 +3,31 @@ classdef Analysis < handle
     %   Detailed explanation goes here
     
     properties (Access = public)
-%         DataSet = DataContainer.empty;
+        name string = "";
+        parent Project = Project.empty;
         GroupSet = AnalysisGroup.empty;
-        Parent = Project.empty;
         Selection = DataContainer.empty;
-        Name = "";
     end
-    
+
     properties (Access = public, Dependent)
-        DisplayName;
+        display_name;
         DataSet; % Set of all DataContainers
     end
     
     methods
-        function self = Analysis(parentProject, dataset)
+        function self = Analysis(parent_project, dataset, name)
             %CONSTRUCTOR
-            self.Parent = parentProject;
-            
+
+            arguments
+                parent_project Project;
+                dataset DataContainer;
+                name string = "";
+            end
+
+            self.parent = parent_project;
             self.append_data(dataset);
+            self.name = name;
+
         end
         
         function append_data(self, dataset, new_group_name)
@@ -36,35 +43,29 @@ classdef Analysis < handle
         end
                 
         function set_name(self, name)
-            self.Name = name;
+            self.name = name;
         end
         
-        function displayname = get.DisplayName(self)
-            % Get formatted DisplayName
-            if (self.Name == "")
-                displayname = "Empty Subset";
+        function displayname = get.display_name(self)
+            %DISPLAY_NAME Get formatted name
+
+            if (self.name == "")
+                displayname = "Unnamed Analysis Subset";
             else
-                displayname = self.Name;
+                displayname = self.name;
             end
+
         end
         
-        function newgroup = add_group(varargin)
+        function newgroup = add_group(self, name)
             %ADD_GROUP Add analysis group to current analysis subset
-            
-            self = varargin{1};
-            
-            if (nargin == 1)
-                % Construct new analysis group without name
-                
-                newgroup = AnalysisGroup(self);
-                
-            elseif (nargin == 2)
-                % Construct new analysis group with name
-                
-                name = varargin{2};
-                newgroup = AnalysisGroup(self, name);
-                
+
+            arguments
+                self Analysis;
+                name string = "";
             end
+            
+            newgroup = AnalysisGroup(self, name);
             
             % Add new group to group set.
             self.GroupSet = [self.GroupSet; newgroup];
@@ -94,7 +95,7 @@ classdef Analysis < handle
                     % children and remove the occurences
                     
                     group = self.GroupSet(g);
-                    group.Children(datacon == group.Children) = [];
+                    group.children(datacon == group.children) = [];
                     
                 end
                 
@@ -115,8 +116,8 @@ classdef Analysis < handle
                 
                 group = self.GroupSet(i);
                 
-                for j = 1:numel(group.Children)
-                    dc = group.Children(j);
+                for j = 1:numel(group.children)
+                    dc = group.children(j);
                     
                     dataset = [dataset; dc];
                     
@@ -200,7 +201,7 @@ classdef Analysis < handle
                 
                 specdata = specdata(sortingIdx);
                 
-                groupNames = vertcat( groups.DisplayName );
+                groupNames = vertcat( groups.display_name );
                 
                 % Get data sizes
                 dataSizes = vertcat( specdata.DataSize );
@@ -284,7 +285,7 @@ classdef Analysis < handle
                 
                 sortedData = data(sortingIdx);
                 
-                groupNames = vertcat( groups.DisplayName );
+                groupNames = vertcat( groups.display_name );
                 
                 % Get data sizes
                 if options.FlatSizes
@@ -329,7 +330,7 @@ classdef Analysis < handle
                     % Look in each group
                     group = self.GroupSet(j);
                     
-                    if any(group.Children == datacon)
+                    if any(group.children == datacon)
                         % Found datacon in current group
                         
                         groupList(end + 1) = group;
@@ -379,7 +380,7 @@ classdef Analysis < handle
         function delete(self)
             %DESTRUCTOR Delete all references to object
 
-            fprintf("Deleting %s...", self.DisplayName);
+            fprintf("Deleting %s...", self.display_name);
 
             % Delete all analysis groups (children)
             for i = 1:numel(self.GroupSet)
@@ -389,7 +390,7 @@ classdef Analysis < handle
             end
             
             % Delete references at parent
-            prj = self.Parent;
+            prj = self.parent;
             
             if ~isvalid(prj)
                 % Program is probably closing, prj hasn't been found

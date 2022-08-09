@@ -33,16 +33,13 @@ classdef (Abstract) SpecDataABC < DataItem
     end
     
     properties (Access = public, Dependent)
-        FilteredData;
-        FlatDataArray;
+%         FilteredData;
+%         FlatDataArray;
         GraphSize;
-        XSize;
-        YSize;
-        ZSize;
-        DataSize;
-        
-        XData; % Deprecated
-        YData; % Deprecated
+%         XSize;
+%         YSize;
+%         ZSize;
+%         DataSize;
     end
     
     properties (SetAccess = private)
@@ -71,15 +68,12 @@ classdef (Abstract) SpecDataABC < DataItem
             end
             
         end
-
         
         % DEPENDENT PROPERTIES
         function wavres = get.GraphSize(self)
             % Returns size or wave resolution of the spectral graph
             wavres = size(self.graph, 1);
         end
-
-
         
     end
 end

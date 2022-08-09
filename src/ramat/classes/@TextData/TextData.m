@@ -3,11 +3,7 @@ classdef TextData < DataItem
     %   Detailed explanation goes here
     
     properties
-        Data;
-        XSize = 0;
-        YSize = 0;
-        ZSize = 0;
-        DataSize = 0;
+        data;
     end
     
     properties (SetAccess = private)
@@ -18,16 +14,14 @@ classdef TextData < DataItem
         function self = TextData(name, data)
             %TEXTDATA Construct an instance of this class
             %   Detailed explanation goes here
-            
-            if (nargin == 0)
-                self.Name = "";
-                self.Data = "";
-                
-                return;
+
+            arguments
+                name string = "";
+                data string = "";
             end
             
-            self.Name = name;
-            self.Data = data;
+            self.name = name;
+            self.data = data;
             
         end
         

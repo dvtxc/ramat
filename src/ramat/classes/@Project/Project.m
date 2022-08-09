@@ -3,47 +3,85 @@ classdef Project < handle
     %   Detailed explanation goes here
     
     properties
+        name string = "";
+        analyses Analysis = Analysis.empty;
+    end
+
+    properties (Dependent)
+        data_root Group;
+        analysis_result_root Group;
+    end
+
+    properties (Access = private)
+        root Group = Group.empty;
+    end
+
+    properties
         DataSet = DataContainer.empty;
         GroupSet = Group.empty;
-        AnalysisSet = Analysis.empty;
         ActiveAnalysis = Analysis.empty;
         ActiveAnalysisResult = AnalysisResult.empty;
-        Name = "";
-        AnalysisResults; %OLD
-        analysis_result_root Group = Group.empty; %New
-        data_root Group = Group.empty; %New
     end
     
     methods
-        function append_data(self, dataset, group)
-            %APPEND_DATA:
-            %   Appends a dataset to the project object
+        function self = Project(name)
+            %PROJECT Constructor
 
             arguments
-                self;
-                dataset;
+                name string = "Unnamed project"
+            end
+
+            self.name = name;
+
+            % Create root groups
+            self.root = Group(self, "Root");
+            self.root.add_child_group("Data Root");
+            self.root.add_child_group("Analysis_Result_Root");
+        end
+
+        function append_data(self, dataset, group)
+            %APPEND_DATA:
+            %   Appends a dataset (set of DataContainer) to the project,
+            %   e.g after importing data
+            %
+
+            arguments
+                self Project;
+                dataset DataContainer;
                 group = Group.empty();
             end
 
-            self.DataSet = [self.DataSet; dataset];
-            
-            % What group will it be appended to
+            % Assign parent project
+            [dataset.parent_project] = deal(self);
+           
+            % Create a new group for the newly appended data if group does
+            % not exist or is empty
             if isempty(group)
-                % Create a new group for the newly appended data
-                new_group = self.add_group("New Import");
-            else
-                new_group = group;
+                root_folder = self.data_root;
+                group = root_folder.add_child_group("New Import");
             end
 
-            new_group.add_children(dataset);
-            
-            dataset.setgroup( new_group );
+            % Add children to this group
+            group.add_children(dataset);
+
+            self.DataSet = [self.DataSet; dataset];
         end
         
-        function new_group = add_group(self, groupname)
+        function new_group = add_group(self, groupname, parent)
             %ADD_GROUP
+
+            arguments
+                self Project;
+                groupname string = "";
+                parent Group = Group.empty;
+            end
+
+            % Always make sure the new group is added to the root
+            if isempty(parent)
+                parent = self.data_root;
+            end
             
-            new_group = Group( self, groupname );
+            new_group = parent.add_child_group(groupname);
             self.GroupSet(end + 1) = new_group;
             
         end
@@ -54,32 +92,53 @@ classdef Project < handle
             %   Returns:    handle to new analysis subset
             
             newAnalysisHandle = Analysis(self, dataset);
-            self.AnalysisSet = [self.AnalysisSet; newAnalysisHandle];
+            self.analyses = [self.analyses; newAnalysisHandle];
         end
         
-        function pcaresult = create_pca(self, options)
-            % Create new PCA analysis
+        function result = create_pca(self, options)
+            %CREATE_PCA Create new PCA analysis
             
             arguments
                 self Project
                 options.Range = [];
                 options.Selection (:,:) DataContainer = DataContainer.empty;
             end
-            
-            if ~isempty(self.AnalysisSet)
-                if ~isempty(self.ActiveAnalysis)
-                    % Found analysis subset to operate on
-                    subset = self.ActiveAnalysis;
-                    
-                    pcaresult = subset.compute_pca(Range=options.Range, Selection=options.Selection);
-                end
+
+            % Checks
+            if isempty(self.analyses)
+                return;
             end
+            if isempty(self.ActiveAnalysis)
+                return;
+            end
+            
+            % Create PCA
+            subset = self.ActiveAnalysis;
+            pcaresult = subset.compute_pca(Range=options.Range, Selection=options.Selection);
+
+            % Pack in container
+            result = AnalysisResultContainer(self);
+            result.append_child(pcaresult);
+            
         end
         
-        function add_analysis_result(self, newresult)
+        function add_analysis_result(self, newresult, group)
             %ADD_ANALYSIS_RESULT
+
+            arguments
+                self Project;
+                newresult AnalysisResultContainer;
+                group Group = Group.empty();
+            end
+
+            % Set target group
+            if isempty(group)
+                group = self.analysis_result_root;
+            end
             
-            self.AnalysisResults = [self.AnalysisResults; newresult];
+            % Append analysis result
+            group.add_children(newresult);
+
         end
         
     end
@@ -87,13 +146,14 @@ classdef Project < handle
     methods
         % Get root groups
 
-        function root = get_analysis_result_root(self)
-            root = self.analysis_result_root();
+        function root = get.data_root(self)
+            root = self.root.child_groups(1);
         end
 
-        function root = get_data_root(self)
-            root = self.data_root();
+        function root = get.analysis_result_root(self)
+            root = self.root.child_groups(2);
         end
+        
     end
 end
 

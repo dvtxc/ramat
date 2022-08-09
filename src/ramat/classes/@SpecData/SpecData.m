@@ -21,7 +21,7 @@ classdef SpecData < SpecDataABC
 
     properties (Access = public)
         % Spectral Data
-        data double;
+        data;
 
         % Meta
         excitation_wavelength double;
@@ -35,16 +35,23 @@ classdef SpecData < SpecDataABC
         zlength double;
 
         % Cursor for large area spectra
-        cursor cursor;
+        cursor Cursor;
 
         % Mask
         mask Mask;
+
+        % Filter
+        active_filter SpecFilter = SpecFilter.empty();
     end
 
     properties (Access = public, Dependent)
+        %Filter
+        filter;
+        filter_output;
+
         FilteredData;
         FlatDataArray;
-        GraphSize;
+%         GraphSize;
         XSize;
         YSize;
         ZSize;
@@ -88,18 +95,32 @@ classdef SpecData < SpecDataABC
         end
         
         
-        function normalize_spectrum(self)
+        function normalize_spectrum(self, kwargs)
             % Normalizes spectrum, so sum(Data) = 1
+
+            arguments
+                self
+                kwargs.copy logical = false;
+            end
             
             % Repeat operation for each spectral data object
-            for i = 1:numel(self)               
+            for i = 1:numel(self)
+
                 % Divide by sums of the individual spectra
-                self(i).data = dat ./ sum( dat, 3 );
+                dat = self(i).data;
+                norm_data = dat ./ sum( dat, 3 );
+
+                if kwargs.copy
+                    % Create copy
+                    new_specdat = copy(self);
+                    new_specdat.data = norm_data;
+                    new_specdat.description =  "Normalized";
+                    self.append_sibling(new_specdat);
+                else
+                    % Overwrite
+                    self(i).data = norm_data;
+                end
             end
-        end
-        function normalizeSpectrum(self)
-            warning("Rename SpecData.normalizeSpectrum()");
-            self.normalize_spectrum();
         end
                 
         function remove_constant_offset(self)
@@ -123,13 +144,18 @@ classdef SpecData < SpecDataABC
         
 
         function spec_simple = get_spectrum_simple(self)
-            %GET_SPECTRUM_SIMPLE Get simple spectrum class, wrapper
-            % function of GET_SINGLE_SPECTRUM.
+            %GET_SPECTRUM_SIMPLE Get simple spectrum class
+            %   wrapper function of GET_SINGLE_SPECTRUM.
+            %
+            %   Out:
+            %       spec_simple Spectrum_1D
+
+            ydata = self.get_single_spectrum();
 
             spec_simple = SpectrumSimple( ...
                 self.graph, ...                     % xdata
                 self.graph_unit, ...                % xdata_unit
-                self.get_single_spectrum(), ...     % ydata
+                ydata, ...                          % ydata
                 self.data_unit, ...                 % ydata_unit
                 self);                              % source
 
@@ -138,9 +164,12 @@ classdef SpecData < SpecDataABC
         function spec = get_single_spectrum(self)
             %GET_SINGLE_SPECTRUM Retrieves single spectrum at cursor or
             %accumulated over the size of the cursor
+            %
+            %   Out:
+            %       spec    double
 
             if (self.DataSize == 1)
-                spec = self.Data(1, 1, :);
+                spec = self.data(1, 1, :);
                 spec = permute(spec, [3 1 2]);
                 return;
             end
@@ -150,20 +179,75 @@ classdef SpecData < SpecDataABC
             end
 
             if (self.cursor.size == 1)
-                spec = self.Data(self.cursor.x, self.cursor.y, :);
+                spec = self.data(self.cursor.x, self.cursor.y, :);
 
             else
                 % Accumulate over cursor
                 
                 rows = self.cursor.mask_coords.rows;
                 cols = self.cursor.mask_coords.cols;
-                spec = mean(self.Data(rows(1):rows(2), cols(1):cols(2), :),[1 2]);
+                spec = mean(self.data(rows(1):rows(2), cols(1):cols(2), :),[1 2]);
 
             end
 
             % Return 1-dimensional array
             spec = permute(spec, [3 1 2]);
 
+        end
+
+
+        function filter = get.filter(self)
+            %FILTER Returns the active filter
+
+            arguments
+                self SpecData;
+            end
+                                    
+            % Only LA Scans
+            if self.DataSize <= 1
+                return
+            end
+
+            filter = SpecFilter.empty();
+            dataitemtypes = parent_container.listDataItemTypes();
+            
+            % Is there no filter present?
+            if ~any(dataitemtypes == "SpecFilter")
+                % Create new filter
+                newfilter = SpecFilter();
+                self.append_sibling(newfilter)
+                self.set_filter(newfilter);
+                
+            end
+            
+            % Is there a filter present, but not set to active?
+            if isempty(self.ActiveFilter)
+                % Return last SpecFilter from data items
+                idx = find(dataitemtypes == "SpecFilter", 1, 'last');
+                self.set_filter(self.parent_container.children(idx));
+            end
+            
+            filter = self.ActiveFilter;
+            
+        end
+        
+        function set_filter(self, filter)
+            self.active_filter = filter;
+        end
+        
+        function output = get.filter_output(self)
+            %FILTEROUTPUT Output of filter operation.
+            
+            if isempty(self.Filter)
+                output = [];
+                return
+                
+            end
+            
+            % Return output of filter
+            specdat = self.data;
+            output = self.filter.getResult(specdat);
+            
         end
 
         %% Overrides
@@ -181,7 +265,7 @@ classdef SpecData < SpecDataABC
             assert(range(vertcat(self.YSize)) == 0, "Not all SpecData instances are equal in size.");
 
             % Calculate average
-            avg_dat = mean(cat(4, self.Data), 4);
+            avg_dat = mean(cat(4, self.data), 4);
 
             % Create SpecDat
             newname = sprintf("Average of %d", numel(self));
@@ -189,18 +273,13 @@ classdef SpecData < SpecDataABC
     
         end
         
-        % DEPENDENT PROPERTIES
-        function wavres = get.GraphSize(self)
-            % Returns size or wave resolution of the spectral graph
-            wavres = size(self.Graph, 1);
-        end
-        
+        % DEPENDENT PROPERTIES        
         function xres = get.XSize(self)
-            xres = size(self.Data, 1);
+            xres = size(self.data, 1);
         end
         
         function yres = get.YSize(self)
-            yres = size(self.Data, 2);
+            yres = size(self.data, 2);
         end
         
         function zres = get.ZSize(self)
@@ -214,9 +293,9 @@ classdef SpecData < SpecDataABC
         
         function flatdata = get.FlatDataArray(self)
             % Returns a two-dimensional m-by-n array of spectral data
-            graphsize = size(self.Data, 3);
+            graphsize = size(self.data, 3);
             
-            flatdata = permute(self.Data, [3 1 2]);
+            flatdata = permute(self.data, [3 1 2]);
             flatdata = reshape(flatdata, graphsize, [], 1);
         end
 
@@ -232,16 +311,16 @@ classdef SpecData < SpecDataABC
         function set.data(self, data)
             % Force a three-dimensional matrix
             if numel(size(data)) == 3
-                self.Data = data;
+                self.data = data;
             else
-                if isempty(self.Data)
+                if isempty(self.data)
                     xs = 1;
                     ys = 1;
                 else
                     xs = self.XSize;
                     ys = self.YSize;
                 end
-                self.Data = permute(reshape(data', xs, ys, self.GraphSize), [2 1 3]);
+                self.data = permute(reshape(data', xs, ys, self.GraphSize), [2 1 3]);
             end
         end
         

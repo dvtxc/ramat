@@ -1,16 +1,47 @@
-function update_app_selection_changed(app)
+function update_app_selection_changed(app, event)
     %UPDATE_APP_SELECTION_CHANGED Update app, after selection in
-    %datamgrtree changed
-    
-    selectedNodes = app.DataMgrTree.SelectedNodes;
-            
+    %the data manager has changed
+    %
+    %   Input arguments:
+    %       app     app handle
+    %       event   matlab.ui.eventdata.SelectedNodesChangedData
+    %
+
+    arguments
+        app ramatguiapp;
+        event matlab.ui.eventdata.SelectedNodesChangedData;
+    end
+
+    % Get selected nodes    
+    selectedNodes = event.SelectedNodes;
+
+    % Check for homogeneity
+    classes = cellfun(@(x) string(class(x)), {selectedNodes.NodeData}');
+    if ~all(classes(1) == classes)
+        % Inhomogeneous selection, revert selection
+        event.Source.SelectedNodes = event.PreviousSelectedNodes;
+        return;
+
+    end
+     
     % Get associated data containers
     nodeData = vertcat( selectedNodes.NodeData );
 
     % Update data items tree
     update_data_items_tree(app, nodeData);
-                
 
+    % Check if non-data-containing things have been selected
+    if classes(1) == "Group"
+        return;
+    end
+    if isempty(nodeData)
+        return;
+    end
+    if ~(all( vertcat( nodeData.dataType ) == "SpecData" ) || (numel(nodeData) == 1 && nodeData.dataType == "ImageData" ))
+        return;
+    end               
+
+    % Open dialogs for specdata large area scans
     if (numel(nodeData) == 1)
         % Actions for single selections: 
         
@@ -20,7 +51,7 @@ function update_app_selection_changed(app)
             if (nodeData.dataType == "SpecData")                   
                 
                 % AREA SCANS:
-                if (nodeData.DataSize > 1)
+                if (nodeData.Data.DataSize > 1)
                     % Area Spectra Data Opened -> open filter window
                     
 
@@ -58,10 +89,6 @@ function update_app_selection_changed(app)
             end
             
         end
-
-    else
-        % Actions for multiple selections:
-
         
     end
     
@@ -69,17 +96,8 @@ function update_app_selection_changed(app)
     
     % TO-DO: create superclass for all containers and implement plot method there
     % TEMPORARY WORKAROUND:
-    % Check if non-uniform data types have been selected
-    if isempty(nodeData) || class(nodeData) == "Group"
-        % Nothing has been selected
-
-        return;
-    end
     
-    if ~(all( vertcat( nodeData.dataType ) == "SpecData" ) || (numel(nodeData) == 1 && nodeData.dataType == "ImageData" ))
-        return;
-
-    end
+    
     % END of temporary workaround
     
     % Invoke plot method of selected data containers

@@ -21,7 +21,6 @@ addpath(fullfile('helper', 'io'));
 
 
 % Create new empty project
-global prj;
 prj = Project();
 
 

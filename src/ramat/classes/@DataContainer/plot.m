@@ -103,7 +103,7 @@ function ax = plot(self, kwargs)
             for i = 1:numel(self)
                 dat = self(i);
 
-                xdat = dat.Graph;
+                xdat = dat.Data.graph;
                 ydat = dat.DataPreview;
                 
                 % Normalize YData
@@ -123,9 +123,9 @@ function ax = plot(self, kwargs)
 
                 % Add peaks
                 if kwargs.PlotPeaks
-                    if any(vertcat(dat.DataItems.Type) == "PeakTable")
+                    if any(vertcat(dat.children.Type) == "PeakTable")
                         % There are peaktables
-                        peaktable = dat.DataItems( find(vertcat(dat.DataItems.Type) == "PeakTable", 1, 'first' ) );
+                        peaktable = dat.children( find(vertcat(dat.children.Type) == "PeakTable", 1, 'first' ) );
                         peaktable.plot(Axes=ax);
                     end
                 end
@@ -133,7 +133,7 @@ function ax = plot(self, kwargs)
             end
 
             % Add legend
-            leg = legend(ax, vertcat(self.DisplayName));
+            leg = legend(ax, vertcat(self.display_name));
             leg.Color = 'none';
             leg.Box = "off";
 
@@ -143,7 +143,7 @@ function ax = plot(self, kwargs)
 
         case "ImageData"
             % Plot first
-            imagesc(ax, self.Data.Data );
+            imagesc(ax, self.Data.data );
             
             % Set-Up Axes
             ax.DataAspectRatio = [1 1 1];

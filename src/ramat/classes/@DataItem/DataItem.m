@@ -7,7 +7,7 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
     properties
         name string;
         description string;
-        parent_container {mustbeA(parent_container, 'Container')};
+        parent_container {mustBeA(parent_container, 'Container')} = DataContainer.empty();
     end
     
     properties (Abstract, SetAccess = private)
@@ -24,7 +24,7 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
 
             arguments
                 self
-                new_data_item {mustBeA(new_data_item, 'DataItem')};
+                new_data_item {mustBeA(new_data_item, 'DataItem')} = SpecData.empty();
             end
 
             if isempty(self.parent_container) || ~isvalid(self.parent_container)

@@ -1,4 +1,4 @@
-classdef Container < handle
+classdef (Abstract) Container < handle
     %CONTAINER Abstract parent class of DataContainer and
     %AnalysisResultContainer
     %   Can contain DataItems that are part of a measurement or an analysis
@@ -7,8 +7,8 @@ classdef Container < handle
     properties
         name string;
         parent Group;
-        project_parent Project;
-        DataItems {mustBeA(DataItems, "DataItem")};
+        parent_project Project;
+        children {mustBeA(children, "DataItem")} = SpecData.empty();
     end
 
     properties (Dependent)
@@ -17,9 +17,13 @@ classdef Container < handle
         next Container;
     end
 
+    properties (Abstract, Dependent)
+        dataType string;
+    end
+
     methods (Sealed)
-        function append_data_item(self, data_items)
-            %APPENDDATAITEM
+        function append_child(self, data_items)
+            %APPENDCHILD
             %   Appends DataItem object to list of data items
             %   It can also append multiple DataItems objects to multiple
             %   DataContainer objects if the number of instances is equal.
@@ -45,8 +49,8 @@ classdef Container < handle
             if num_self == 1
                 % Append new data item(s) to single Container
                 for item = data_items
-                    item.ParentContainer = self;
-                    self.DataItems(end+1) = item;
+                    item.parent_container = self;
+                    self.children(end+1) = item;
                 end
             
             else
@@ -55,8 +59,8 @@ classdef Container < handle
                 if num_data_items == 1
                     % Distribute single data item to multiple Containers
                     for container = self
-                        data_items.ParentContainer = container;
-                        container.DataItems(end + 1) = data_items;
+                        data_items.parent_container = container;
+                        container.children(end + 1) = data_items;
                     end
         
                 else
@@ -66,8 +70,8 @@ classdef Container < handle
                         new_item = data_items(i);
                         container = self(i);
         
-                        new_item.ParentContainer = container;
-                        container.DataItems(end + 1) = new_item;
+                        new_item.parent_container = container;
+                        container.children(end + 1) = new_item;
                     end
         
                 end
@@ -75,13 +79,14 @@ classdef Container < handle
         
         end
 
-        function move_to_group(self, new_group)
+        function move_to_group(self, new_group, parent_group)
             %MOVE_TO_GROUP Moves container to new group
             %
 
             arguments
                 self Container;
                 new_group Group = Group.empty();
+                parent_group Group = Group.empty();
             end
 
             % Check if new group is singular
@@ -99,7 +104,7 @@ classdef Container < handle
             % Move to a new group
             % Create new group when no group is given. Retrieve from first self.
             if isempty(new_group)
-                new_group = self(1).project_parent.add_group("New Group");
+                new_group = self(1).parent_project.add_group("New Group", parent_group);
             end
 
             % Remove from old group
@@ -112,8 +117,90 @@ classdef Container < handle
 
         end
 
+        function setgroup(self, group)
+            %SETGROUP Set parent group
+
+            arguments
+                self;
+                group Group;
+            end
+
+            for i = 1:numel(self)
+                self(i).parent = group;
+            end
+            
+        end
+
+        
     end
 
+    % Builtin overrides
+    methods
+        function t = table(self)
+            %TABLE Output data formatted as table
+            %   This method overrides table() and replaces the need for
+            %   struct2table()
+            
+            t = struct2table(struct(self));
+            
+        end
+        
+        function s = struct(self)
+            %STRUCT Output data formatted as structure
+            %   This method overrides struct()
+            
+            publicProperties = properties(self);
+            s = struct();
+            for i = 1:numel(self)
+                for j = 1:numel(publicProperties)
+                    if strcmp(publicProperties{j}, 'Group') && ~isempty(self(i).Group)
+                        s(i).(publicProperties{j}) = self(i).(publicProperties{j}).Name;
+                    else
+                        s(i).(publicProperties{j}) = self(i).(publicProperties{j}); 
+                    end
+                end 
+            end 
+        end
+
+        % destructor
+        function delete(self)
+            %DESTRUCTOR Delete all references to object
+            
+            prj = self.parent_project;
+
+            if isempty(prj)
+                return;
+            end
+            
+            if ~isvalid(prj)
+                % Program is probably closing, prj hasn't been found
+                % Skip checks
+                return
+                
+            end
+            
+            % Remove itself from the dataset
+            idx = find(self == prj.DataSet);
+            prj.DataSet(idx) = [];
+
+            % Remove itself from the group
+            if ~isempty(self.parent)
+                self.parent.remove_child(self);
+            end
+            
+            % Remove itself from every analysis group
+%             if ~isempty(self.AnalysisGroupParent)
+%                 idx = find(self == self.AnalysisGroupParent.Children);
+%                 self.AnalysisGroupParent.Children(idx) = [];
+%             end
+            
+            
+        end
+
+        
+    end
+
+    % Getters (dependent properties)
     methods
         function display_name = get.display_name(self)
             %DISPLAY_NAME Readable display name
@@ -136,12 +223,12 @@ classdef Container < handle
             end
 
             % Find itself in the list of children
-            idx = find(self == self.parent.Children);
+            idx = find(self == self.parent.children);
 
             if idx == 1
                 return;
             else
-                prev = self.parent.Children(idx - 1);
+                prev = self.parent.children(idx - 1);
             end
 
         end
@@ -156,12 +243,12 @@ classdef Container < handle
             end
 
             % Find itself in the list of children
-            idx = find(self == self.parent.Children);
+            idx = find(self == self.parent.children);
 
-            if idx == numel(self.parent.Children)
+            if idx == numel(self.parent.children)
                 return;
             else
-                next = self.parent.Children(idx + 1);
+                next = self.parent.children(idx + 1);
             end
 
         end

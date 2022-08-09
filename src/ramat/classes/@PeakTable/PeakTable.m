@@ -12,15 +12,6 @@ classdef PeakTable < DataItem
         Table;
     end
 
-    % TO-DO remove these dependent properties,
-    % needed for verbose table output
-    properties (Dependent)
-        XSize;
-        YSize;
-        ZSize;
-        DataSize;
-    end
-
     properties (SetAccess = private)
         Type = "PeakTable";
     end
@@ -44,7 +35,7 @@ classdef PeakTable < DataItem
             self.peaks = peaks;
             self.locations = locations;
             self.ParentSpecData = parent_specdata;
-            self.Name = name;
+            self.name = name;
         end
 
         function t = get.Table(self)
@@ -56,24 +47,6 @@ classdef PeakTable < DataItem
 
     end
 
-    % Dependent
-    methods
-        %% Dependent Properties
-        function xres = get.XSize(self)
-            xres = 0;
-        end  
-        function yres = get.YSize(self)
-            yres = 0;
-        end  
-        function zres = get.ZSize(self)
-            zres = 0;
-        end 
-        function datares = get.DataSize(self)
-            datares = 0;
-        end
 
-
-
-    end
 
 end

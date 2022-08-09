@@ -2,7 +2,7 @@ classdef ImageData < DataItem
     %IMAGEDATA 
     
     properties
-        Data;
+        data;
     end
     
     properties (Dependent)
@@ -21,24 +21,22 @@ classdef ImageData < DataItem
             %IMAGEDATA Construct an instance of this class
             %   Detailed explanation goes here
             
-            if (nargin == 0)
-                self.Name = "";
-                self.Data = "";
-                
-                return;
+            arguments
+                name string = "";
+                data double = [];
             end
             
-            self.Name = name;
-            self.Data = data;
+            self.name = name;
+            self.data = data;
             
         end
         
         function xres = get.XSize(self)
-            xres = size(self.Data, 1);
+            xres = size(self.data, 1);
         end
         
         function yres = get.YSize(self)
-            yres = size(self.Data, 2);
+            yres = size(self.data, 2);
         end
         
         function zres = get.ZSize(self)

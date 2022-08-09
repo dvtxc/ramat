@@ -4,10 +4,19 @@ classdef AnalysisResultContainer < Container
     %   Similar to DataContainer, but contains DataItems that are part of
     %   an analysis result, e.g. PCAResult and extracted information.
 
+    %   Properties inherited from parent class "Container":
+    %       name            string
+    %       parent          Group
+    %       parent_project  string
+    %       children        DataItem
+    %       dataType        string (Abstract)
+
     properties
     end
 
     properties (Dependent)
+        data PCAResult;
+        dataType;
     end
 
     methods
@@ -28,17 +37,54 @@ classdef AnalysisResultContainer < Container
 
             % Set to root group, if no group is provided.
             if isempty(parent)
-                parent = prj.get_analysis_result_root();
+                parent = prj.analysis_result_root;
             end
 
-            self.project_parent = prj;
+            self.parent_project = prj;
             self.name = name;
             self.parent = parent;
+
+        end
+
+        function ax = plot(self, kwargs)
+            %PLOT Default plotting method, overloads default plot function.
+            %   This is the default method to plot data within the container. It
+            %   only takes the container as necessary input argument, additional
+            %   keyword arguments provide plotting options and axis handles.
+            %
+            %   Examples:
+            %       PLOT(result);
+            %
+
+            arguments
+                self AnalysisResultContainer;
+                kwargs.Axes = [];
+            end
+
+            if isempty(self.data)
+                return;
+            end
+
+            % Forward to data
+            dataitem = self.data;
+            kwargs = unpack(kwargs);
+            ax = dataitem.plot(kwargs{:});
 
         end
 
     end
 
     methods
+        function datatype = get.dataType(self)
+            datatype = "PCA";
+        end
+
+        function data = get.data(self)
+            %DATA Get most important child as data item
+
+            classes = cellfun(@(x) string(class(x)), {self.children}');
+            data = self.children([find(classes == "PCAResult", 1)]);
+
+        end
     end
 end

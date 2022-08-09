@@ -3,58 +3,60 @@ classdef Group < handle
     %   Detailed explanation goes here
     
     properties (Access = public)
-        Name;
-        Parent;
-        Children;
+        name string = "";
+        parent {mustBeA(parent, ["Group", "Project"])} = Group.empty();
+        children {mustBeA(children, "Container")} = DataContainer.empty();
+        child_groups Group;
     end
     
     properties (Access = public, Dependent)
-%         Children
+        display_name;
+        parent_project;
     end
-    
-    properties (Access = public)
-        ProjectParent;
-        ID;
-    end
-       
+           
     methods
         function self = Group(parent, name)
             %GROUP Construct an instance of this class
             %   Detailed explanation goes here
 
             arguments
-                parent Project = [];
+                parent {mustBeA(parent, ["Group", "Project"])} = Group.empty();
                 name string = "";
             end
-            
-            self.Parent = parent;
-            self.Name = name;
 
-            global prj
-            
-            if ~isempty(prj)
-                self.ProjectParent = prj;
+            if isempty(parent)
+                warning("New group must have a parent.");
+                return;
             end
             
+            self.parent = parent;
+            self.name = name;
             
         end
 
-        function add_children(self, dataset)
+        function add_children(self, children)
             %ADD_CHILDREN Adds children containers and sets their group
             %
             %   Usage:
-            %   add_children(group, datacon_arr)
+            %   add_children(group, child_arr)
 
             arguments
                 self Group;
-                dataset DataContainer = [];
+                children {mustBeA(children, "Container")} = DataContainer.empty();
+            end
+
+            % Set children type
+            if isempty(self.children)
+                self.children = children;
+                children.setgroup(self);
+                return;
             end
 
             % Append to list of children
-            self.Children = [self.Children; dataset];
+            self.children = [self.children; children];
 
             % Set group
-            dataset.setgroup(self);
+            children.setgroup(self);
 
         end
 
@@ -69,27 +71,29 @@ classdef Group < handle
             end
 
             % Unset the corresponding children
-            idx = find(dataset == self.Children);
-            self.Children(idx) = [];
+            idx = find(dataset == self.children);
+            self.children(idx) = [];
 
         end
-        
-%         function children = get.Children(self) - DEPRECATED
-%             %global prj
-%             
-%             if ~isempty(self.ProjectParent)
-%                 children = self.ProjectParent.DataSet.findgroup( self );
-%             end
-%         end
-        
-        function id = getid(self)
-            id = vertcat(self.ID);
+
+        function group = add_child_group(self, name)
+            %ADD_CHILD_GROUP Adds a lower level group
+
+            arguments
+                self Group;
+                name string;
+            end
+
+            group = Group(self, name);
+            self.child_groups(end + 1) = group;
+            
         end
         
-       
         
         function specplot(self, stacked)
             % SPECPLOT
+
+            warning("Group.specplot() is deprecated.");
             
             fig = figure;
             hold on
@@ -99,7 +103,7 @@ classdef Group < handle
                 
                 % Get handles of all instances of DataContainer() within
                 % the current instance Group() that contain spectral data.
-                h = self(i).Children.getDataHandles('SpecData');
+                h = self(i).children.getDataHandles('SpecData');
                 
                 xdata = [];
                 ydata = [];
@@ -121,8 +125,23 @@ classdef Group < handle
                                 
             end
             
-            legend({self.Name}');
+            legend({self.name}');
             
+        end
+
+        function parent_prj = get.parent_project(self)
+            %PARENT_PROJECT is the top-level parent
+            parent_prj = get_parent_project(self);
+        end
+
+        function display_name = get.display_name(self)
+            %DISPLAY_NAME Makes sure that displayed name is not empty
+
+            display_name = self.name;
+
+            if display_name == ""
+                display_name = sprintf("Unnamed %s", class(self));
+            end
         end
         
         pcaresult = groupedPCA(self, range);
@@ -149,42 +168,7 @@ classdef Group < handle
             end
         end
 
-%         function sizes = countGroupFlatDataSizes(self, omitnan)
-%             %COUNTGROUPFLATDATASIZES -- DEPRECATED
-%             %   Since groups are stored in DataContainer, we need to
-%             %   calculate the flat data sizes of the contained data items
-%             %   here.
-%             
-%             sizes = zeros( numel(self), 1 );
-%             
-%             for i = 1:numel(self)
-%                 % For every instance of Group.
-%                 
-%                 % Get handles of all instances of DataContainer() within
-%                 % the current instance Group() that contain spectral data.
-%                 h = self(i).Children.getDataHandles('SpecData');
-%                       
-%                 if ~isempty(h)
-%                     % Current instance of Group() has instances of
-%                     % DataContainer()
-%                 
-%                     if (nargin > 1 && strcmp(omitnan, 'omitnan'))
-%                         % Calculate number of spectra, whilst OMITTING
-%                         % NaN-spectra.
-%                         sizes(i) = sum( ~any( isnan( horzcat(h.FlatDataArray) ) ) );
-%                     else
-%                         % Calculate number of spectra, INCLUDING NaN-spectra.
-%                         sizes(i) = size( horzcat( h.Data.FlatDataArray ), 2);
-%                     end
-%                 else
-%                     % Current instance of Group() is empty or has
-%                     % non-spectral data.
-%                     sizes(i) = 0;
-%                 end
-% 
-%             end
-%  
-%         end
+
         
     end
 end

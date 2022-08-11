@@ -24,7 +24,7 @@ function update_spec_area_cursor(specdat, coords, ax, main_axes)
 
     % Update main app spectral preview
     if ~isempty(main_axes)
-        update_spectral_preview(specdat.ParentContainer, main_axes);
+        update_spectral_preview(specdat.parent_container, main_axes);
     end
 
 end

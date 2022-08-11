@@ -103,6 +103,11 @@ function ax = plot(self, kwargs)
             for i = 1:numel(self)
                 dat = self(i);
 
+                % Abort if multiple large-area scans have been given
+                if (numel(self) > 1 && dat.Data.DataSize > 1)
+                    throw(MException("Ramat:Cannotplot", "Cannot plot multiple large area scans in single preview window."));
+                end
+
                 xdat = dat.Data.graph;
                 ydat = dat.DataPreview;
                 

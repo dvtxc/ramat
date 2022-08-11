@@ -209,7 +209,7 @@ classdef SpecData < SpecDataABC
             end
 
             filter = SpecFilter.empty();
-            dataitemtypes = parent_container.listDataItemTypes();
+            dataitemtypes = self.parent_container.listDataItemTypes();
             
             % Is there no filter present?
             if ~any(dataitemtypes == "SpecFilter")
@@ -221,13 +221,13 @@ classdef SpecData < SpecDataABC
             end
             
             % Is there a filter present, but not set to active?
-            if isempty(self.ActiveFilter)
+            if isempty(self.active_filter)
                 % Return last SpecFilter from data items
                 idx = find(dataitemtypes == "SpecFilter", 1, 'last');
                 self.set_filter(self.parent_container.children(idx));
             end
             
-            filter = self.ActiveFilter;
+            filter = self.active_filter;
             
         end
         
@@ -238,15 +238,14 @@ classdef SpecData < SpecDataABC
         function output = get.filter_output(self)
             %FILTEROUTPUT Output of filter operation.
             
-            if isempty(self.Filter)
+            if isempty(self.filter)
                 output = [];
                 return
                 
             end
             
             % Return output of filter
-            specdat = self.data;
-            output = self.filter.getResult(specdat);
+            output = self.filter.getResult(self);
             
         end
 

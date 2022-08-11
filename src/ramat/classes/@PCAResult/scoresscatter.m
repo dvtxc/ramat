@@ -2,8 +2,8 @@ function scoresscatter(pcaresult, pcax, options)
 %SCORESSCATTER
 %   Draw a scatter plot of the scores of the PCA Data along 2 principal
 %   components (2D PCA)
-%   pcaresult:  PCAResult() object
-%   pcax:       2x1 integer array with the principal component axis numbers
+%       pcaresult:  PCAResult() object
+%       pcax:       2x1 integer array with the principal component axis numbers
 
     arguments
         pcaresult PCAResult;
@@ -13,17 +13,17 @@ function scoresscatter(pcaresult, pcax, options)
         options.CenteredAxes logical = true;
     end
 
-    if isempty(pcaresult.SrcData)
+    if isempty(pcaresult.source_data)
         % We need a grouping table to create a legend.
         
         num_spectra = size(pcaresult.Score, 1);
-        pcaresult.SrcData.GroupName = "Ungrouped";
-        pcaresult.SrcData.GroupSize = num_spectra;
+        pcaresult.source_data.name = "Ungrouped";
+        pcaresult.source_data.accumsize = num_spectra;
 
     end
         
-    groupLengths = vertcat(pcaresult.SrcData.GroupSize);
-    nGroups = numel(pcaresult.SrcData);
+    groupLengths = vertcat(pcaresult.source_data.accumsize);
+    nGroups = numel(pcaresult.source_data);
     
     % Define axes
     if isempty(options.Axes)
@@ -83,9 +83,9 @@ function scoresscatter(pcaresult, pcax, options)
         s(i).DataTipTemplate.DataTipRows(2).Label = sprintf("PC %d: ",pcax(2));
 
         % Append Data Source reference
-        if isfield(pcaresult.SrcData, 'GroupChildren')
+        if isfield(pcaresult.source_data, 'specdata')
             % Add handle to specdata
-            s(i).UserData = pcaresult.SrcData(i).GroupChildren;
+            s(i).UserData = pcaresult.source_data(i).specdata;
             
             % Create array of names for tooltips
             % TO DO: make sure DataItem.Name is string
@@ -143,7 +143,7 @@ function scoresscatter(pcaresult, pcax, options)
     end
 
     % Set Legend
-    groupNames = vertcat(pcaresult.SrcData.GroupName);
+    groupNames = vertcat(pcaresult.source_data.name);
     leg = legend(ax, s,groupNames);
     leg.Location = 'northeastoutside';
 

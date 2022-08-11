@@ -1,5 +1,5 @@
 function updateSpecAreaFilterOutput(viewer, dc)
-%UPDATESPECAREAFILTEROUTPUT 
+    %UPDATESPECAREAFILTEROUTPUT 
 
     arguments
         viewer SpecAreaDataViewer = [];
@@ -13,8 +13,13 @@ function updateSpecAreaFilterOutput(viewer, dc)
         return;
     end
 
-    output = dc.FilterOutput;
+    % Check if actual specdata has been selected
+    if ~(dc.dataType == "SpecData")
+        return;
+    end
+
     specdat = dc.Data;
+    output = specdat.filter_output;
     
     cla(ax, 'reset');
     
@@ -26,10 +31,10 @@ function updateSpecAreaFilterOutput(viewer, dc)
         
     % Set Title
     string = sprintf("%s: %s of [%.0f - %.0f]", ...
-        dc.DisplayName, ...
-        dc.Filter.Operation, ...
-        dc.Filter.Range(1), ...
-        dc.Filter.Range(2));
+        dc.display_name, ...
+        specdat.filter.operation, ...
+        specdat.filter.range(1), ...
+        specdat.filter.range(2));
     ax.Title.String = string;
     
     img = imagesc(ax, output);

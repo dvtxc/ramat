@@ -59,6 +59,8 @@ classdef AnalysisResultContainer < Container
             arguments
                 self AnalysisResultContainer;
                 kwargs.Axes = [];
+                kwargs.Preview = true;
+                kwargs.PlotType = "";
             end
 
             if isempty(self.data)

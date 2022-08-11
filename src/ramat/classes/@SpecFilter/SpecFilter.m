@@ -3,12 +3,8 @@ classdef SpecFilter < DataItem
     %   Detailed explanation goes here
     
     properties
-        Range;  % Working Range of Filter
-        Operation;  % Mathematical Operation to Perform
-        XSize = 0;
-        YSize = 0;
-        ZSize = 0;
-        DataSize = 0;
+        range;  % Working Range of Filter
+        operation;  % Mathematical Operation to Perform
     end
     
     properties (SetAccess = private)
@@ -21,14 +17,14 @@ classdef SpecFilter < DataItem
             %   Detailed explanation goes here
             
             arguments
-                options.Name string = "";
-                options.Range double = [1000, 1300];
-                options.Operation char = 'sum';
+                options.name string = "";
+                options.range double = [1000, 1300];
+                options.operation char = 'sum';
             end
             
-            self.Name = options.Name;
-            self.Range = options.Range;
-            self.Operation = options.Operation;
+            self.name = options.name;
+            self.range = options.range;
+            self.operation = options.operation;
             
             
         end
@@ -38,16 +34,16 @@ classdef SpecFilter < DataItem
             %   specdat:    Operand (Input)
             %   result:     Output
             
-            idxrange = specdat.wavnumtoidx( self.Range );
+            idxrange = specdat.wavnumtoidx( self.range );
             
-            switch self.Operation
+            switch self.operation
                 case 'sum'
-                    result = sum( specdat.Data(:, :, idxrange(1):idxrange(2)), 3);
+                    result = sum( specdat.data(:, :, idxrange(1):idxrange(2)), 3);
                 case 'avg'
-                    result = mean( specdat.Data(:, :, idxrange(1):idxrange(2)), 3);
+                    result = mean( specdat.data(:, :, idxrange(1):idxrange(2)), 3);
                 case 'maxmin'
-                    hi = max( specdat.Data(:, :, idxrange(1):idxrange(2)), [], 3);
-                    lo = min( specdat.Data(:, :, idxrange(1):idxrange(2)), [], 3);
+                    hi = max( specdat.data(:, :, idxrange(1):idxrange(2)), [], 3);
+                    lo = min( specdat.data(:, :, idxrange(1):idxrange(2)), [], 3);
                     result = hi - lo;
             end
             

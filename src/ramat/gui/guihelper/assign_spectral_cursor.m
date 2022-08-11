@@ -12,6 +12,7 @@ function assign_spectral_cursor(f, ax)
             f.UserData.Cursor.axes = ax;
             f.UserData.Cursor.active = true;
             f.UserData.Cursor.draw();
+            f.UserData.Cursor.hook(f);
             return;
         end
     end
@@ -21,7 +22,7 @@ function assign_spectral_cursor(f, ax)
 
     % Re-assign callback
     if isempty(f.WindowButtonMotionFcn)
-        f.UserData.Cursor.hook();
+        f.UserData.Cursor.hook(f);
     end
 
 end

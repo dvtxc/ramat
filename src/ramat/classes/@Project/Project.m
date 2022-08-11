@@ -119,6 +119,7 @@ classdef Project < handle
             % Pack in container
             result = AnalysisResultContainer(self);
             result.append_child(pcaresult);
+            result.name = pcaresult.name;
             
         end
         

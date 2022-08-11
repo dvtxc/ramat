@@ -49,7 +49,9 @@ classdef SpectralCursor < handle
             hold(self.axes,"on");
             xlim(self.axes, self.axes.XLim);
             ylim(self.axes, self.axes.YLim);
-            self.axes.Legend.AutoUpdate = 'off';
+            if ~isempty(self.axes.Legend)
+                self.axes.Legend.AutoUpdate = 'off';
+            end
 
             self.cursor(1).h = line(self.axes, [0 0], self.axes.YLim);
             self.cursor(2).h = line(self.axes, self.axes.XLim, [0 0]);

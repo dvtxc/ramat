@@ -13,6 +13,10 @@ classdef Analysis < handle
         display_name;
         DataSet; % Set of all DataContainers
     end
+
+    methods
+        pcaresult = compute_pca(self, options);
+    end
     
     methods
         function self = Analysis(parent_project, dataset, name)
@@ -145,199 +149,91 @@ classdef Analysis < handle
             
         end
         
-        function pcaresult = compute_pca(self, options)
-            %COMPUTE_PCA Compute a principle component analysis (PCA) of
-            %current analysis subset.
-            %TODO: pass source data as analysis groups!!
-            %Input:
-            %   self
-            %   options.Range:      range [2x1 array] in cm^-1
-            %   options.Selection   selection of DataContainers
-            %
-            %Output:
-            %   pcaresult:  PCAResult object
-            
-            arguments
-                self Analysis
-                options.Range
-                options.Selection (:,:) DataContainer = DataContainer.empty;
-            end
-            
-            pcaresult = PCAResult.empty;
-                        
-            % Get handles of selected data containers
-            if isempty(options.Selection)
-                % No selection has been provided, take self.Selection
-                data = self.Selection;
-                
-            else
-                % Selection has been provided
-                
-                % Make sure the selection corresponds to data that is
-                % within this analysis subset
-                % TO-DO
-                
-                data = options.Selection;
-                
-            end
-                        
-            if ~isempty(data)
-                
-                % Get list of groups
-                grouplist = self.getParentGroups(data, ExclusiveDataType="SpecData");
-                
-                % Get spectral data handles from selected containers
-                specdata = data.getDataHandles('SpecData');
-                
-                % Check whether we have group information for all data
-                if (numel(grouplist) ~= numel(specdata))
-                    warning("Data selection for PCA failed.");
-                    return
-                end
-                                
-                % Sort data by group
-                [groups, ~, groupIdx] = unique(grouplist);
-                [sortedGroupIdx, sortingIdx] = sort(groupIdx);
-                
-                specdata = specdata(sortingIdx);
-                
-                groupNames = vertcat( groups.display_name );
-                
-                % Get data sizes
-                dataSizes = vertcat( specdata.DataSize );
-                groupSizes = accumarray( sortedGroupIdx, dataSizes);
-
-                if ~isempty(specdata)
-                    % Selection contains actual spectral data
-
-                    if isempty(options.Range)
-                        % No range has been provided, take entire range
-
-                        pcaresult = specdata.calculatePCA();
-                    else
-                        % Take only provided range
-
-                        pcaresult = specdata.calculatePCA(options.Range);
-                        
-                    end
-                else
-                    % No spectral data
-                    warning("No spectral data has been selected");
-                    
-                end
-                
-                % Add source data information to PCA result
-                % TODO: perhaps implement AnalysisGroup()?
-                groupChildren = cell(numel(groupSizes),1);
-                jidx = 1;
-                for i = 1:numel(groupSizes)
-                    groupChildren{i} = vertcat( specdata(jidx : jidx + groupSizes(i) - 1));
-                    jidx = jidx + groupSizes(i);
-                end
-
-                sourcedata = struct( ...
-                    'GroupName', num2cell(groupNames), ...
-                    'GroupSize', num2cell(groupSizes), ...
-                    'GroupChildren', groupChildren ...
-                    );
-                
-                pcaresult.SrcData = sourcedata;
-                pcaresult.DataSizes = dataSizes;
-                
-            else
-                % No data
-                warning("No data has been selected");
-                
-            end
-            
-        end
-        
-        
-        function [sortedData, groupNames, groupSizes, dataSizes] = sortdata(self, options)
-            %SORTDATA Output sorted list of data and corresponding group
-            %names and group sizes
-            
-            arguments
-                self;                               % Analysis Subset
-                options.Selection = self.DataSet;   % Selection
-                options.FlatSizes = false;          % Roll out sizes?
-            end
-            
-            % Take data from provided selection
-            data = options.Selection;
-                                    
-            if ~isempty(data)
-                % Get list of groups
-                grouplist = self.getParentGroups(data, ExclusiveDataType="SpecData");
-                
-                % Get only spectral data
-                data = data([data.dataType] == 'SpecData');
-                
-                % Check whether we have group information for all data
-                if (numel(grouplist) ~= numel(data))
-                    warning("Data selection failed.");
-                    return
-                end
-                                
-                % Sort data by group
-                [groups, ~, groupIdx] = unique(grouplist);
-                [sortedGroupIdx, sortingIdx] = sort(groupIdx);
-                
-                sortedData = data(sortingIdx);
-                
-                groupNames = vertcat( groups.display_name );
-                
-                % Get data sizes
-                if options.FlatSizes
-                    % Get all sizes and count spectra of LA scans as
-                    % individual data
-                    dataSizes = vertcat( sortedData.DataSize ); 
-                else
-                    % Take LA Scans as single data containers
-                    dataSizes = ones(numel(sortedData), 1);
-                end
-                
-                groupSizes = accumarray( sortedGroupIdx, dataSizes);
-                
-            end
-            
-        end
-        
-        
-        function groupList = getParentGroups(self, dataContainer, options)
-            %GETPARENTGROUPS Get parent groups belonging to data containers
-            
-            arguments
-                self
-                dataContainer
-                options.ExclusiveDataType = [];
-            end
-            
-            groupList = AnalysisGroup.empty();
-            
-            for i = 1 : numel(dataContainer)
-                datacon = dataContainer(i);
-                
-                if ~isempty(options.ExclusiveDataType)
-                    if (datacon.dataType ~= options.ExclusiveDataType)
-                        % Different data type: skip data container
-                        
-                        continue;
-                    end
-                end
-                
-                for j = 1 : numel(self.GroupSet)
-                    % Look in each group
-                    group = self.GroupSet(j);
-                    
-                    if any(group.children == datacon)
-                        % Found datacon in current group
-                        
-                        groupList(end + 1) = group;
-                    end
-                end
-            end
-        end
+%         function [sortedData, groupNames, groupSizes, dataSizes] = sortdata(self, options)
+%             %SORTDATA Output sorted list of data and corresponding group
+%             %names and group sizes
+%             
+%             arguments
+%                 self;                               % Analysis Subset
+%                 options.Selection = self.DataSet;   % Selection
+%                 options.FlatSizes = false;          % Roll out sizes?
+%             end
+%             
+%             % Take data from provided selection
+%             data = options.Selection;
+%                                     
+%             if ~isempty(data)
+%                 % Get list of groups
+%                 grouplist = self.getParentGroups(data, ExclusiveDataType="SpecData");
+%                 
+%                 % Get only spectral data
+%                 data = data([data.dataType] == 'SpecData');
+%                 
+%                 % Check whether we have group information for all data
+%                 if (numel(grouplist) ~= numel(data))
+%                     warning("Data selection failed.");
+%                     return
+%                 end
+%                                 
+%                 % Sort data by group
+%                 [groups, ~, groupIdx] = unique(grouplist);
+%                 [sortedGroupIdx, sortingIdx] = sort(groupIdx);
+%                 
+%                 sortedData = data(sortingIdx);
+%                 
+%                 groupNames = vertcat( groups.display_name );
+%                 
+%                 % Get data sizes
+%                 if options.FlatSizes
+%                     % Get all sizes and count spectra of LA scans as
+%                     % individual data
+%                     dataSizes = vertcat( sortedData.DataSize ); 
+%                 else
+%                     % Take LA Scans as single data containers
+%                     dataSizes = ones(numel(sortedData), 1);
+%                 end
+%                 
+%                 groupSizes = accumarray( sortedGroupIdx, dataSizes);
+%                 
+%             end
+%             
+%         end
+%         
+%         
+%         function groupList = getParentGroups(self, dataContainer, options)
+%             %GETPARENTGROUPS Get parent groups belonging to data containers
+%             
+%             arguments
+%                 self
+%                 dataContainer
+%                 options.ExclusiveDataType = [];
+%             end
+%             
+%             groupList = AnalysisGroup.empty();
+%             
+%             for i = 1 : numel(dataContainer)
+%                 datacon = dataContainer(i);
+%                 
+%                 if ~isempty(options.ExclusiveDataType)
+%                     if (datacon.dataType ~= options.ExclusiveDataType)
+%                         % Different data type: skip data container
+%                         
+%                         continue;
+%                     end
+%                 end
+%                 
+%                 for j = 1 : numel(self.GroupSet)
+%                     % Look in each group
+%                     group = self.GroupSet(j);
+%                     
+%                     if any(group.children == datacon)
+%                         % Found datacon in current group
+%                         
+%                         groupList(end + 1) = group;
+%                     end
+%                 end
+%             end
+%         end
         
         function set.Selection(self, selection)
             %SELECTION Update the list of selected data containers
@@ -375,20 +271,31 @@ classdef Analysis < handle
             
         end
 
+        function s = struct(self, options)
+            %STRUCT Output data formatted as structure
+            %   This method overrides struct()
+            %   Create struct, calls struct method of AnalysisGroup
+
+            arguments
+                self Analysis;
+                options.selection logical = false;
+                options.custom_selection DataContainer = DataContainer.empty;
+                options.specdata logical = false;
+                options.accumsize logical = false;
+            end
+
+            options = unpack(options);                        
+            s = self.GroupSet.struct(options{:});
+
+        end
+
         %% Destructor
         
         function delete(self)
             %DESTRUCTOR Delete all references to object
 
             fprintf("Deleting %s...", self.display_name);
-
-            % Delete all analysis groups (children)
-            for i = 1:numel(self.GroupSet)
-                if isvalid(self.GroupSet(i))
-                    delete(self.GroupSet(i));
-                end
-            end
-            
+           
             % Delete references at parent
             prj = self.parent;
             
@@ -397,6 +304,13 @@ classdef Analysis < handle
                 % Skip checks
                 return
                 
+            end
+
+            % Delete all analysis groups (children)
+            for i = 1:numel(self.GroupSet)
+                if isvalid(self.GroupSet(i))
+                    delete(self.GroupSet(i));
+                end
             end
             
             % Remove itself from the dataset

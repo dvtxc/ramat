@@ -13,8 +13,12 @@ classdef PCAResult < DataItem
         Coefs double;                           % Coefficients
         Score double;                           % Scores
         Variance double;
-        SrcData struct = struct();              % Source Data
+
+        % Source Reference
         source Analysis = Analysis.empty();
+        source_data struct = struct();
+
+        % Other info
         CoefsBase double = [0 1];               % Spectral Base for loadings plot of the coefficients
         DataSizes;
         dataType = "PCA";
@@ -69,10 +73,34 @@ classdef PCAResult < DataItem
                 sprintf( "Points: %.0f", self.NumDataPoints ) );
 
         end
+
+        function recalculate(self)
+            %RECALCULATE Recalculates PCA from linked analysis
+            
+            new_pca_result = self.source.compute_pca();
+            self.update(new_pca_result);
+        end
+
+        function update(self, new_pcares)
+            %UPDATE Updates properties with new PCAResult, provided by
+            %new_pcares
+
+            arguments
+                self PCAResult;
+                new_pcares PCAResult;
+            end
+
+            self.Coefs = new_pcares.Coefs;
+            self.CoefsBase = new_pcares.CoefsBase;
+            self.Score = new_pcares.Score;
+            self.Variance = new_pcares.Variance;
+            self.source_data = new_pcares.source_data;
+
+        end
         
         function numgroups = get.NumGroups(self)
             % Get the number of groups
-            numgroups = length(self.SrcData);
+            numgroups = length(self.source_data);
         end
         
         function numdatapoints = get.NumDataPoints(self)
@@ -93,6 +121,8 @@ classdef PCAResult < DataItem
                 self;
                 kwargs.Axes = [];
                 kwargs.PCs uint8 = [1 2];
+                kwargs.Preview = true;
+                kwargs.PlotType = "";
             end
 
             ax = [];

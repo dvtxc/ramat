@@ -33,7 +33,7 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
             end
 
             % Append DataItem
-            self.parent_container.appendDataItem(new_data_item);
+            self.parent_container.append_child(new_data_item);
             
         end
 

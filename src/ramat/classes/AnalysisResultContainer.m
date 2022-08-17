@@ -84,7 +84,10 @@ classdef AnalysisResultContainer < Container
         function data = get.data(self)
             %DATA Get most important child as data item
 
-            classes = cellfun(@(x) string(class(x)), {self.children}');
+            data = PCAResult.empty();
+            if isempty(self.children), return; end
+
+            classes = arrayfun(@(x) string(class(x)), self.children);
             data = self.children([find(classes == "PCAResult", 1)]);
 
         end

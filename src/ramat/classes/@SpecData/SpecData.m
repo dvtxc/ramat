@@ -60,7 +60,7 @@ classdef SpecData < SpecDataABC
 
     % Signatures
     methods
-        removeBaseline(self, method, kwargs);
+        remove_baseline(self, method, kwargs);
         out = clipByMask(self, mask);
     end
     
@@ -141,6 +141,22 @@ classdef SpecData < SpecDataABC
             warning("Rename SpecData.removeConstantOffset()");
             self.remove_constant_offset();
         end
+
+        function [ax, f] = plot(self, options)
+            %PLOT
+
+            arguments
+                self
+                options.Axes = [];
+            end
+
+            spec_simple = self.get_spectrum_simple();
+
+            [ax, f] = spec_simple.plot(Axes=options.Axes);
+
+            spec_simple.delete();
+            
+        end
         
 
         function spec_simple = get_spectrum_simple(self)
@@ -148,16 +164,21 @@ classdef SpecData < SpecDataABC
             %   wrapper function of GET_SINGLE_SPECTRUM.
             %
             %   Out:
-            %       spec_simple Spectrum_1D
+            %       spec_simple (1xn) Spectrum_1D
 
-            ydata = self.get_single_spectrum();
+            nout = numel(self);
+            spec_simple = SpectrumSimple.empty(nout,0);
 
-            spec_simple = SpectrumSimple( ...
-                self.graph, ...                     % xdata
-                self.graph_unit, ...                % xdata_unit
-                ydata, ...                          % ydata
-                self.data_unit, ...                 % ydata_unit
-                self);                              % source
+            for i = 1:nout
+                ydata = self(i).get_single_spectrum();
+    
+                spec_simple(i) = SpectrumSimple( ...
+                    self(i).graph, ...                     % xdata
+                    self(i).graph_unit, ...                % xdata_unit
+                    ydata, ...                          % ydata
+                    self(i).data_unit, ...                 % ydata_unit
+                    self(i));                              % source
+            end
 
         end
 

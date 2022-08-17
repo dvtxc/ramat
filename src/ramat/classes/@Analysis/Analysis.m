@@ -6,7 +6,7 @@ classdef Analysis < handle
         name string = "";
         parent Project = Project.empty;
         GroupSet = AnalysisGroup.empty;
-        Selection = DataContainer.empty;
+        Selection Link = Link.empty;
     end
 
     properties (Access = public, Dependent)
@@ -113,7 +113,7 @@ classdef Analysis < handle
             %DATASET Ungrouped list of datacontainers of this analysis
             %subset.
             
-            dataset = DataContainer.empty;
+            dataset = Link.empty;
             
             for i = 1:numel(self.GroupSet)
                 % Look for data in each group
@@ -235,13 +235,13 @@ classdef Analysis < handle
 %             end
 %         end
         
-        function set.Selection(self, selection)
+        function set_selection(self, selection)
             %SELECTION Update the list of selected data containers
             %   Input:
             %   selection:  can be either list of datacontainers or of GUI
             %   tree nodes
             
-            datacontainers = DataContainer.empty();
+            links = Link.empty();
             
             % Type-Based
             switch class(selection)
@@ -250,24 +250,24 @@ classdef Analysis < handle
                     
                     % Only include nodes that contain data
                     for i=1:numel(selection)
-                        if class(selection(i).NodeData) == "DataContainer"
-                            datacontainers(end+1) = selection(i).NodeData;
+                        if class(selection(i).NodeData) == "Link"
+                            links(end+1) = selection(i).NodeData;
                         end
                     end
                     
-                case "DataContainer"
+                case "Link"
                     % Actual datacontainers provided
                     
-                    datacontainers = selection;
+                    links = selection;
                     
             end
             
             % Check whether provided selection actually only contains
             % elements that are present in this analysis
-            datacontainers = intersect(self.DataSet, datacontainers);
+            links = intersect(self.DataSet, links);
             
             % Update Selection
-            self.Selection = datacontainers;
+            self.Selection = links;
             
         end
 

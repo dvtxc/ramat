@@ -4,13 +4,16 @@ classdef AnalysisGroup < handle
     
     properties (Access = public)
         name string = "";
-        children DataContainer;
+        children Link;
         parent Analysis;
         parent_project Project;
     end
     
     properties (Access = public, Dependent)
         display_name string;
+        prev AnalysisGroup;
+        next AnalysisGroup;
+        idx uint8;
     end
     
     methods
@@ -24,20 +27,41 @@ classdef AnalysisGroup < handle
             end
 
             self.parent = parent;
-            self.parent_project = parent.parent;
+
+            if ~isempty(self.parent), self.parent_project = parent.parent; end
 
             self.name = name;
-            self.children = data;
+            self.append_data(data);
             
         end
         
         function append_data(self, data)
             %APPEND_DATA Append data to children of current analysis group
             %   data:   nx1 DataContainer
+
+            arguments
+                self AnalysisGroup;
+                data {mustBeA(data, ["DataContainer", "Link"])};
+            end
+
+            if isempty(data), return; end
+
+            % Convert to links
+            if class(data(1)) == "DataContainer"
+                % Only allow spectral data
+                data(vertcat(data.dataType) ~= "SpecData") = [];
+                
+                datalinks = arrayfun(@(x) Link(x, self), data);
+            else
+                datalinks = data;
+            end
             
-            self.children = [self.children; data];
+            % Make sure parents are set correctly
+            [datalinks.parent] = deal(self);
+
+            % Append to list
+            self.children = [self.children; datalinks];
             
-            % TO-DO: checks
         end
         
         function set.name(self, newname)
@@ -81,6 +105,9 @@ classdef AnalysisGroup < handle
                     s(i).children = self(i).children;
                 end
 
+                % Get children link targets: datacontainers
+                s(i).children = vertcat(s(i).children.target);
+
                 % Get handles to data items (SpecData) instead of
                 % containers
                 if options.specdata
@@ -96,9 +123,18 @@ classdef AnalysisGroup < handle
             
         end
 
+        function l = get_static_list(self)
+            dc = vertcat(self.children.target);
+            specdats = vertcat(dc.getDataHandles("SpecData"));
+            l = specdats.get_spectrum_simple();
+        end
+
         function remove(self)
             %REMOVE Soft Destructor
-            
+
+            % Delete all children links
+            self.children.remove();
+
             % Unset at parent
             self.parent.GroupSet(self.parent.GroupSet == self) = [];
 
@@ -107,6 +143,57 @@ classdef AnalysisGroup < handle
 
         end
         
+    end
+
+    % Methods for indexing and restructuring
+    methods
+        function idx = get.idx(self)
+            %IDX Get index of group
+            if isempty(self.parent), return; end
+            idx = find(self == self.parent.GroupSet);
+        end
+
+        function prev = get.prev(self)
+            %PREV Get previous sibling
+
+            prev = [];
+            if isempty(self.parent), return; end
+            if self.idx == 1, return; end
+
+            prev = self.parent.children(self.idx - 1);
+        end
+
+        function next = get.next(self)
+            %PREV Get next sibling
+
+            next = [];
+            if isempty(self.parent), return; end
+            if self.idx == numel(self.parent.children), return; end
+
+            next = self.parent.children(self.idx + 1);
+        end
+
+        function moveup(self)
+            %MOVEUP Move group up one place
+
+            % Cannot move up from 1st place
+            if self.idx == 1, return; end
+
+            % Move by swapping with previous sibling
+            swapidx = [self.idx - 1, self.idx];
+            self.parent.GroupSet(swapidx) = self.parent.GroupSet(fliplr(swapidx));
+        end
+
+        function movedown(self)
+            %MOVEUP Move group down one place
+            
+            % Cannot move down from last place
+            if self.idx == numel(self.parent.GroupSet), return; end
+
+            % Move by swapping with previous sibling
+            swapidx = [self.idx + 1, self.idx];
+            self.parent.GroupSet(swapidx) = self.parent.GroupSet(fliplr(swapidx));
+        end
     end
 end
 

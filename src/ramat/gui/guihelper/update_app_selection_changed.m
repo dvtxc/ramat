@@ -33,8 +33,12 @@ function update_app_selection_changed(app, event)
     % Get associated data containers
     node_data = vertcat( selectedNodes.NodeData );
 
-    % Update data items tree
-    update_data_items_tree(app, node_data);
+    % Check if selection contains deleted data containers
+    if ~all(isvalid(node_data))
+        % Remove nonvalid nodes
+        update_node(selectedNodes(~isvalid(node_data)), "remove");
+        return;
+    end
 
     % Check if non-data-containing things have been selected
     if classes(1) == "Group"
@@ -69,34 +73,44 @@ function update_app_selection_changed(app, event)
         plot_type = "Overlaid";
     end
 
+    % Start updating
+
+    % Update title
+    app.DataContainerNameLabel.Text = node_data.display_name;
+    
+    % Update data items tree
+    update_data_items_tree(app, node_data);
+
     ax = app.UIPreviewAxes;
     node_data.plot(Axes=ax, PlotType=plot_type, Preview=true);
 
-    if (node_data_type == "SpecData" && node_data.Data.DataSize > 1)
-    % Open dialogs for specdata large area scans
-    % Area Spectra Data Opened -> open filter window
-    if isempty(app.OpenedDialogs.SpectralAreaDataViewer) || ~isvalid(app.OpenedDialogs.SpectralAreaDataViewer)
-        % Open new data viewer
-        app.OpenedDialogs.SpectralAreaDataViewer = SpecAreaDataViewer(app, node_data);
-        
-    else
-        % Update data viewer
-        app.OpenedDialogs.SpectralAreaDataViewer.DataCon = node_data;
-        app.OpenedDialogs.SpectralAreaDataViewer.update();
-        
-    end
+    if (node_data_type == "SpecData" && node_data(1).Data.DataSize > 1)
+        % Open dialogs for specdata large area scans
+        % Area Spectra Data Opened -> open filter window
+        if isempty(app.OpenedDialogs.SpectralAreaDataViewer) || ~isvalid(app.OpenedDialogs.SpectralAreaDataViewer)
+            % Open new data viewer
+            app.OpenedDialogs.SpectralAreaDataViewer = SpecAreaDataViewer(app, node_data);
+            
+        else
+            % Update data viewer
+            app.OpenedDialogs.SpectralAreaDataViewer.DataCon = node_data;
+            app.OpenedDialogs.SpectralAreaDataViewer.update();
+            
+        end
     end
  
-    if node_data_type == "PCAResult"
+    if node_data_type == "PCA"
         % If node is an analysis result, set this to the current active
         % analysis result
         % PCA Result is selected
         pcares = node_data;
+        if isempty(pcares.data), return; end
         
         % Set Active Analysis Result and prepare for analysis
         app.prj.ActiveAnalysisResult = pcares;
         app.TabGroup.SelectedTab = app.PCATab;
-        app.PCADescription.Value = pcares.Description;
+
+        app.PCADescription.Value = pcares.data.description;
         
     end
             

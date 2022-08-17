@@ -1,5 +1,6 @@
 function gen_child_nodes(parent_node, group, app)
-    %GEN_CHILD_NODES
+    %GEN_CHILD_NODES Recursive function to generate child nodes in the data
+    %manager tree
     
     arguments
         parent_node;

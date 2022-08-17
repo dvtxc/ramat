@@ -1,13 +1,13 @@
-classdef SpecPlot < AnalysisResult
+classdef SpecPlot
     %SPECPLOT Saved spectral plot
     %   ...
     
     properties
-        Data;
-        GroupNames;
-        GroupSizes;
-        DataSizes;
-        PlotOptions = struct();
+        name string;
+        parent Project;
+        data AnalysisGroup;
+        options = struct();
+        selection;
     end
     
     properties
@@ -15,23 +15,40 @@ classdef SpecPlot < AnalysisResult
     end
     
     methods
-        function self = SpecPlot(data, kwargs)
+        function self = SpecPlot(data, parent, kwargs)
             %SPECPLOT Construct an instance of this class
             %   ...
             
             arguments
-                data;
-                kwargs.GroupNames;
-                kwargs.GroupSizes;
-                kwargs.DataSizes;
-                kwargs.PlotType = 'Overlaid';
+                data {mustBeA(data, ["DataContainer", "Link"])};
+                parent Project;
+                kwargs.plot_type = 'Overlaid';
             end
+
+            self.data = AnalysisGroup(Analysis.empty(), "Plotting");
+            self.data.append_data(data);
+
+            self.parent = parent;
             
-            self.Data = data;
+            self.options.plot_type = kwargs.plot_type;
+            self.options.plot_stack_distance = 1;
             
-            self.PlotOptions.PlotType = kwargs.PlotType;
-            self.PlotOptions.PlotStackDistance = 1;
-            
+        end
+
+        function [ax, f] = plot(self, options)
+
+            arguments
+                self SpecPlot;
+                options.Axes = [];
+            end
+
+            static_data = self.data.get_static_list();
+
+            static_data.plot( ...
+                Axes=options.Axes, ...
+                plot_type=self.options.plot_type, ...
+                plot_stack_distance=self.options.plot_stack_distance);
+
         end
         
     end

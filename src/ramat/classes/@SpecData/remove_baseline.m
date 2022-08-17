@@ -1,4 +1,4 @@
-function removeBaseline(self, method, kwargs)
+function remove_baseline(self, method, kwargs)
     % REMOVEBASELINE Returns object with baseline removed
     %   NaN-safe and preserves NaN values
     

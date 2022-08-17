@@ -162,40 +162,47 @@ classdef (Abstract) Container < handle
             end 
         end
 
-        % destructor
-        function delete(self)
-            %DESTRUCTOR Delete all references to object
-            
-            prj = self.parent_project;
+        % soft destructor
+        function remove(self)
+            %REMOVE soft destructor
 
-            if isempty(prj)
-                return;
-            end
-            
-            if ~isvalid(prj)
-                % Program is probably closing, prj hasn't been found
-                % Skip checks
-                return
-                
-            end
-            
-            % Remove itself from the dataset
-            idx = find(self == prj.DataSet);
-            prj.DataSet(idx) = [];
+            for i = 1:numel(self)
+                self(i).children.delete();
+                self(i).parent.children(self(i).parent.children == self(i)) = [];
+                self(i).parent_project.DataSet(self(i).parent_project.DataSet == self(i)) = [];
 
-            % Remove itself from the group
-            if ~isempty(self.parent)
-                self.parent.remove_child(self);
+                self(i).delete();
             end
-            
-            % Remove itself from every analysis group
-%             if ~isempty(self.AnalysisGroupParent)
-%                 idx = find(self == self.AnalysisGroupParent.Children);
-%                 self.AnalysisGroupParent.Children(idx) = [];
-%             end
-            
-            
+
         end
+
+        % destructor
+%         function delete(self)
+%             %DESTRUCTOR Delete all references to object
+%             
+%             prj = self.parent_project;
+% 
+%             if isempty(prj)
+%                 return;
+%             end
+%             
+%             if ~isvalid(prj)
+%                 % Program is probably closing, prj hasn't been found
+%                 % Skip checks
+%                 return
+%                 
+%             end
+%             
+%             % Remove itself from the dataset
+%             idx = find(self == prj.DataSet);
+%             prj.DataSet(idx) = [];
+% 
+%             % Remove itself from the group
+%             if ~isempty(self.parent)
+%                 self.parent.remove_child(self);
+%             end
+% 
+%         end
 
         
     end

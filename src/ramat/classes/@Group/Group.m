@@ -144,7 +144,18 @@ classdef Group < handle
             end
         end
         
-        pcaresult = groupedPCA(self, range);
+        function remove(self)
+            %REMOVE Soft Destructor
+            
+            % Do not remove root groups
+            if class(self.parent.parent) == "Project", return; end
+
+            if ~isempty(self.child_groups), self.child_groups.remove(); end
+            if ~isempty(self.children), self.children.remove(); end
+            self.parent.child_groups(self.parent.child_groups == self) = [];
+            self.delete();
+
+        end
         
         function t = table(self)
             %TABLE Output data formatted as table

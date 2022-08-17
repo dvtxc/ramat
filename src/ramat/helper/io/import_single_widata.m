@@ -110,13 +110,13 @@ function datacon = import_single_widata(widO, kwargs)
             % Remove Offset
             if kwargs.processing.remove_offset
                 out('-- Removing Offset ...', gui=kwargs.gui);
-                specdat.removeBaseline('constant');
+                specdat.remove_baseline('constant');
             end
             
             % Remove Background
             if kwargs.processing.remove_baseline
                 out('-- Removing Baseline ...', gui=kwargs.gui);
-                specdat.removeBaseline();
+                specdat.remove_baseline();
             end
             
             % Normalize Data

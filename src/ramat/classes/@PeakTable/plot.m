@@ -20,20 +20,15 @@ function plot(self, options)
         return
     end
 
-    % Get axes handle or create new figure window with empty axes
-    if isempty(options.Axes)
-        f = figure;
-        ax = axes('Parent',f);
-    else
-        if ( class(options.Axes) == "matlab.graphics.axis.Axes" || class(options.Axes) == "matlab.ui.control.UIAxes")
-            ax = options.Axes;
-            
-        else
-            warning("Invalid Axes Handle");
-            return;
-            
-        end
+    ax = options.Axes;
+
+    % Plot original linked spectral data
+    if ~isempty(self.parent_specdata)
+        [ax, ~] = self.parent_specdata.plot(Axes = options.Axes);
     end
+
+    % Get axes handle or create new figure window with empty axes
+    [ax, ~] = plot@DataItem(self, Axes = ax, reset=false);
 
     % Hold axes, so peaks are added to existing plot
     hold(ax, "on");

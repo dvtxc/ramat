@@ -10,7 +10,7 @@ function subtract_minimum(self, options)
     end
 
     % Retrieve flattened 2-dimensional array
-    gdat = self.Graph;
+    gdat = self.graph;
     flatdat = self.FlatDataArray;
 
     % Find indices of region
@@ -30,6 +30,6 @@ function subtract_minimum(self, options)
     end
 
     % Subtract minima
-    self.Data = flatdat - minima;
+    self.data = flatdat - minima;
 
 end    

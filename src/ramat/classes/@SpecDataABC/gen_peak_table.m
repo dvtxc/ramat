@@ -1,8 +1,8 @@
-function peak_table = find_peaks(self, options)
+function peak_table = gen_peak_table(self, options)
     % FIND_PEAKS
 
     arguments
-        self SpecData;
+        self {mustBeA(self, "SpecDataABC")};
         options.min_prominence = 0.1;
     end
 
@@ -19,8 +19,13 @@ function peak_table = find_peaks(self, options)
         return
     end
 
-    xdata = self.Graph;
-    ydata = self.FlatDataArray;
+    xdata = self.graph;
+
+    if class(self) == "SpecData"
+        ydata = self.get_single_spectrum();
+    else
+        ydata = self.data;
+    end
 
     range = max(ydata) - min(ydata);
 
@@ -31,7 +36,8 @@ function peak_table = find_peaks(self, options)
     [peaks, locations] = findpeaks(ydata, xdata, MinPeakProminence=abs_min_prominence);
 
     % Create PeakTable
-    peak_table = PeakTable(peaks, locations, self, "PeakTable");
+    peak_table = PeakTable(peaks, locations, self);
+    peak_table.name = "Peaks of " + string(self.name);
 
     % Store used options to find peaks
     peak_table.min_prominence = options.min_prominence;

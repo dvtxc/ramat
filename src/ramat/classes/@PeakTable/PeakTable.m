@@ -4,16 +4,20 @@ classdef PeakTable < DataItem
     properties
         peaks = [];
         locations = [];
-        ParentSpecData;
+        parent_specdata;
         min_prominence = [];
     end
 
     properties (Dependent)
-        Table;
+        as_table;
     end
 
     properties (SetAccess = private)
         Type = "PeakTable";
+    end
+
+    properties (SetAccess = private, GetAccess = private)
+        format_list = ["csv";"mat"];
     end
 
     % Method signatures
@@ -28,21 +32,81 @@ classdef PeakTable < DataItem
             arguments
                 peaks (:,1) {mustBeNumeric,mustBeReal};
                 locations (:,1) {mustBeNumeric,mustBeReal,mustBeEqualSize(peaks,locations)};
-                parent_specdata SpecData = [];
+                parent_specdata {mustBeA(parent_specdata, "SpecDataABC")} = [];
                 name string = "";
             end
 
             self.peaks = peaks;
             self.locations = locations;
-            self.ParentSpecData = parent_specdata;
+            self.parent_specdata = parent_specdata;
             self.name = name;
         end
 
-        function t = get.Table(self)
+        function t = get.as_table(self)
             % TABLE Outputs peaks and locations as table
 
             t = table(self.locations, self.peaks);
             t.Properties.VariableNames = ["Wavenum", "Height"];
+        end
+
+        function export(self, options)
+            %EXPORT
+
+            arguments
+                self PeakTable;
+                options.path string = "";
+                options.format string = "";
+            end
+
+            if options.path == ""
+                [file, path] = export@DataItem(self, format=options.format, format_list=self.format_list);
+                options.path = fullfile(path, file);
+            end
+
+            peaktable = self.as_table;
+
+            switch options.format
+                case "csv"
+                    writetable(peaktable, options.path);
+                case "mat"
+                    save(options.path, 'peaktable');
+            end
+
+        end
+
+        function get_context_actions(self, cm, node, app)
+            %GET_CONTEXT_ACTIONS Retrieve all (possible) actions for this
+            %data item that should be displayed in the context menu
+            %   This function adds menu items to the context menu, which
+            %   link to specific context actions for this data item.
+            %
+            arguments
+                self PeakTable;
+                cm matlab.ui.container.ContextMenu;
+                node matlab.ui.container.TreeNode;
+                app ramatguiapp;
+            end
+
+            % Get parent actions of DataItem
+            get_context_actions@DataItem(self, cm, node, app);
+
+            uimenu(cm, Text="Plot", MenuSelectedFcn=@(~,~) plot(self));
+
+            uimenu(cm, Text="Print Peak Table", MenuSelectedFcn={@print, self});
+            
+            menu_export = uimenu(cm, Text="Export as ...");
+            uimenu(menu_export, Text="Comma-separated values (.csv, .txt)", MenuSelectedFcn={@export, self, "csv"});
+            uimenu(menu_export, Text="MATLAB file (.mat)", MenuSelectedFcn={@export, self, "mat"});
+
+
+            function print(~, ~, self)
+                disp(self.as_table);
+            end
+
+            function export(~, ~, self, format)
+                self.export(format=format);
+            end
+
         end
 
     end

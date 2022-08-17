@@ -33,13 +33,7 @@ classdef (Abstract) SpecDataABC < DataItem
     end
     
     properties (Access = public, Dependent)
-%         FilteredData;
-%         FlatDataArray;
         GraphSize;
-%         XSize;
-%         YSize;
-%         ZSize;
-%         DataSize;
     end
     
     properties (SetAccess = private)
@@ -48,13 +42,12 @@ classdef (Abstract) SpecDataABC < DataItem
 
     % Signatures
     methods
-        peak_table = extract_peak_table(self, options);
-        peak_table = find_peaks(self, options);
+        peak_table = add_peak_table(self, options);
+        peak_table = gen_peak_table(self, options);
     end
     
     methods
-        
-        
+
         function idx = wavnumtoidx(self, wavnum)
             % WAVNUMTOIDX Convert wavenumbers to indices
             
@@ -73,6 +66,63 @@ classdef (Abstract) SpecDataABC < DataItem
         function wavres = get.GraphSize(self)
             % Returns size or wave resolution of the spectral graph
             wavres = size(self.graph, 1);
+        end
+
+        function preview_peak_table(self, options)
+            %PREVIEW_PEAK_TABLE
+
+            arguments
+                self
+                options.Axes = [];
+                options.min_prominence = 0.1;
+            end
+
+            peaktable = self.gen_peak_table(min_prominence=options.min_prominence);
+
+            if isempty(peaktable)
+                warning("No peak table was extracted.");
+                return;
+            end
+
+            peaktable.plot(Axes = options.Axes);
+            
+        end
+
+        function get_context_actions(self, cm, node, app)
+            %GET_CONTEXT_ACTIONS Retrieve all (possible) actions for this
+            %data item that should be displayed in the context menu
+            %   This function adds menu items to the context menu, which
+            %   link to specific context actions for this data item.
+            %
+            arguments
+                self;
+                cm matlab.ui.container.ContextMenu;
+                node matlab.ui.container.TreeNode;
+                app ramatguiapp;
+            end
+
+            % Get parent actions of DataItem
+            get_context_actions@DataItem(self, cm, node, app);
+
+            % Get specific context actions for SpecDataABC
+            min_prom = app.MinimumProminenceEditField.Value;
+            menu_item = uimenu(cm, ...
+                Text="Peak Analysis");
+            m1 = uimenu(menu_item, ...
+                Text="Preview Peak Analysis (min_prom: " + string(min_prom) + ")", ...
+                MenuSelectedFcn={@preview, self, min_prom});
+            m2 = uimenu(menu_item, Text="Extract Peak Table (min_prom: " + string(min_prom) + ")", ...
+                MenuSelectedFcn={@extract, self, app, min_prom});
+
+            function preview(~, ~, self, min_prom)
+                self.preview_peak_table(min_prominence=min_prom);
+            end
+
+            function extract(~, ~, self, app, min_prom)
+                self.add_peak_table(min_prominence=min_prom);
+                update_data_items_tree(app, self.parent_container);
+            end
+
         end
         
     end

@@ -6,17 +6,14 @@ function updateScoresScatterPlot(app)
     pcx = app.PCXSpinner.Value;
     pcy = app.PCYSpinner.Value;
 
-    if ~isempty(app.prj.ActiveAnalysisResult)
-        if (app.prj.ActiveAnalysisResult.dataType == "PCA")
-            pcares = app.prj.ActiveAnalysisResult;
-            ax = app.UIPreviewAxes;
+    pcares = app.prj.get_active_pca_result();
+    if isempty(pcares), return; end
 
-            % Update preview
-            pcares.scoresscatter([pcx pcy], ...
-                Axes=ax, ...
-                ErrorEllipse=app.PCAErrorEllipseCheckBox.Value);
-        end
+    ax = app.UIPreviewAxes;
 
-    end
+    % Update preview
+    pcares.scoresscatter([pcx pcy], ...
+        Axes=ax, ...
+        ErrorEllipse=app.PCAErrorEllipseCheckBox.Value);
 end
 

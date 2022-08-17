@@ -154,6 +154,16 @@ classdef Project < handle
         function root = get.analysis_result_root(self)
             root = self.root.child_groups(2);
         end
+
+        function pcar = get_active_pca_result(self)
+
+            pcar = [];
+            if isempty(self.ActiveAnalysisResult), return; end
+            if isempty(self.ActiveAnalysisResult.data), return; end
+            if class(self.ActiveAnalysisResult.data) ~= "PCAResult", return; end
+
+            pcar = self.ActiveAnalysisResult.data;
+        end
         
     end
 end

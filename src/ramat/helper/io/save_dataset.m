@@ -1,16 +1,13 @@
-function save_dataset(options)
+function save_dataset(prj, options)
     %SAVE_DATASET Summary of this function goes here
     %   Detailed explanation goes here
 
     arguments
+        prj Project = Project.empty();
         options.App = [];
     end
 
-    global prj;
-    if isempty(prj)
-        warning("No project to be saved");
-        return
-    end
+    if isempty(prj), return; end
 
     [filename, path] = uiputfile(...
         {'*.ramat','Raman MATLAB Dataset (*.ramat)'; ...

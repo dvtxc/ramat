@@ -1,19 +1,13 @@
-function prj = load_dataset(options)
+function prj = load_dataset(prj, options)
     %OPEN Summary of this function goes here
     %   Detailed explanation goes here
     
     arguments
+        prj Project = Project.empty();
         options.App = []
     end
-    
-    % Check whether we already have the global prj variable set
-    global prj
-    if isempty(prj)
-        warning("No initialisation performed.");
-        return
-    end
-    
-    % TO-DO: declare app handle global
+        
+
     if (exist('app', 'var') && isempty(options.App))
         options.App = app;
     end
@@ -38,7 +32,7 @@ function prj = load_dataset(options)
     prj = loaded_dataset.prj;
     
 %     Set name of project (in case dataset file has been renamed)
-    prj.Name = file;
+    prj.name = file;
     
     % Update GUI data trees
     if ~isempty(options.App)
@@ -50,7 +44,7 @@ function prj = load_dataset(options)
         app.updatemgr();
         
         % Set UI window title
-        app.DVRamanToolUIFigure.Name = app.prj.Name;
+        app.DVRamanToolUIFigure.Name = app.prj.name;
     end
     
     fprintf('Loaded %s successfully.\n', file);

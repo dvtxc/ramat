@@ -68,6 +68,7 @@ classdef PCAResult < DataItem
 
             desc = vertcat(...
                 sprintf( "Name:   %s", self.name ), ...
+                sprintf( "Generated from: %s", self.source.display_name), ...
                 sprintf( "Range:  %.1f - %.1f", self.Range(1), self.Range(2) ), ...
                 sprintf( "Groups: %.0f", self.NumGroups ), ...
                 sprintf( "Points: %.0f", self.NumDataPoints ) );
@@ -129,6 +130,56 @@ classdef PCAResult < DataItem
 
             pcax = kwargs.PCs;
             self.scoresscatter(pcax, Axes=kwargs.Axes);
+
+        end
+
+        function add_loadings_spectrum(self, pcax)
+            %ADD_LOADINGS_SPECTRUM Generate a loadings spectrum and add it
+            %to the parent container
+
+            arguments
+                self;
+                pcax uint8 = 1;
+            end
+            
+            specsimple = self.gen_loadings_spectrum(pcax);
+            self.append_sibling(specsimple);
+        end
+
+        function plot_loadings_spectrum(self, pcax)
+            %PLOPT_LOADINGS_SPECTRUM Plot / preview loadings spectrum,
+            %without adding it to the parent container
+
+            arguments
+                self;
+                pcax uint8 = 1;
+            end
+
+            specsimple = self.gen_loadings_spectrum(pcax);
+            specsimple.plot();
+            specsimple.delete();
+        end
+
+
+        function specsimple = gen_loadings_spectrum(self, pcax)
+            %GEN_LOADINGS_SPECTRUM Generate a loadings spectrum
+            %   Outputs a SpectrumSimple object.
+
+            arguments
+                self
+                pcax uint8 = 1;
+            end
+
+            xdat = self.CoefsBase;
+            ydat = self.Coefs(:, pcax);
+
+            specsimple = SpectrumSimple( ...
+                xdat, "cm-1", ...
+                ydat, "a.u.", ...
+                self);
+
+            specsimple.name = "Loadings PC" + string(pcax(:)');
+            specsimple.legend_entries = "PC" + string(pcax(:));
 
         end
             

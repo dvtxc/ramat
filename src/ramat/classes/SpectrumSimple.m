@@ -22,11 +22,11 @@ classdef SpectrumSimple < SpecDataABC
     properties (Access = public)
         data;
         source {mustBeA(source, ["SpecData", "PCAResult"])} = SpecData.empty;
-        legend_entries string;
+        legend_entries string = "data";
     end
 
     methods
-        function self = SpectrumSimple(xdata, xdata_unit, ydata, ydata_unit, source)
+        function self = SpectrumSimple(xdata, xdata_unit, ydata, ydata_unit, source, opts)
             %SPECTRUMSIMPLE Creates an instance of a simple spectral class
 
             arguments
@@ -35,6 +35,7 @@ classdef SpectrumSimple < SpecDataABC
                 ydata double = [];
                 ydata_unit string = "";
                 source {mustBeA(source, ["SpecData", "PCAResult"])} = [];
+                opts.legend_entries string = "";
             end
 
             self.graph = xdata;
@@ -43,6 +44,11 @@ classdef SpectrumSimple < SpecDataABC
             self.data_unit = ydata_unit;
             self.source = source;
 
+            % Get legend entries
+            if ~isempty(source) && (opts.legend_entries == "")
+                opts.legend_entries = source.name;
+            end
+            self.legend_entries = opts.legend_entries;
 
         end
 
@@ -60,6 +66,7 @@ classdef SpectrumSimple < SpecDataABC
                 kwargs.plot_stack_distance = 1;   % Stacking Shift Multiplier
                 kwargs.normalize = false;
                 kwargs.plot_peaks = true;
+                kwargs.legend_entries string = self.legend_entries;
             end
 
             % Call plot at superclass, to properly set axes
@@ -139,7 +146,7 @@ classdef SpectrumSimple < SpecDataABC
             end
 
             % Add legend
-            leg = legend(ax, vertcat(self.legend_entries));
+            leg = legend(ax, vertcat(kwargs.legend_entries));
             leg.Color = 'none';
             leg.Box = "off";
 

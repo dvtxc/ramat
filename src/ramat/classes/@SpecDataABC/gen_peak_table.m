@@ -3,7 +3,8 @@ function peak_table = gen_peak_table(self, options)
 
     arguments
         self {mustBeA(self, "SpecDataABC")};
-        options.min_prominence = 0.1;
+        options.min_prominence double = 0.1;
+        options.negative_peaks logical = false;
     end
 
     peak_table = [];
@@ -34,6 +35,13 @@ function peak_table = gen_peak_table(self, options)
 
     % Find peaks
     [peaks, locations] = findpeaks(ydata, xdata, MinPeakProminence=abs_min_prominence);
+
+    % Do negative peaks?
+    if options.negative_peaks
+        [peaks_neg, locations_neg] = findpeaks(-ydata, xdata, MinPeakProminence=abs_min_prominence);
+        peaks = [peaks; peaks_neg];
+        locations = [locations; locations_neg];
+    end
 
     % Create PeakTable
     peak_table = PeakTable(peaks, locations, self);

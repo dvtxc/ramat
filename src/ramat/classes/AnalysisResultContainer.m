@@ -81,6 +81,17 @@ classdef AnalysisResultContainer < Container
             datatype = "PCA";
         end
 
+        function icon = get_icon(self)
+            %ICON Gets icon, based on data
+
+            % Retrieve default icon for DataContainer
+            icon = get_icon@Container(self);
+            if isempty(self.data), return; end
+
+            % Retrieve icon, based on current data item
+            icon = self.data.icon;
+        end
+
         function data = get.data(self)
             %DATA Get most important child as data item
 

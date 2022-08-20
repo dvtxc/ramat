@@ -11,20 +11,22 @@ function updateappmgr(app, options)
     %% Update Data Manager
     
     if any(options.Parts == 1)
+
+        update_data_mgr_tree(app);
     
-        tree = app.DataMgrTree;
-        data_root = app.prj.data_root();
-        analysis_result_root = app.prj.analysis_result_root();
-
-        % Clear Tree
-        a = tree.Children;
-        a.delete;
-
-        % Create Data Nodes
-        gen_child_nodes(tree, data_root, app);
-        
-        % Create Analysis Result Nodes
-        gen_child_nodes(tree, analysis_result_root, app);
+%         tree = app.DataMgrTree;
+%         data_root = app.prj.data_root();
+%         analysis_result_root = app.prj.analysis_result_root();
+% 
+%         % Clear Tree
+%         a = tree.Children;
+%         a.delete;
+% 
+%         % Create Data Nodes
+%         gen_child_nodes(tree, data_root, app);
+%         
+%         % Create Analysis Result Nodes
+%         gen_child_nodes(tree, analysis_result_root, app);
         
     end % END PART 1
 

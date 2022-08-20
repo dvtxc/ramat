@@ -13,6 +13,7 @@ classdef (Abstract) Container < handle
 
     properties (Dependent)
         display_name string;
+        icon string;
         prev Container;
         next Container;
     end
@@ -130,8 +131,39 @@ classdef (Abstract) Container < handle
             end
             
         end
+    end
 
-        
+    methods
+        function add_context_actions(self, cm, node, app)
+            %ADD_CONTEXT_ACTIONS Retrieve all (possible) actions for this
+            %data item that should be displayed in the context menu
+            %   This function adds menu items to the context menu, which
+            %   link to specific context actions for this data item.
+            %
+            arguments
+                self;
+                cm matlab.ui.container.ContextMenu;
+                node matlab.ui.container.TreeNode;
+                app ramatguiapp;
+            end
+
+            % Dump to workspace
+            uimenu(cm, Text="Dump to Workspace", Callback={@DumptoWorkspaceSelected, app})
+
+            % Remove
+            uimenu(cm, Text="Remove", MenuSelectedFcn={@remove, self, node});
+
+            function remove(~, ~, self, node)
+                self.remove();
+                update_node(node, "remove");
+            end
+
+            function DumptoWorkspaceSelected(~, ~, app)
+                % User has selected <DUMP TO WORKSPACE>
+                dump_selection(app.selected_datacontainers);
+            end
+
+        end
     end
 
     % Builtin overrides
@@ -174,37 +206,7 @@ classdef (Abstract) Container < handle
                 self(i).delete();
             end
 
-        end
-
-        % destructor
-%         function delete(self)
-%             %DESTRUCTOR Delete all references to object
-%             
-%             prj = self.parent_project;
-% 
-%             if isempty(prj)
-%                 return;
-%             end
-%             
-%             if ~isvalid(prj)
-%                 % Program is probably closing, prj hasn't been found
-%                 % Skip checks
-%                 return
-%                 
-%             end
-%             
-%             % Remove itself from the dataset
-%             idx = find(self == prj.DataSet);
-%             prj.DataSet(idx) = [];
-% 
-%             % Remove itself from the group
-%             if ~isempty(self.parent)
-%                 self.parent.remove_child(self);
-%             end
-% 
-%         end
-
-        
+        end        
     end
 
     % Getters (dependent properties)
@@ -240,6 +242,19 @@ classdef (Abstract) Container < handle
 
         end
 
+        function icon = get.icon(self)
+            %ICON Default method to retrieve icon and make this a dependent
+            %property. For overrides in subclasses, override the method
+            %get_icon() instead. Do not change this property.
+            icon = self.get_icon();
+        end
+
+        function icon = get_icon(self)
+            %GET_ICON Default method to retrieve icon. Override this method
+            %in subclasses to assign different icons for subclasses.
+            icon = self.get_default_icon();
+        end
+
         function next = get.next(self)
             %PREV Get previous sibling
 
@@ -260,6 +275,14 @@ classdef (Abstract) Container < handle
 
         end
 
+
+    end
+
+    methods (Static)
+
+        function icon = get_default_icon()
+            icon = "Default.png";
+        end
 
     end
 end

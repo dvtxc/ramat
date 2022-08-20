@@ -47,6 +47,11 @@ classdef ImageData < DataItem
         function datares = get.DataSize(self)
             datares = self.XSize * self.YSize * self.ZSize;
         end
+
+        function icon = get_icon(self)
+            %GET_ICON Overrides <DataItem>.icon dependent property.
+            icon = "TDImage.png";
+        end
         
     end
 end

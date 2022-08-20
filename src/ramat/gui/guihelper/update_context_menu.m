@@ -20,6 +20,6 @@ function update_context_menu(cm, ~, selected_node, app)
 
     % Get available context menu actions
     data = selected_node.NodeData;
-    data.get_context_actions(cm, selected_node, app);
+    data.add_context_actions(cm, selected_node, app);
     
 end

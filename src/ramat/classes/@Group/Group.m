@@ -7,6 +7,7 @@ classdef Group < handle
         parent {mustBeA(parent, ["Group", "Project"])} = Group.empty();
         children {mustBeA(children, "Container")} = DataContainer.empty();
         child_groups Group;
+        icon string = "Folder_24.png";
     end
     
     properties (Access = public, Dependent)
@@ -154,6 +155,37 @@ classdef Group < handle
             if ~isempty(self.children), self.children.remove(); end
             self.parent.child_groups(self.parent.child_groups == self) = [];
             self.delete();
+
+        end
+
+        function add_context_actions(self, cm, node, app)
+            %ADD_CONTEXT_ACTIONS Retrieve all (possible) actions for this
+            %data item that should be displayed in the context menu
+            %   This function adds menu items to the context menu, which
+            %   link to specific context actions for this data item.
+            %
+            arguments
+                self;
+                cm matlab.ui.container.ContextMenu;
+                node matlab.ui.container.TreeNode;
+                app ramatguiapp;
+            end
+
+            % Dump to workspace
+            uimenu(cm, Text="Dump to Workspace", Callback={@DumptoWorkspaceSelected, app})
+
+            % Remove
+            uimenu(cm, Text="Remove", MenuSelectedFcn={@remove, self, node});
+
+            function remove(~, ~, self, node)
+                self.remove();
+                update_node(node, "remove");
+            end
+
+            function DumptoWorkspaceSelected(~, ~, app)
+                % User has selected <DUMP TO WORKSPACE>
+                dump_selection(app.selected_datacontainers);
+            end
 
         end
         

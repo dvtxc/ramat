@@ -270,6 +270,13 @@ classdef SpecData < SpecDataABC
             
         end
 
+        function icon = get_icon(self)
+            %GET_ICON Overrides <DataItem>.icon dependent property.
+            icon = get_icon@DataItem(self);
+            if (self.DataSize == 1), icon = "TDGraph_2.png"; end
+            if (self.DataSize > 1), icon = "TDGraph_0.png"; end
+        end
+
         %% Overrides
 
         function avg_specdat = mean(self)

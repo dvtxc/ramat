@@ -123,8 +123,17 @@ classdef AnalysisGroup < handle
             
         end
 
-        function l = get_static_list(self)
-            dc = vertcat(self.children.target);
+        function l = get_static_list(self, opts)
+            %GET_STATIC_LIST Get list of simple specdats
+
+            arguments
+                self
+                opts.selection Link = self.children;
+            end
+
+            links = opts.selection;
+
+            dc = vertcat(links.target);
             specdats = vertcat(dc.getDataHandles("SpecData"));
             l = specdats.get_spectrum_simple();
         end

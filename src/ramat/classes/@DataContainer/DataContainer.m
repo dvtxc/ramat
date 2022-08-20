@@ -34,8 +34,8 @@ classdef DataContainer < Container
     methods (Access = public)
         specop(self, operation, kwargs);    % Wrapper for spec ops
         ax = plot(self, kwargs);
-        subsetHandle = addToNewSubset(self);
-        addToSubset(self, subsetHandle);
+        subsetHandle = add_to_new_subset(self);
+        add_to_subset(self, subsetHandle);
     end
 
     % Full method definitions
@@ -119,6 +119,109 @@ classdef DataContainer < Container
             
         end
         
+
+        function add_context_actions(self, cm, node, app)
+            %ADD_CONTEXT_ACTIONS Retrieve all (possible) actions for this
+            %data item that should be displayed in the context menu
+            %   This function adds menu items to the context menu, which
+            %   link to specific context actions for this data item.
+            %
+            arguments
+                self;
+                cm matlab.ui.container.ContextMenu;
+                node matlab.ui.container.TreeNode;
+                app ramatguiapp;
+            end
+
+            % Add "add to analysis set" menu nodes
+            node_add_to = uimenu(cm, 'Text', 'Add to Analysis Set ...');
+            uimenu(node_add_to, ...
+                'Text', '<New Analysis>', ...
+                'Callback', {@add_to_new_analysis, app});
+
+            % Populate sub menu with all available analysis sets
+            for analysis = app.prj.analyses(:)'
+                name = analysis.display_name;
+                uimenu(node_add_to, ...
+                    'Text', name, ...       % Name of analysis subset
+                    'Callback', {@add_to_analysis, app, analysis}); 
+            end
+
+            % Move to Group <xy>
+            node_move_to = uimenu(cm, 'Text', 'Move to Group ...');
+            uimenu(node_move_to, ...
+                'Text', '<New Group>', ...
+                'Callback', {@MovetoGroupSelected, Group.empty()});
+            
+            % Populate sub menu with all groups
+            gen_child_group_nodes(node_move_to, app.prj.data_root, app);
+
+            function gen_child_group_nodes(parent_node, group, app)
+                %GEN_CHILD_GROUP_NODES Recursive function to generate all
+                %child nodes
+                
+                % MATLAB automatically executes callback when child menus
+                % are present, so always add one more child menu with
+                % actual callback
+                group_node = uimenu(parent_node, ...
+                    'Text', group.display_name);
+                uimenu(group_node, ...
+                    'Text', sprintf("Move to %s", group.display_name), ...
+                    "Callback", {@move_to_group, app, group, Group.empty()});
+
+                % Recursion
+                for child = group.child_groups
+                    gen_child_group_nodes(group_node, child, app)
+                end
+
+                % To new group in current group
+                uimenu(group_node, ...
+                    'Text', "<New Group>", ...
+                    "Callback", {@move_to_group, app, Group.empty(), group});
+
+            end
+            
+            add_context_actions@Container(self, cm, node, app);
+
+            function add_to_new_analysis(~,~,app)
+                % User has selected <ADD TO NEW ANALYSIS>
+
+                % Get handles to selected data containers
+                h = vertcat(app.DataMgrTree.SelectedNodes.NodeData);
+                
+                h.add_to_new_subset();
+                
+                % Update GUI Managers
+                app.updatemgr(Parts=[2,3]);
+            end
+
+            function add_to_analysis(~, ~, app, analysis)
+                % User has selected <ADD TO ANALYSIS>
+                
+                % Get handles to selected data containers
+                h = vertcat(app.DataMgrTree.SelectedNodes.NodeData);
+                
+                h.add_to_subset(analysis);
+                
+                % Update GUI Managers
+                app.updatemgr(Parts=3);
+            end
+
+            function move_to_group(~, ~, app, group_handle, parent_group)
+                % User has selected <MOVE TO GROUP xy>
+
+                % Get selected dataset handles
+                dataset = vertcat(app.DataMgrTree.SelectedNodes.NodeData);
+
+                % Move dataset
+                dataset.move_to_group(group_handle, parent_group);
+
+                % Update datamgr
+                app.updatemgr();
+            end
+
+
+        end
    
                 
         %% Getters and setters of Dependent Properties
@@ -152,38 +255,16 @@ classdef DataContainer < Container
             end
             
         end
-                
-        function analysisGroupParent = get.AnalysisGroupParent(self)
-            %ANALYSISGROUPPARENT Retrieve analysis group this data
-            %container has been assigned to.
+        
+        function icon = get_icon(self)
+            %ICON Gets icon, based on data
 
-            warning("DataContainer.AnalysisGroupParent is deprecated.");
-            
-            % Search in project.
-            prj = self.parent_project;
-            analysisGroupParent = AnalysisGroup.empty;
+            % Retrieve default icon for DataContainer
+            icon = get_icon@Container(self);
+            if isempty(self.Data), return; end
 
-            if isempty(prj)
-                return;
-            end
-
-            
-            % Search in analysis sets.
-            for i = 1 : numel(prj.AnalysisSet)
-                subset = prj.AnalysisSet(i);
-                
-                % Search in analysis groups.
-                for j = 1:numel(subset.GroupSet)
-                    subsetgroup = subset.GroupSet(j);
-                    
-                    if any(self == subsetgroup.Children)
-                        % Parent found.
-                        analysisGroupParent = subsetgroup;
-                        
-                    end
-                    
-                end
-            end
+            % Retrieve icon, based on current data item
+            icon = self.Data.icon;
         end
         
         

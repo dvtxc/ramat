@@ -9,6 +9,10 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
         description string;
         parent_container {mustBeA(parent_container, 'Container')} = DataContainer.empty();
     end
+
+    properties (Dependent)
+        icon;
+    end
     
     properties (Abstract, SetAccess = private)
         Type;
@@ -129,8 +133,8 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
 
         end
 
-        function get_context_actions(self, cm, node, app)
-            %GET_CONTEXT_ACTIONS Retrieve all (possible) actions for this
+        function add_context_actions(self, cm, node, app)
+            %ADD_CONTEXT_ACTIONS Retrieve all (possible) actions for this
             %data item that should be displayed in the context menu
             %   This function adds menu items to the context menu, which
             %   link to specific context actions for this data item.
@@ -150,6 +154,20 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
                 update_node(node, "remove");
             end
 
+        end
+
+        function icon = get.icon(self)
+            %ICON Default method to retrieve icon and make this a dependent
+            %property. For overrides in subclasses, override the method
+            %get_icon() instead. Do not change this property.
+            icon = self.get_icon();
+        end
+
+        function icon = get_icon(self)
+            %GET_ICON Default method to retrieve icon. Override this method
+            %in subclasses to assign different icons for subclasses.
+
+            icon = self.get_default_icon();
         end
 
         function remove(self)
@@ -174,6 +192,10 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
 
             pathfilter = [pathfilter; {'*.*', 'All Files (*.*)'}];
 
+        end
+
+        function icon = get_default_icon()
+            icon = "Default.png";
         end
     end
     

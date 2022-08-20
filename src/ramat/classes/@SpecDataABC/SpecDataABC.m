@@ -88,8 +88,8 @@ classdef (Abstract) SpecDataABC < DataItem
             
         end
 
-        function get_context_actions(self, cm, node, app)
-            %GET_CONTEXT_ACTIONS Retrieve all (possible) actions for this
+        function add_context_actions(self, cm, node, app)
+            %ADD_CONTEXT_ACTIONS Retrieve all (possible) actions for this
             %data item that should be displayed in the context menu
             %   This function adds menu items to the context menu, which
             %   link to specific context actions for this data item.
@@ -102,7 +102,7 @@ classdef (Abstract) SpecDataABC < DataItem
             end
 
             % Get parent actions of DataItem
-            get_context_actions@DataItem(self, cm, node, app);
+            add_context_actions@DataItem(self, cm, node, app);
 
             % Get specific context actions for SpecDataABC
             min_prom = app.MinimumProminenceEditField.Value;

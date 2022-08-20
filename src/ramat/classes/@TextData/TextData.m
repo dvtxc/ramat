@@ -24,6 +24,11 @@ classdef TextData < DataItem
             self.data = data;
             
         end
+
+        function icon = get_icon(self)
+            %GET_ICON Overrides <DataItem>.icon dependent property.
+            icon = "TDText.png";
+        end
         
     end
 end

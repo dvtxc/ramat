@@ -7,6 +7,16 @@ classdef Link < handle & matlab.mixin.indexing.RedefinesDot & matlab.mixin.Copya
     properties
         target DataContainer = DataContainer.empty;
         parent AnalysisGroup = AnalysisGroup.empty;
+        name string;
+    end
+
+    properties (Dependent)
+        display_name string;
+    end
+
+    % Cached properties, in case target gets deleted.
+    properties (Access = private)
+        cached_display_name string;
     end
 
     properties (Dependent)
@@ -19,6 +29,8 @@ classdef Link < handle & matlab.mixin.indexing.RedefinesDot & matlab.mixin.Copya
             
             self.target = target;
             self.parent = parent;
+
+            self.cached_display_name = target.display_name;
         end
     end
 
@@ -30,15 +42,46 @@ classdef Link < handle & matlab.mixin.indexing.RedefinesDot & matlab.mixin.Copya
         end
 
         function self = dotAssign(self,indexOp,varargin)
-                [self.target.(indexOp)] = varargin{:};
+            [self.target.(indexOp)] = varargin{:};
         end
         
         function n = dotListLength(self,indexOp,indexContext)
+            
+            % Strategy when target has been deleted
+            if ~isempty(self.target)
+                if ~isvalid(self.target)
+                    self.target = DataContainer.empty();
+                else
+                    self.cached_display_name = self.target.display_name;
+                end
+            end
+
             n = listLength(self.target,indexOp,indexContext);
         end
     end
 
     methods
+        function displayname = get.display_name(self)
+
+            if isempty(self.target), self.get_deleted_name(); return; end
+            if ~isvalid(self.target), self.get_deleted_name(); return; end
+
+            if self.name ~= ""
+                displayname = self.name;
+                return;
+            end
+
+            displayname = self.target.display_name;
+            self.cached_display_name = self.target.display_name;
+            
+        end
+
+        function displayname = get_deleted_name(self)
+
+            displayname = "(DELETED) " + self.cached_display_name;
+            
+        end
+
         function idx = get.idx(self)
             %IDX Get index of group
             if isempty(self.parent), return; end

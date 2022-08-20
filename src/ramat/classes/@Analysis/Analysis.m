@@ -139,101 +139,17 @@ classdef Analysis < handle
             end
             
             data = options.Selection;
-            
-            [sortedData, groupNames, groupSizes, dataSizes] = self.sortdata(Selection=data);
-            
-            SpectralPlotEditor(sortedData, ...
-                GroupNames=groupNames, ...
-                GroupSizes=groupSizes, ...
-                DataSizes=dataSizes);
+
+            specplot = SpecPlot(data, self.parent);
+                        
+            SpectralPlotEditor(specplot);
             
         end
+
+        function gen_specplot(self, options)
+
+        end
         
-%         function [sortedData, groupNames, groupSizes, dataSizes] = sortdata(self, options)
-%             %SORTDATA Output sorted list of data and corresponding group
-%             %names and group sizes
-%             
-%             arguments
-%                 self;                               % Analysis Subset
-%                 options.Selection = self.DataSet;   % Selection
-%                 options.FlatSizes = false;          % Roll out sizes?
-%             end
-%             
-%             % Take data from provided selection
-%             data = options.Selection;
-%                                     
-%             if ~isempty(data)
-%                 % Get list of groups
-%                 grouplist = self.getParentGroups(data, ExclusiveDataType="SpecData");
-%                 
-%                 % Get only spectral data
-%                 data = data([data.dataType] == 'SpecData');
-%                 
-%                 % Check whether we have group information for all data
-%                 if (numel(grouplist) ~= numel(data))
-%                     warning("Data selection failed.");
-%                     return
-%                 end
-%                                 
-%                 % Sort data by group
-%                 [groups, ~, groupIdx] = unique(grouplist);
-%                 [sortedGroupIdx, sortingIdx] = sort(groupIdx);
-%                 
-%                 sortedData = data(sortingIdx);
-%                 
-%                 groupNames = vertcat( groups.display_name );
-%                 
-%                 % Get data sizes
-%                 if options.FlatSizes
-%                     % Get all sizes and count spectra of LA scans as
-%                     % individual data
-%                     dataSizes = vertcat( sortedData.DataSize ); 
-%                 else
-%                     % Take LA Scans as single data containers
-%                     dataSizes = ones(numel(sortedData), 1);
-%                 end
-%                 
-%                 groupSizes = accumarray( sortedGroupIdx, dataSizes);
-%                 
-%             end
-%             
-%         end
-%         
-%         
-%         function groupList = getParentGroups(self, dataContainer, options)
-%             %GETPARENTGROUPS Get parent groups belonging to data containers
-%             
-%             arguments
-%                 self
-%                 dataContainer
-%                 options.ExclusiveDataType = [];
-%             end
-%             
-%             groupList = AnalysisGroup.empty();
-%             
-%             for i = 1 : numel(dataContainer)
-%                 datacon = dataContainer(i);
-%                 
-%                 if ~isempty(options.ExclusiveDataType)
-%                     if (datacon.dataType ~= options.ExclusiveDataType)
-%                         % Different data type: skip data container
-%                         
-%                         continue;
-%                     end
-%                 end
-%                 
-%                 for j = 1 : numel(self.GroupSet)
-%                     % Look in each group
-%                     group = self.GroupSet(j);
-%                     
-%                     if any(group.children == datacon)
-%                         % Found datacon in current group
-%                         
-%                         groupList(end + 1) = group;
-%                     end
-%                 end
-%             end
-%         end
         
         function set_selection(self, selection)
             %SELECTION Update the list of selected data containers

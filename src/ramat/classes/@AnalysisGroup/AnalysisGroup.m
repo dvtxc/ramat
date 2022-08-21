@@ -142,7 +142,7 @@ classdef AnalysisGroup < handle
             %REMOVE Soft Destructor
 
             % Delete all children links
-            self.children.remove();
+            if ~isempty(self.children), self.children.remove(); end
 
             % Unset at parent
             self.parent.GroupSet(self.parent.GroupSet == self) = [];

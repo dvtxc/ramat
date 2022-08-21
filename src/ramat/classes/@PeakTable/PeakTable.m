@@ -4,6 +4,7 @@ classdef PeakTable < DataItem
     properties
         peaks = [];
         locations = [];
+        neg = [];
         parent_specdata;
         min_prominence = [];
     end

@@ -122,4 +122,72 @@ classdef Link < handle & matlab.mixin.indexing.RedefinesDot & matlab.mixin.Copya
         end
 
     end
+
+    % Context menu methods
+    methods
+        function add_context_actions(self, cm, node, app)
+            %ADD_CONTEXT_ACTIONS Retrieve all (possible) actions for this
+            %data item that should be displayed in the context menu
+            %   This function adds menu items to the context menu, which
+            %   link to specific context actions for this data item.
+            %
+            arguments
+                self;
+                cm matlab.ui.container.ContextMenu;
+                node matlab.ui.container.TreeNode;
+                app ramatguiapp;
+            end
+
+            % Get analysis.
+            analysis = self.parent.parent;
+            if isempty(analysis), return; end
+
+            uimenu(cm, ...
+                'Text', 'Assign to New Group', ...
+                'Callback', {@assign_to, self, analysis, [], app});
+            
+            if numel(analysis.GroupSet) > 0
+                % The active analysis subset has groups
+                mh = uimenu(cm, 'Text', 'Assign to ...');
+                
+                for group = analysis.GroupSet(:)'
+                    uimenu(mh, 'Text', group.display_name, 'Callback', {@assign_to, self, analysis, group, app}); 
+                end
+            end
+
+            uimenu(cm, Text = "Move up", MenuSelectedFcn={@moveup, self, node});
+            uimenu(cm, Text = "Move down", MenuSelectedFcn={@movedown, self, node});
+            uimenu(cm, Text = "Remove", MenuSelectedFcn = {@remove, self, node});
+
+            function moveup(~,~,self,node)
+                self.moveup();
+                update_node(node, "moveup");
+            end
+
+            function movedown(~,~,self,node)
+                self.movedown();
+                update_node(node, "movedown");
+            end
+
+            function remove(~, ~, self, node)
+                % User has selected <REMOVE>
+                self.remove();
+                update_node(node, "remove");
+            end
+
+            % Menu selected function: AddtoMenu
+            function assign_to(~, ~, self, analysis, newgroup, app)
+                % User has selected <ASSIGN TO ...>
+                if isempty(newgroup)
+                    newgroup = analysis.add_group();
+                end
+
+                analysis.move_data_to_group(self, newgroup);
+                
+                % Update GUI Managers
+                app.updatemgr(Parts=3);
+            end
+
+        end
+    end
 end

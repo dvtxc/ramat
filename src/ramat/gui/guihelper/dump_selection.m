@@ -7,7 +7,8 @@ function varargout = dump_selection(selection)
     end
 
     if nargout == 0
-        selection
+        ans = selection
+        assignin('base', 'ans', ans);
     elseif nargout == 1
         varargout = selection;
     else

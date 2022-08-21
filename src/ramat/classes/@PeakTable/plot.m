@@ -42,6 +42,9 @@ function plot(self, options)
         annotation_string = sprintf("%.*f", options.Precision, peak(1));
         annotation_marker = {annotation_string; "|"; ""; ""; ""};
         
+        % Invert for negative peaks
+        if self.neg(i), annotation_marker = flipud(annotation_marker); end
+        
         % Add annotation to plot
         t = text(ax, peak(1), peak(2), annotation_marker);
         t.HorizontalAlignment = 'center';

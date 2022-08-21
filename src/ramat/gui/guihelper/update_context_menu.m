@@ -16,7 +16,6 @@ function update_context_menu(cm, ~, selected_node, app)
 
     % Make sure the node actually points to data
     if isempty(selected_node.NodeData), return; end
-%     if ~isa(selected_node.NodeData, "DataItem"); end
 
     % Get available context menu actions
     data = selected_node.NodeData;

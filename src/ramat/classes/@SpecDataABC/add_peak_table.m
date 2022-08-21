@@ -5,6 +5,7 @@ function peak_table = add_peak_table(self, options)
     arguments
         self {mustBeA(self, "SpecDataABC")};
         options.min_prominence = 0.1;
+        options.negative_peaks = false;
     end
 
     % To pass options kwargs, convert to struct to cell

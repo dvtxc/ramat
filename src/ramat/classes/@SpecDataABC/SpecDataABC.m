@@ -75,9 +75,10 @@ classdef (Abstract) SpecDataABC < DataItem
                 self
                 options.Axes = [];
                 options.min_prominence = 0.1;
+                options.negative_peaks = false;
             end
 
-            peaktable = self.gen_peak_table(min_prominence=options.min_prominence);
+            peaktable = self.gen_peak_table(min_prominence=options.min_prominence, negative_peaks=options.negative_peaks);
 
             if isempty(peaktable)
                 warning("No peak table was extracted.");
@@ -105,21 +106,23 @@ classdef (Abstract) SpecDataABC < DataItem
             add_context_actions@DataItem(self, cm, node, app);
 
             % Get specific context actions for SpecDataABC
-            min_prom = app.MinimumProminenceEditField.Value;
+            opts.min_prom = app.MinimumProminenceEditField.Value;
+            opts.neg_peaks = app.PeakAnalysisNegativeCheckbox.Value;
+
             menu_item = uimenu(cm, ...
                 Text="Peak Analysis");
             m1 = uimenu(menu_item, ...
-                Text="Preview Peak Analysis (min_prom: " + string(min_prom) + ")", ...
-                MenuSelectedFcn={@preview, self, min_prom});
-            m2 = uimenu(menu_item, Text="Extract Peak Table (min_prom: " + string(min_prom) + ")", ...
-                MenuSelectedFcn={@extract, self, app, min_prom});
+                Text="Preview Peak Analysis (min_prom: " + string(opts.min_prom) + ")", ...
+                MenuSelectedFcn={@preview, self, opts});
+            m2 = uimenu(menu_item, Text="Extract Peak Table (min_prom: " + string(opts.min_prom) + ")", ...
+                MenuSelectedFcn={@extract, self, app, opts});
 
-            function preview(~, ~, self, min_prom)
-                self.preview_peak_table(min_prominence=min_prom);
+            function preview(~, ~, self, opts)
+                self.preview_peak_table(min_prominence=opts.min_prom, negative_peaks=opts.neg_peaks);
             end
 
-            function extract(~, ~, self, app, min_prom)
-                self.add_peak_table(min_prominence=min_prom);
+            function extract(~, ~, self, app, opts)
+                self.add_peak_table(min_prominence=opts.min_prom, negative_peaks=opts.neg_peaks);
                 update_data_items_tree(app, self.parent_container);
             end
 

@@ -52,6 +52,31 @@ classdef ImageData < DataItem
             %GET_ICON Overrides <DataItem>.icon dependent property.
             icon = "TDImage.png";
         end
+
+        function [ax, f] = plot(self, kwargs)
+            %PLOT
+
+            arguments
+                self;
+                kwargs.Axes = [];                
+            end
+
+            % Call plot at superclass, to properly set axes
+            [ax, f] = plot@DataItem(self, Axes=kwargs.Axes);
+
+            % plot imagedata
+            if numel(size(self.data)) == 3
+                d = uint8(self.data);
+                image(ax, d);
+            else
+                imagesc(ax, self.data);
+            end
+
+            % Set-Up Axes
+            ax.DataAspectRatio = [1 1 1];
+            ax.XDir = 'normal';
+            ax.YDir = 'normal';
+        end
         
     end
 end

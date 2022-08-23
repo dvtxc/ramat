@@ -53,7 +53,7 @@ classdef DataContainer < Container
             self.parent_project = parent_prj;
             
             if ~isempty(data_items)
-                self.append_data_item(data_items);
+                self.append_child(data_items);
             end
             
         end
@@ -133,18 +133,20 @@ classdef DataContainer < Container
                 app ramatguiapp;
             end
 
+            selection = vertcat(app.DataMgrTree.SelectedNodes.NodeData);
+
             % Add "add to analysis set" menu nodes
             node_add_to = uimenu(cm, 'Text', 'Add to Analysis Set ...');
             uimenu(node_add_to, ...
                 'Text', '<New Analysis>', ...
-                'Callback', {@add_to_new_analysis, app});
+                'Callback', {@add_to_new_analysis, app, selection});
 
             % Populate sub menu with all available analysis sets
             for analysis = app.prj.analyses(:)'
                 name = analysis.display_name;
                 uimenu(node_add_to, ...
                     'Text', name, ...       % Name of analysis subset
-                    'Callback', {@add_to_analysis, app, analysis}); 
+                    'Callback', {@add_to_analysis, app, analysis, selection}); 
             end
 
             % Move to Group <xy>
@@ -155,6 +157,22 @@ classdef DataContainer < Container
             
             % Populate sub menu with all groups
             gen_child_group_nodes(node_move_to, app.prj.data_root, app);
+
+            % Spectral operations
+            node_specops = uimenu(cm, Text="Math ...");
+
+            if numel(selection) > 1
+                uimenu(node_specops, Text="Sum", MenuSelectedFcn=@(~,~) sum(selection));
+                uimenu(node_specops, Text="Mean", MenuSelectedFcn=@(~,~) mean(selection));
+                if numel(selection) == 2
+                    a = selection(1); b = selection(2);
+                    uimenu(node_specops, Text="A + B", MenuSelectedFcn=@(~,~) plus(a, b));
+                    uimenu(node_specops, Text="A - B (" + a.display_name + "  -  " + b.display_name + ")", ...
+                        MenuSelectedFcn=@(~,~) minus(a, b));
+                    uimenu(node_specops, Text="B - A (" + b.display_name + "  -  " + a.display_name + ")", ...
+                        MenuSelectedFcn=@(~,~) minus(b, a));
+                end
+            end
 
             function gen_child_group_nodes(parent_node, group, app)
                 %GEN_CHILD_GROUP_NODES Recursive function to generate all
@@ -181,27 +199,23 @@ classdef DataContainer < Container
 
             end
             
+            % Add general context actions for all containers
             add_context_actions@Container(self, cm, node, app);
 
-            function add_to_new_analysis(~,~,app)
+            % Nested functions
+            function add_to_new_analysis(~,~,app, selection)
                 % User has selected <ADD TO NEW ANALYSIS>
 
-                % Get handles to selected data containers
-                h = vertcat(app.DataMgrTree.SelectedNodes.NodeData);
-                
-                h.add_to_new_subset();
+                selection.add_to_new_subset();
                 
                 % Update GUI Managers
                 app.updatemgr(Parts=[2,3]);
             end
 
-            function add_to_analysis(~, ~, app, analysis)
+            function add_to_analysis(~, ~, app, analysis, selection)
                 % User has selected <ADD TO ANALYSIS>
                 
-                % Get handles to selected data containers
-                h = vertcat(app.DataMgrTree.SelectedNodes.NodeData);
-                
-                h.add_to_subset(analysis);
+                selection.add_to_subset(analysis);
                 
                 % Update GUI Managers
                 app.updatemgr(Parts=3);
@@ -278,16 +292,79 @@ classdef DataContainer < Container
             
         end
 
-        function avg_datacontainer = mean(self)
-            % MEAN Returns averaged spectra
+        function r = mean(self)
+            % MEAN Returns average of data
+            operands = self.op_start();
+            if isempty(operands), return; end
 
-            % Calculate mean
-            specdat = self.getDataHandles;
-            avg_specdat = specdat.mean();
-            avg_datacontainer = DataContainer(avg_specdat.Name);
-            avg_datacontainer.appendDataItem(avg_specdat);
+            res = operands.mean();
+            r = DataContainer(res.name, self(1).parent_project, res);
+
+            if ~isempty(self(1).parent), self(1).parent.add_children(r); end
+        end
+
+        function r = sum(self)
+            % MEAN Returns average of data
+            operands = self.op_start();
+            if isempty(operands), return; end
+
+            res = operands.sum();
+            r = DataContainer(res.name, self(1).parent_project, res);
+
+            if ~isempty(self(1).parent), self(1).parent.add_children(r); end
+        end
+
+        function r = plus(a, b)
+            % MEAN Returns average of data
+            operands = op_start(a, b);
+            if isempty(operands), return; end
+
+            res = plus(operands(1), operands(2));
+            r = DataContainer(res.name, a.parent_project, res);
+
+            if ~isempty(a.parent), a.parent.add_children(r); end
+        end
+
+        function r = minus(a, b)
+            % MEAN Returns average of data
+            operands = op_start(a, b);
+            if isempty(operands), return; end
+
+            res = minus(operands(1), operands(2));
+            r = DataContainer(res.name, a.parent_project, res);
+
+            if ~isempty(a.parent), a.parent.add_children(r); end
+        end
+
+        function op = op_start(varargin)
+            
+            op = [];
+
+            try
+                if nargin == 1
+                    a = varargin{1};
+                    operands = a.getDataHandles();
+                    operands.op_start();
+                elseif nargin == 2
+                    a = varargin{1};
+                    b = varargin{2};
+                    in = [a b];
+                    operands = in.getDataHandles();
+                    op_start(operands(1), operands(2));
+                end
+            catch ME
+                if strcmp(ME.identifier, 'OperatorAssertion:InhomogeneousOperands')
+                    warning("Cannot operate on inhomogeneous array");
+                    return;
+                else
+                    rethrow(ME);
+                end
+            end
+
+            op = operands;
 
         end
+
         
         %% Other methods
         function t = listDataItems(self)

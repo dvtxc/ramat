@@ -148,20 +148,7 @@ function ax = plot(self, kwargs)
 
         case "ImageData"
             % Plot first
-            imagesc(ax, self.Data.data );
-            
-            % Set-Up Axes
-            ax.DataAspectRatio = [1 1 1];
-            ax.XDir = 'normal';
-            ax.YDir = 'normal';
-            
-%             ax.XTick = [];
-%             ax.YTick = [];
-%             ax.XAxis.Label.delete();
-%             ax.YAxis.Label.delete();
-% 
-%             ax.XLim = [0.5, data.XSize + 0.5];
-%             ax.YLim = [0.5, data.YSize + 0.5];
+            [ax, f] = self.Data.plot(Axes=ax);
 
 
     end

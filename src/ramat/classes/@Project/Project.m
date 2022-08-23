@@ -102,7 +102,10 @@ classdef Project < handle
                 self Project
                 options.Range = [];
                 options.Selection (:,:) DataContainer = DataContainer.empty;
+                options.algorithm string = "svd";
             end
+
+            result = [];
 
             % Checks
             if isempty(self.analyses)
@@ -114,7 +117,8 @@ classdef Project < handle
             
             % Create PCA
             subset = self.ActiveAnalysis;
-            pcaresult = subset.compute_pca(Range=options.Range, Selection=options.Selection);
+            pcaresult = subset.compute_pca(Range=options.Range, Selection=options.Selection, algorithm=options.algorithm);
+            if isempty(pcaresult), return; end
 
             % Pack in container
             result = AnalysisResultContainer(self);

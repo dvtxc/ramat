@@ -34,7 +34,7 @@ classdef SpectrumSimple < SpecDataABC
                 xdata_unit string = "";
                 ydata double = [];
                 ydata_unit string = "";
-                source {mustBeA(source, ["SpecData", "PCAResult"])} = [];
+                source {mustBeA(source, ["SpecData", "PCAResult"])} = SpecData.empty;
                 opts.legend_entries string = "";
             end
 

@@ -2,14 +2,13 @@ classdef PeakTable < DataItem
     % PEAKTABLE Stores extracted peak table
 
     properties
-        peaks = [];
-        locations = [];
-        neg = [];
+        peaks struct = struct.empty;
         parent_specdata;
         min_prominence = [];
     end
 
     properties (Dependent)
+    	locations;
         as_table;
     end
 
@@ -27,27 +26,31 @@ classdef PeakTable < DataItem
     end
 
     methods
-        function self = PeakTable(peaks, locations, parent_specdata, name)
+        function self = PeakTable(peaks, parent_specdata, name)
             % PEAKTABLE Construct an instance of this class
 
             arguments
-                peaks (:,1) {mustBeNumeric,mustBeReal};
-                locations (:,1) {mustBeNumeric,mustBeReal,mustBeEqualSize(peaks,locations)};
+                peaks struct;
+%                 locations (:,1) {mustBeNumeric,mustBeReal,mustBeEqualSize(peaks,locations)};
                 parent_specdata {mustBeA(parent_specdata, "SpecDataABC")} = [];
                 name string = "";
             end
 
             self.peaks = peaks;
-            self.locations = locations;
+%             self.locations = locations;
             self.parent_specdata = parent_specdata;
             self.name = name;
+        end
+
+        function x = get.locations(self)
+            x = self.peaks.x;
         end
 
         function t = get.as_table(self)
             % TABLE Outputs peaks and locations as table
 
-            t = table(self.locations, self.peaks);
-            t.Properties.VariableNames = ["Wavenum", "Height"];
+            t = struct2table(self.peaks);
+            t.Properties.VariableNames = ["Wavenum", "Height", "Negative"];
         end
 
         function export(self, options)
@@ -63,6 +66,8 @@ classdef PeakTable < DataItem
                 [file, path] = export@DataItem(self, format=options.format, format_list=self.format_list);
                 options.path = fullfile(path, file);
             end
+
+            if strcmp(path,' \ '), return; end
 
             peaktable = self.as_table;
 

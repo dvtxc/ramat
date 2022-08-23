@@ -93,6 +93,11 @@ classdef AnalysisGroup < handle
             end
             
             s = struct();
+            
+            % set defaults
+            if options.specdata, s.specdata = []; end
+            if options.accumsize, s.accumsize = []; end
+
             for i = 1:numel(self)
                 s(i).name = self(i).display_name;
 
@@ -107,6 +112,7 @@ classdef AnalysisGroup < handle
 
                 % Get children link targets: datacontainers
                 s(i).children = vertcat(s(i).children.target);
+                if isempty(s(i).children), continue; end
 
                 % Get handles to data items (SpecData) instead of
                 % containers

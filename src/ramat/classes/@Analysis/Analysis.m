@@ -16,6 +16,7 @@ classdef Analysis < handle
 
     methods
         pcaresult = compute_pca(self, options);
+        tsneresult = compute_tsne(self, options);
     end
     
     methods

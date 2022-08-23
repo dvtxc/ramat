@@ -13,6 +13,7 @@ function pcaresult = compute_pca(self, options)
         self Analysis
         options.Range double = [];
         options.Selection (:,:) DataContainer = DataContainer.empty;
+        options.algorithm = "svd";
     end
     
     pcaresult = PCAResult.empty;
@@ -28,7 +29,7 @@ function pcaresult = compute_pca(self, options)
     end
 
     % Calculate PCA
-    pcaresult = specdata.calculatePCA(options.Range);
+    pcaresult = specdata.calculatePCA(range = options.Range, algorithm = options.algorithm);
 
     % Provide source reference
     pcaresult.source = self;

@@ -1,51 +1,26 @@
-function pcaresult = calculatePCA(self, range)
+function pcaresult = calculatePCA(self, options)
     %CALCULATEPCA Calculate principle component analysis (PCA) of an array
     %of spectral data objects
     %
     %   Input
     %       self:   (mx1) array of SpecData
-    %       range:  (2x1) double
+    %       options.range:  (2x1) double
+    %       options.algorithm: "svd", "eig", "als"
 
     arguments
         self;
-        range double = [];
+        options.range double = [];
+        options.algorithm string = "svd";
     end
        
     % Prepare data
-
-    if ~isempty(range)
-        % Calculate PCA of a specific range
-        startG = range(1);
-        endG = range(2);
-        
-        % Create a trimmed SpecData() as a copy.
-        tmpdat = trim_spectrum(copy(self), startG, endG);
-        graphBase = tmpdat.graph;            
-        
-        flatdata = horzcat(tmpdat.FlatDataArray);
-        
-        % Free up memory
-        delete(tmpdat);
-        clear tmpdat
-        
-    else
-        % Use the full range
-        
-        flatdata = horzcat(self.FlatDataArray);
-        graphBase = self.graph;
-        
-    end
-    
-    % Remove NaN-Spectra
-    flatdata( :, all(isnan(flatdata))) = [];
-    
-    inputdata = transpose(flatdata);
+    [x, graph_base] = self.prepare_multivariate(range=options.range);
 
     % Calculate PCA
-    [coefs, score, ~, ~, variance] = pca(inputdata);
+    [coefs, score, ~, ~, variance] = pca(x, Algorithm=options.algorithm);
     
     % Return results as an PCAResult Object
-    pcaresult = PCAResult(graphBase, coefs, score, variance);
+    pcaresult = PCAResult(graph_base, coefs, score, variance);
 
 end
 

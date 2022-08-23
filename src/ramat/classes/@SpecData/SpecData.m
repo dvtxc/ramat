@@ -62,6 +62,7 @@ classdef SpecData < SpecDataABC
     methods
         remove_baseline(self, method, kwargs);
         out = clipByMask(self, mask);
+        y = tsne(self, opts);
     end
     
     methods
@@ -277,13 +278,23 @@ classdef SpecData < SpecDataABC
             if (self.DataSize > 1), icon = "TDGraph_0.png"; end
         end
 
+        function tags = get_tags(self)
+            %GET_TAGS Returns tags for e.g. tooltips formatted as strings
+
+            tags = string.empty;
+            for s = self(:)'
+                specnum = 1:s.DataSize;
+                tags = [tags; s.name + specnum'];
+            end
+        end
+
         %% Overrides
 
         function avg_specdat = mean(self)
             % MEAN Returns averaged spectral data
 
             arguments
-                self
+                self SpecData;
             end
 
             % Can only do for similarly sizes specdats
@@ -296,7 +307,7 @@ classdef SpecData < SpecDataABC
 
             % Create SpecDat
             newname = sprintf("Average of %d", numel(self));
-            avg_specdat = SpecData(newname, self(1).Graph, avg_dat, self(1).GraphUnit, self(1).DataUnit);
+            avg_specdat = SpecData(newname, self(1).graph, avg_dat, self(1).graph_unit, self(1).data_unit);
     
         end
         

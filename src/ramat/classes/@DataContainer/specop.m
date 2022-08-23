@@ -13,25 +13,34 @@ function specop(self, operation, kwargs)
 
     num_dat = numel(self);
 
-    for i = 1:num_dat
+    if any(operation == ["sum"; "mean"; "multiply"; "subtract"])
+        if ~all(self.dataType == "SpecData"), return; end
 
-        if isempty(self.Data)
-            continue;
+        
+
+    end
+
+    if any(operation == ["trim"; "normalize"])
+        for i = 1:num_dat
+    
+            if isempty(self.Data)
+                continue;
+            end
+    
+            % Only perform operations on spectral data
+            if (self(i).dataType ~= "SpecData")
+                continue;
+            end
+    
+            fprintf("Performing operation %s on %d/%d", operation, i, num_dat);
+    
+            switch operation
+                case "trim"
+                    self(i).Data.trimSpectrum(kwargs{:});
+                case "normalize"
+                    self(i).normalizeSpectrum(kwargs{2}, kwargs{4});
+            end
+    
         end
-
-        % Only perform operations on spectral data
-        if (self(i).dataType ~= "SpecData")
-            continue;
-        end
-
-        fprintf("Performing operation %s on %d/%d", operation, i, num_dat);
-
-        switch operation
-            case "trim"
-                self(i).Data.trimSpectrum(kwargs{:});
-            case "normalize"
-                self(i).normalizeSpectrum(kwargs{2}, kwargs{4});
-        end
-
     end
 end

@@ -129,5 +129,36 @@ classdef (Abstract) SpecDataABC < DataItem
         end
         
     end
+
+    % Spectral operations
+    methods
+        function r = plus(a, b)
+            r = op_start(a, b);
+            r.data = a.data + b.data;
+            r.graph = a.graph;
+            r.graph_unit = a.graph_unit;
+        end
+
+        function r = minus(a, b)
+            r = op_start(a, b);
+            r.data = a.data - b.data;
+            r.graph = a.graph;
+            r.graph_unit = a.graph_unit;
+        end
+
+        function r = sum(vec)
+            r = op_start(vec);
+            r.data = sum([vec.data], 2);
+            r.graph = vec(1).graph;
+            r.graph_unit = vec(1).graph_unit;
+        end
+
+        function r = mean(vec)
+            r = op_start(vec);
+            r.data = mean([vec.data], 2);
+            r.graph = vec(1).graph;
+            r.graph_unit = vec(1).graph_unit;
+        end
+    end
 end
 

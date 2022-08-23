@@ -78,7 +78,10 @@ classdef AnalysisResultContainer < Container
 
     methods
         function datatype = get.dataType(self)
-            datatype = "PCA";
+            datatype = "";
+            if isempty(self.data), return; end
+
+            datatype = self.data.dataType;
         end
 
         function icon = get_icon(self)
@@ -100,6 +103,7 @@ classdef AnalysisResultContainer < Container
 
             classes = arrayfun(@(x) string(class(x)), self.children);
             data = self.children([find(classes == "PCAResult", 1)]);
+            data = [data; self.children([find(classes == "TSNEResult", 1)])];
 
         end
     end

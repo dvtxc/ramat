@@ -34,21 +34,22 @@ function peak_table = gen_peak_table(self, options)
     abs_min_prominence = options.min_prominence * range;
 
     % Find peaks
-    [peaks, locations] = findpeaks(ydata, xdata, MinPeakProminence=abs_min_prominence);
-    neg = false([numel(peaks),1]);
+    [y, x] = findpeaks(ydata, xdata, MinPeakProminence=abs_min_prominence);
+    peaks = struct('x', num2cell(x(:)), 'y', num2cell(y(:)));
+    [peaks.neg] = deal(false);
 
     % Do negative peaks?
     if options.negative_peaks
-        [peaks_neg, locations_neg] = findpeaks(-ydata, xdata, MinPeakProminence=abs_min_prominence);
-        peaks = [peaks; peaks_neg.*-1];
-        locations = [locations; locations_neg];
-        neg = [neg; true([numel(peaks_neg),1])];
+        [y, x] = findpeaks(-ydata, xdata, MinPeakProminence=abs_min_prominence);
+        y = -y;
+        peaks_neg = struct('x', num2cell(x(:)), 'y', num2cell(y(:)));
+        [peaks_neg.neg] = deal(true);
+        peaks = [peaks; peaks_neg];
     end
 
     % Create PeakTable
-    peak_table = PeakTable(peaks, locations, self);
+    peak_table = PeakTable(peaks, self);
     peak_table.name = "Peaks of " + string(self.name);
-    peak_table.neg = neg;
 
     % Store used options to find peaks
     peak_table.min_prominence = options.min_prominence;

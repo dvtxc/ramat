@@ -88,8 +88,7 @@ function scoresscatter(pcaresult, pcax, options)
             s(i).UserData = pcaresult.source_data(i).specdata;
             
             % Create array of names for tooltips
-            % TO DO: make sure DataItem.Name is string
-            scattertags = convertCharsToStrings( {s(i).UserData.name} );
+            scattertags = vertcat(s(i).UserData.get_tags());
 
             % Add information to data tooltips
             s(i).DataTipTemplate.DataTipRows(end + 1) = dataTipTextRow("Spectrum: ", scattertags);

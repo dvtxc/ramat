@@ -34,19 +34,16 @@ function plot(self, options)
     hold(ax, "on");
 
     % Add annotation
-    for i = 1:length(self.peaks)
-        % Create "tuple"-like var with location and y-pos.
-        peak = [self.locations(i), self.peaks(i)];
-
+    for peak = self.peaks(:)'
         % Create string for annotation
-        annotation_string = sprintf("%.*f", options.Precision, peak(1));
+        annotation_string = sprintf("%.*f", options.Precision, peak.x);
         annotation_marker = {annotation_string; "|"; ""; ""; ""};
         
         % Invert for negative peaks
-        if self.neg(i), annotation_marker = flipud(annotation_marker); end
+        if peak.neg, annotation_marker = flipud(annotation_marker); end
         
         % Add annotation to plot
-        t = text(ax, peak(1), peak(2), annotation_marker);
+        t = text(ax, peak.x, peak.y, annotation_marker);
         t.HorizontalAlignment = 'center';
         t.FontWeight = 'bold';
     end

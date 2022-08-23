@@ -177,8 +177,25 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
             self.delete();
 
         end
-
         
+    end
+
+    % Operator overloading
+    methods (Sealed)
+        function r = op_start(varargin)
+            %OP_START Checks whether operation can be performed.
+            if nargin == 1
+                a = varargin{1};
+                assert(class(a) ~= "DataItem", 'OperatorAssertion:InhomogeneousOperands', "Can only operator on homogeneous arrays.")
+            elseif nargin == 2
+                a = varargin{1};
+                b = varargin{2};
+                assert(strcmp(class(a), class(b)), 'OperatorAssertion:InhomogeneousOperands', "Can only operate on two similar classes.");
+            end
+            
+            % Create new instance of class
+            r = feval( class(a) );
+        end
     end
 
     methods (Static)

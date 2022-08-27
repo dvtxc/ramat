@@ -26,7 +26,6 @@ classdef DataContainer < Container
     properties (Access = public, Dependent)
         Data {mustBeA(Data, "DataItem")};
         DataPreview;
-        AnalysisGroupParent;
         dataType;
     end
 

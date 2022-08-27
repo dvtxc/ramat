@@ -112,8 +112,9 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
             end
         end
 
-        function [file, path] = export(self, options)
-            %EXPORT
+        function [file, path] = export_ui_dialog(self, options)
+            %EXPORT_UI_DIALOG Open ui dialog, presenting the user with the
+            %available export options.
 
             arguments
                 self {mustBeA(self, "DataItem")};
@@ -128,7 +129,10 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
                 format = options.format_list;
             end
 
+            % Get path filters, depending on the format.
             pathfilter = self.get_export_filter(format);
+
+            % Show UI-put-file dialog
             [file, path] = uiputfile(pathfilter, 'Export Data Item');
 
         end
@@ -206,6 +210,7 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
 
             if any(format_list == "csv"), pathfilter = [pathfilter; {'*.csv;*.txt', 'Comma-separated values (*.csv,*.txt)'}]; end
             if any(format_list == "mat"), pathfilter = [pathfilter; {'*.mat', 'MAT-files (*.mat)'}]; end
+            if any(format_list == "xlsx"), pathfilter = [pathfilter; {'*.xlsx', 'Excel Workbook (*.xlsx)'}]; end
 
             pathfilter = [pathfilter; {'*.*', 'All Files (*.*)'}];
 

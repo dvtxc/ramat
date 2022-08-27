@@ -25,6 +25,10 @@ classdef SpectrumSimple < SpecDataABC
         legend_entries string = "data";
     end
 
+    properties (Dependent)
+        DataSize;
+    end
+
     methods
         function self = SpectrumSimple(xdata, xdata_unit, ydata, ydata_unit, source, opts)
             %SPECTRUMSIMPLE Creates an instance of a simple spectral class
@@ -153,6 +157,13 @@ classdef SpectrumSimple < SpecDataABC
             % Release hold
             hold(ax, 'off');
 
+        end
+        
+        function datasize = get.DataSize(self)
+            %DATASIZE Number of spectra
+            
+            sizes = size(self.data);
+            datasize = sizes(2);
         end
     end
     

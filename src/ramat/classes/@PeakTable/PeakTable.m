@@ -63,7 +63,7 @@ classdef PeakTable < DataItem
             end
 
             if options.path == ""
-                [file, path] = export@DataItem(self, format=options.format, format_list=self.format_list);
+                [file, path] = export_ui_dialog(self, format=options.format, format_list=self.format_list);
                 options.path = fullfile(path, file);
             end
 

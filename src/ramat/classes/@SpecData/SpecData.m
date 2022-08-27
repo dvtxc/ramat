@@ -217,6 +217,11 @@ classdef SpecData < SpecDataABC
 
         end
 
+        function flatdata = get_flatdata(self)
+            %GET_FLATDATA Returns m*n (two-dimensional) matrix.
+            flatdata = self.FlatDataArray;                
+        end
+
 
         function filter = get.filter(self)
             %FILTER Returns the active filter

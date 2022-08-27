@@ -35,9 +35,18 @@ classdef (Abstract) SpecDataABC < DataItem
     properties (Access = public, Dependent)
         GraphSize;
     end
+
+    properties (Dependent, Abstract)
+        DataSize;
+    end
     
     properties (SetAccess = private)
         Type = "SpecData";
+    end
+
+    % List of exportable formats
+    properties (SetAccess = private, GetAccess = private)
+        format_list = ["csv";"mat";"xlsx"];
     end
 
     % Signatures
@@ -60,6 +69,122 @@ classdef (Abstract) SpecDataABC < DataItem
                 idx = [startIdx, endIdx];
             end
             
+        end
+
+        function export(self, options)
+            %EXPORT Exports numerical data of specdata to specificied
+            %output format
+
+            arguments
+                self;
+                options.path string = "";
+                options.format string = "";
+                options.format_list string = self.format_list;
+                options.direction string = "horizontal";
+                options.include_wavenum logical = true;
+                options.rand_subset logical = true;
+                options.rand_num uint32 = 100;
+            end
+
+            % Prepare data
+            export_array = self.get_formatted_export_array( ...
+                direction=options.direction, ...
+                include_wavenum=options.include_wavenum, ...
+                rand_subset=options.rand_subset, ...
+                rand_num=options.rand_num);
+
+            % Ask for path
+            if options.path == ""
+                [file, path] = self.export_ui_dialog(format=options.format, format_list=self.format_list);
+                options.path = fullfile(path, file);
+            end
+
+            % Write to file
+            fprintf("\nWriting to file...\n");
+            writematrix(export_array, options.path);
+            fprintf("Finished.\n");
+            
+        end
+
+        function numarray = get_formatted_export_array(self, options)
+            %GET_FORMATTED_EXPORT_ARRAY Outputs formatted flat array ready
+            %for export or printing.
+            %
+            %   Example usage:
+            %       get_formatted_export_array(self,
+            %       direction="horizontal") will generate the following:
+            %        0      wavenumbers --->
+            %        idx1   data of spectrum 1 --->
+            %        idx2   data of spectrum 2 --->
+
+            arguments
+                self
+                options.direction string = "vertical";
+                options.include_wavenum logical = true;
+                options.rand_subset logical = false;    % Select random subset of data
+                options.rand_num uint32 = 100;          % Number of randomly selected spectra
+            end
+
+            numarray = [];
+
+            if options.include_wavenum, numarray = self.graph; end
+
+            flatdata = [];
+            pos = [];
+
+            if options.rand_subset
+                % Get a small selection
+                [flatdata, pos] = self.select_random(options.rand_num);
+
+                % Append positions (spectral indices) as first row
+                flatdata = [pos(:)' ; flatdata];
+                numarray = [0; numarray];
+            else
+                flatdata = self.get_flatdata();
+            end
+
+            % Append flat data
+            numarray = [numarray flatdata];
+
+            % Transpose
+            if options.direction == "horizontal", numarray = transpose(numarray); end
+            
+        end
+
+        function flatdata = get_flatdata(self)
+            %FLATDATA
+            % Default. Overriden in <SpecData>
+            flatdata = self.data;
+        end
+
+        function [data, pos] = select_random(self, rand_num)
+            %SELECT_RANDOM Selects a random number of spectra from the
+            %data and outputs corresponding spectral indices.
+            %
+            %   Output:
+            %       data    The random spectra
+            %       pos     The indices belonging to the randomly selected
+            %               data.
+
+            arguments
+                self;
+                rand_num uint32 = 100;
+            end
+            
+            % This is returned by default
+            data = self.get_flatdata();
+            pos = 1:self.DataSize;
+
+            % Check if we can actually sample from this
+            if rand_num > self.DataSize
+                warning("Number of random sampled spectra is larger than data size.");
+                return;
+            end
+
+            % Select random spectra.
+            pos = randperm(self.DataSize, rand_num);
+            data = data(:, pos);
+
         end
         
         % DEPENDENT PROPERTIES
@@ -128,6 +253,10 @@ classdef (Abstract) SpecDataABC < DataItem
 
         end
         
+    end
+
+    methods (Abstract)
+
     end
 
     % Spectral operations

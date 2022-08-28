@@ -80,6 +80,20 @@ classdef (Abstract) DataItem < handle & matlab.mixin.Heterogeneous & matlab.mixi
             o = eq@handle(a,b);
         end
 
+        function format_list = get_export_formats(self)
+            %GET_EXPORT_FORMATS Returns list of exportable formats.
+
+            % If empty, return mat by default.
+            if self.format_list == ""
+                format_list = "mat";
+                return;
+            end
+
+            % Retrieve formats
+            format_list = self.format_list;
+            
+        end
+
     end
 
     methods

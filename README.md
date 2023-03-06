@@ -1,3 +1,12 @@
+# NOTICE:
+
+**HEADS UP: The repository has been moved to https://github.com/ksllabtue/ramat. This repository is no longer actively maintained. Please visit the updated repository for the latest version.**
+-
+
+As featured in the following publication:
+
+* Visser et al. (2023) *J. Mater. Chem. B*, DOI: [10.1039/D2TB02602C](https://pubs.rsc.org/en/content/articlelanding/2023/TB/D2TB02602C)
+
 # RAMAT
 *RAMAT* is a MATLAB-based software package for quick analysis, spectral correction, and plotting of spectroscopical Raman data.
 Data can be imported straight from WiTEC software or as one of the many supported ASCII formats.
